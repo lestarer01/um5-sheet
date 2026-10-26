@@ -1,3 +1,4 @@
+/* ===== SAFE STORAGE ===== */
 let memoryBackup = [];
 function loadStorage() {
   try {
@@ -14,6 +15,7 @@ function saveStorage(data) {
   } catch (e) {}
 }
 
+/* ===== SKILLS LIST ===== */
 const SKILLS = [
   { name: 'Acrobatics', stat: 'dex' },
   { name: 'Athletics', stat: 'str' },
@@ -39,6 +41,82 @@ let characters = loadStorage();
 let currentCharId = null;
 let saveTimeout = null;
 
+/* ===== POPULATE DROPDOWNS FROM DATABASE ===== */
+function populateDropdowns() {
+  // Ladder dropdown
+  const ladderSelect = document.getElementById('char-ladder');
+  ladderSelect.innerHTML = '<option value="">Select Ladder...</option>';
+  Object.keys(LADDER_DATA).forEach(name => {
+    ladderSelect.innerHTML += `<option value="${name}">${name}</option>`;
+  });
+
+  // Class dropdown
+  const classSelect = document.getElementById('char-class');
+  classSelect.innerHTML = '<option value="">Select Class...</option>';
+  Object.keys(CLASS_DATA).forEach(name => {
+    classSelect.innerHTML += `<option value="${name}">${name}</option>`;
+  });
+
+  // Weapon preset dropdowns
+  [1, 2].forEach(num => {
+    const wpnSelect = document.getElementById(`wpn-${num}-preset`);
+    wpnSelect.innerHTML = `
+      <option value="">-- Select Preset or Edit Manually --</option>
+      <option value="__custom__">✏️ Custom (Manual Entry)</option>
+    `;
+    // Group by type
+    const grouped = {};
+    Object.entries(WEAPON_DATA).forEach(([name, data]) => {
+      if (!grouped[data.type]) grouped[data.type] = [];
+      grouped[data.type].push(name);
+    });
+    Object.keys(grouped).sort().forEach(type => {
+      wpnSelect.innerHTML += `<optgroup label="${type}">`;
+      grouped[type].forEach(name => {
+        wpnSelect.innerHTML += `<option value="${name}">${name}</option>`;
+      });
+      wpnSelect.innerHTML += `</optgroup>`;
+    });
+  });
+}
+
+/* ===== APPLY WEAPON PRESET ===== */
+window.applyWeaponPreset = function(num) {
+  const presetName = document.getElementById(`wpn-${num}-preset`).value;
+  if (!presetName || presetName === '__custom__') {
+    autoSave();
+    return;
+  }
+
+  const data = WEAPON_DATA[presetName];
+  if (!data) return;
+
+  document.getElementById(`wpn-${num}-name`).value = presetName;
+  document.getElementById(`wpn-${num}-max-ammo`).value = data.magSize;
+  document.getElementById(`wpn-${num}-damage`).value = data.damage;
+  document.getElementById(`wpn-${num}-range`).value = data.range;
+  document.getElementById(`wpn-${num}-props`).value = data.properties;
+
+  // Fully refill ammo on preset change
+  const c = characters.find(ch => ch.id === currentCharId);
+  if (c) {
+    if (num === 1) c.wpn1CurrentAmmo = data.magSize;
+    if (num === 2) c.wpn2CurrentAmmo = data.magSize;
+  }
+
+  updateAmmoDisplay();
+  autoSave();
+};
+
+/* When user types in a weapon field, mark it as custom */
+window.markCustom = function(num) {
+  const presetSelect = document.getElementById(`wpn-${num}-preset`);
+  if (presetSelect.value !== '__custom__' && presetSelect.value !== '') {
+    presetSelect.value = '__custom__';
+  }
+};
+
+/* ===== PAGE NAVIGATION ===== */
 window.switchPage = function(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
@@ -51,8 +129,10 @@ window.switchPage = function(page) {
 
   if (page === 'list') renderCharacterList();
   if (page === 'skills') renderSkills();
+  if (page === 'abilities') renderAbilities();
 };
 
+/* ===== OPERATIVE LIST ===== */
 window.renderCharacterList = function() {
   const container = document.getElementById('character-list');
   if (!container) return;
@@ -62,7 +142,7 @@ window.renderCharacterList = function() {
       <div style="text-align:center; padding: 30px; color:#8b949e;">
         <div style="font-size: 40px; margin-bottom:8px;">🛡️</div>
         <h3>No Operatives Deployed</h3>
-        <p style="font-size: 11px; margin-top: 4px;">Click button below to create your first character.</p>
+        <p style="font-size: 11px; margin-top: 4px;">Click button below to create your first operative.</p>
       </div>
     `;
     return;
@@ -92,8 +172,11 @@ window.createNewCharacter = function() {
     name: '', ladder: '', class: '', race: '', level: 1, credits: 500,
     str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10,
     ac: 10, maxHp: 10, currentHp: 10, speed: 30, notes: '',
-    wpn1Name: '', wpn1MaxAmmo: 30, wpn1CurrentAmmo: 30,
-    wpn2Name: '', wpn2MaxAmmo: 12, wpn2CurrentAmmo: 12,
+    abilitiesNotes: '',
+    wpn1Preset: '', wpn1Name: '', wpn1MaxAmmo: 30, wpn1CurrentAmmo: 30,
+    wpn1Damage: '', wpn1Range: '', wpn1Props: '',
+    wpn2Preset: '', wpn2Name: '', wpn2MaxAmmo: 12, wpn2CurrentAmmo: 12,
+    wpn2Damage: '', wpn2Range: '', wpn2Props: '',
     proficientSkills: []
   };
   characters.push(newChar);
@@ -124,11 +207,23 @@ window.openCharacter = function(id) {
   document.getElementById('char-hp').value = c.maxHp || 10;
   document.getElementById('char-speed').value = c.speed || 30;
   document.getElementById('char-notes').value = c.notes || '';
+  document.getElementById('char-abilities-notes').value = c.abilitiesNotes || '';
 
+  // Weapon 1
+  document.getElementById('wpn-1-preset').value = c.wpn1Preset || '';
   document.getElementById('wpn-1-name').value = c.wpn1Name || '';
   document.getElementById('wpn-1-max-ammo').value = c.wpn1MaxAmmo || 30;
+  document.getElementById('wpn-1-damage').value = c.wpn1Damage || '';
+  document.getElementById('wpn-1-range').value = c.wpn1Range || '';
+  document.getElementById('wpn-1-props').value = c.wpn1Props || '';
+
+  // Weapon 2
+  document.getElementById('wpn-2-preset').value = c.wpn2Preset || '';
   document.getElementById('wpn-2-name').value = c.wpn2Name || '';
   document.getElementById('wpn-2-max-ammo').value = c.wpn2MaxAmmo || 12;
+  document.getElementById('wpn-2-damage').value = c.wpn2Damage || '';
+  document.getElementById('wpn-2-range').value = c.wpn2Range || '';
+  document.getElementById('wpn-2-props').value = c.wpn2Props || '';
 
   updateAll();
   switchPage('sheet');
@@ -142,6 +237,7 @@ window.deleteCharacter = function(id) {
   }
 };
 
+/* ===== CALCULATIONS ===== */
 function calcMod(score) { return Math.floor((score - 10) / 2); }
 function modStr(score) { const m = calcMod(score); return m >= 0 ? '+' + m : '' + m; }
 
@@ -185,12 +281,13 @@ window.changeHp = function(amt) {
   updateHpDisplay();
 };
 
+/* ===== AMMO ===== */
 window.updateAmmoDisplay = function() {
   const c = characters.find(char => char.id === currentCharId);
   if (!c) return;
 
-  const m1 = parseInt(document.getElementById('wpn-1-max-ammo').value) || 30;
-  const m2 = parseInt(document.getElementById('wpn-2-max-ammo').value) || 12;
+  const m1 = parseInt(document.getElementById('wpn-1-max-ammo').value) || 0;
+  const m2 = parseInt(document.getElementById('wpn-2-max-ammo').value) || 0;
 
   const a1 = (c.wpn1CurrentAmmo !== undefined) ? Math.min(m1, c.wpn1CurrentAmmo) : m1;
   const a2 = (c.wpn2CurrentAmmo !== undefined) ? Math.min(m2, c.wpn2CurrentAmmo) : m2;
@@ -211,12 +308,13 @@ window.shootWeapon = function(num) {
 window.reloadWeapon = function(num) {
   const c = characters.find(char => char.id === currentCharId);
   if (!c) return;
-  if (num === 1) c.wpn1CurrentAmmo = parseInt(document.getElementById('wpn-1-max-ammo').value) || 30;
-  if (num === 2) c.wpn2CurrentAmmo = parseInt(document.getElementById('wpn-2-max-ammo').value) || 12;
+  if (num === 1) c.wpn1CurrentAmmo = parseInt(document.getElementById('wpn-1-max-ammo').value) || 0;
+  if (num === 2) c.wpn2CurrentAmmo = parseInt(document.getElementById('wpn-2-max-ammo').value) || 0;
   saveStorage(characters);
   updateAmmoDisplay();
 };
 
+/* ===== SKILLS PAGE ===== */
 window.renderSkills = function() {
   const c = characters.find(char => char.id === currentCharId);
   const container = document.getElementById('skills-container');
@@ -266,6 +364,72 @@ window.toggleSkill = function(name) {
   renderSkills();
 };
 
+/* ===== ABILITIES PAGE (NEW) ===== */
+window.renderAbilities = function() {
+  const c = characters.find(char => char.id === currentCharId);
+  const ladderContainer = document.getElementById('ladder-abilities-container');
+  const classContainer = document.getElementById('class-abilities-container');
+
+  if (!c) {
+    ladderContainer.innerHTML = '<p class="empty-abilities">Select an operative first.</p>';
+    classContainer.innerHTML = '<p class="empty-abilities">Select an operative first.</p>';
+    return;
+  }
+
+  const level = c.level || 1;
+
+  // --- LADDER ABILITIES ---
+  if (c.ladder && LADDER_DATA[c.ladder]) {
+    const ladder = LADDER_DATA[c.ladder];
+    const availableAbilities = ladder.abilities.filter(a => a.level <= level);
+
+    let html = `<div class="ladder-desc">${ladder.desc}</div>`;
+
+    if (availableAbilities.length === 0) {
+      html += '<p class="empty-abilities">No abilities available at this level yet.</p>';
+    } else {
+      html += availableAbilities.map(a => `
+        <div class="ability-entry">
+          <div class="ability-entry-header">
+            <div class="ability-entry-name">${a.name}</div>
+            <div class="ability-entry-level">Lvl ${a.level}</div>
+          </div>
+          <div class="ability-entry-desc">${a.desc}</div>
+        </div>
+      `).join('');
+    }
+    ladderContainer.innerHTML = html;
+  } else {
+    ladderContainer.innerHTML = '<p class="empty-abilities">Select a Ladder on the Tactical page to see abilities.</p>';
+  }
+
+  // --- CLASS ABILITIES ---
+  if (c.class && CLASS_DATA[c.class]) {
+    const cls = CLASS_DATA[c.class];
+    const availableAbilities = cls.abilities.filter(a => a.level <= level);
+
+    let html = `<div class="ladder-desc">${cls.desc} • Hit Die: ${cls.hitDie} • Primary: ${cls.primaryStat}</div>`;
+
+    if (availableAbilities.length === 0) {
+      html += '<p class="empty-abilities">No abilities available at this level yet.</p>';
+    } else {
+      html += availableAbilities.map(a => `
+        <div class="ability-entry">
+          <div class="ability-entry-header">
+            <div class="ability-entry-name">${a.name}</div>
+            <div class="ability-entry-level">Lvl ${a.level}</div>
+          </div>
+          <div class="ability-entry-desc">${a.desc}</div>
+        </div>
+      `).join('');
+    }
+    classContainer.innerHTML = html;
+  } else {
+    classContainer.innerHTML = '<p class="empty-abilities">Select a Class on the Tactical page to see abilities.</p>';
+  }
+};
+
+/* ===== AUTO SAVE ===== */
 window.autoSave = function() {
   if (!currentCharId) return;
   clearTimeout(saveTimeout);
@@ -291,16 +455,28 @@ window.autoSave = function() {
     c.maxHp = parseInt(document.getElementById('char-hp').value) || 10;
     c.speed = parseInt(document.getElementById('char-speed').value) || 30;
     c.notes = document.getElementById('char-notes').value;
+    c.abilitiesNotes = document.getElementById('char-abilities-notes').value;
 
+    c.wpn1Preset = document.getElementById('wpn-1-preset').value;
     c.wpn1Name = document.getElementById('wpn-1-name').value;
-    c.wpn1MaxAmmo = parseInt(document.getElementById('wpn-1-max-ammo').value) || 30;
+    c.wpn1MaxAmmo = parseInt(document.getElementById('wpn-1-max-ammo').value) || 0;
+    c.wpn1Damage = document.getElementById('wpn-1-damage').value;
+    c.wpn1Range = document.getElementById('wpn-1-range').value;
+    c.wpn1Props = document.getElementById('wpn-1-props').value;
+
+    c.wpn2Preset = document.getElementById('wpn-2-preset').value;
     c.wpn2Name = document.getElementById('wpn-2-name').value;
-    c.wpn2MaxAmmo = parseInt(document.getElementById('wpn-2-max-ammo').value) || 12;
+    c.wpn2MaxAmmo = parseInt(document.getElementById('wpn-2-max-ammo').value) || 0;
+    c.wpn2Damage = document.getElementById('wpn-2-damage').value;
+    c.wpn2Range = document.getElementById('wpn-2-range').value;
+    c.wpn2Props = document.getElementById('wpn-2-props').value;
 
     saveStorage(characters);
   }, 300);
 };
 
+/* ===== INIT ===== */
 window.onload = function() {
+  populateDropdowns();
   renderCharacterList();
 };
