@@ -157,8 +157,9 @@ function blankChar() {
     hpMax: 10, hpCur: 10, hpTemp: 0, hd: '1d10', ac: 10, spd: 30, init: 0,
     dsS: [false,false,false], dsF: [false,false,false],
     armorPreset: 'Plain Clothes', armorName: 'Plain Clothes', armorProps: '',
-    w1Preset: '__custom__', w1Name: '', w1Dmg: '', w1Range: '', w1Props: '', w1Max: 0, w1Cur: 0,
-    w2Preset: '__custom__', w2Name: '', w2Dmg: '', w2Range: '', w2Props: '', w2Max: 0, w2Cur: 0,
+    weapons: [
+      { preset: '__custom__', name: '', dmg: '', range: '', props: '', max: 0, cur: 0 }
+    ],
     credits: 500, inventory: '', skills: {}, featNotes: '',
     mpMax: 0, mpCur: 0, spellDc: 10, spellAtk: 0, magicSource: '', spellList: ''
   };
