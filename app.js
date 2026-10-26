@@ -1,5 +1,4 @@
-// SKILL LIST DEFINITION
-const SKILL_LIST = [
+const UM5_SKILLS = [
   { name: 'Acrobatics', stat: 'dex' },
   { name: 'Athletics', stat: 'str' },
   { name: 'Computers', stat: 'int' },
@@ -24,7 +23,7 @@ const SKILL_LIST = [
   { name: 'Heavy Weapons', stat: 'str' }
 ];
 
-const STORAGE_KEY = 'um5_chars_v3';
+const STORAGE_KEY = 'um5_chars_v4';
 let chars = [];
 let activeId = null;
 
@@ -55,61 +54,56 @@ function saveStorage() {
 }
 
 function populateSelects() {
-  if (typeof LADDER_DATA !== 'undefined') {
+  if (typeof LADDER_DATA !== 'undefined' && $('c-ladder')) {
     $('c-ladder').innerHTML = Object.keys(LADDER_DATA).map(k => `<option value="${k}">${k}</option>`).join('');
   }
-  if (typeof CLASS_DATA !== 'undefined') {
+  if (typeof CLASS_DATA !== 'undefined' && $('c-class')) {
     $('c-class').innerHTML = Object.keys(CLASS_DATA).map(k => `<option value="${k}">${k}</option>`).join('');
   }
-  if (typeof ARMOR_DATA !== 'undefined') {
+  if (typeof ARMOR_DATA !== 'undefined' && $('armor-preset')) {
     $('armor-preset').innerHTML = '<option value="__custom__">Custom / Manual</option>' + Object.keys(ARMOR_DATA).map(k => `<option value="${k}">${k} (AC ${ARMOR_DATA[k].baseAc})</option>`).join('');
   }
   if (typeof WEAPON_DATA !== 'undefined') {
     const wOpts = '<option value="__custom__">Custom / Manual</option>' + Object.keys(WEAPON_DATA).map(k => `<option value="${k}">${k} (${WEAPON_DATA[k].type})</option>`).join('');
-    $('w1-preset').innerHTML = wOpts; 
-    $('w2-preset').innerHTML = wOpts;
+    if ($('w1-preset')) $('w1-preset').innerHTML = wOpts;
+    if ($('w2-preset')) $('w2-preset').innerHTML = wOpts;
   }
 }
 
 function buildSkillsUI() {
-  $('skills-box').innerHTML = SKILL_LIST.map((sk, i) => {
-    const name = typeof sk === 'string' ? sk : (sk.name || 'Skill');
-    const stat = typeof sk === 'object' ? (sk.stat || 'str') : 'str';
-    return `
-      <div class="skill-row">
-        <span style="font-size:0.85rem; flex:1;">${name}</span>
-        <span style="font-size:0.65rem; color:var(--muted); width:34px; text-transform:uppercase;">${stat}</span>
-        <span class="skill-bonus" id="sk-bonus-${i}">+0</span>
-        <div class="skill-checks">
-          <label><input type="checkbox" id="sk-p-${i}" /> Prof</label>
-          <label><input type="checkbox" id="sk-e-${i}" /> Exp</label>
-        </div>
+  const box = $('skills-box');
+  if (!box) return;
+  box.innerHTML = UM5_SKILLS.map((sk, i) => `
+    <div class="skill-row">
+      <span style="font-size:0.85rem; flex:1;">${sk.name}</span>
+      <span style="font-size:0.65rem; color:var(--muted); width:34px; text-transform:uppercase;">${sk.stat}</span>
+      <span class="skill-bonus" id="sk-bonus-${i}">+0</span>
+      <div class="skill-checks">
+        <label><input type="checkbox" id="sk-p-${i}" /> Prof</label>
+        <label><input type="checkbox" id="sk-e-${i}" /> Exp</label>
       </div>
-    `;
-  }).join('');
+    </div>
+  `).join('');
 }
 
 function recalc() {
   const lvl = val('c-lvl') || 1;
   const pb = profBonus(lvl);
-  $('prof-display').textContent = fmtMod(pb);
+  if ($('prof-display')) $('prof-display').textContent = fmtMod(pb);
 
   const stats = ['str','dex','con','int','wis','cha','vig'];
   stats.forEach(s => {
     const score = val('s-' + s);
     const m = mod(score);
-    if($('m-' + s)) $('m-' + s).textContent = fmtMod(m);
+    if ($('m-' + s)) $('m-' + s).textContent = fmtMod(m);
     
-    // Saving Throws calculation
     const hasSaveProf = val('svS-' + s);
     const saveTotal = m + (hasSaveProf ? pb : 0);
-    if($('sv-' + s)) $('sv-' + s).textContent = fmtMod(saveTotal);
+    if ($('sv-' + s)) $('sv-' + s).textContent = fmtMod(saveTotal);
   });
 
-  // Skills
-  SKILL_LIST.forEach((sk, i) => {
-    const statKey = typeof sk === 'object' ? sk.stat : 'str';
-    const statMod = mod(val('s-' + statKey));
+  UM5_SKILLS.forEach((sk, i) => {
+    const statMod = mod(val('s-' + sk.stat));
     let total = statMod;
     if (val('sk-p-' + i)) total += pb;
     if (val('sk-e-' + i)) total += pb;
@@ -134,16 +128,22 @@ function applyWeapon(n) {
   const w = WEAPON_DATA[key];
   val(`w${n}-name`, key); val(`w${n}-dmg`, w.damage); val(`w${n}-range`, w.range);
   val(`w${n}-props`, w.properties); val(`w${n}-max`, w.magSize);
-  $(`w${n}-cur`).textContent = w.magSize;
+  const curEl = $(`w${n}-cur`);
+  if (curEl) curEl.textContent = w.magSize;
   saveCurrent();
 }
 
 function fire(n) {
-  let cur = parseInt($(`w${n}-cur`).textContent, 10) || 0;
-  if (cur > 0) { $(`w${n}-cur`).textContent = cur - 1; saveCurrent(); }
+  const curEl = $(`w${n}-cur`);
+  if (!curEl) return;
+  let cur = parseInt(curEl.textContent, 10) || 0;
+  if (cur > 0) { curEl.textContent = cur - 1; saveCurrent(); }
 }
+
 function reload(n) {
-  $(`w${n}-cur`).textContent = parseInt(val(`w${n}-max`), 10) || 0;
+  const curEl = $(`w${n}-cur`);
+  if (!curEl) return;
+  curEl.textContent = parseInt(val(`w${n}-max`), 10) || 0;
   saveCurrent();
 }
 
@@ -181,11 +181,14 @@ function saveCurrent() {
   c.dsS = [val('ds-s1'), val('ds-s2'), val('ds-s3')]; c.dsF = [val('ds-f1'), val('ds-f2'), val('ds-f3')];
 
   c.armorPreset = val('armor-preset'); c.armorName = val('armor-name'); c.armorProps = val('armor-props');
-  c.w1Preset = val('w1-preset'); c.w1Name = val('w1-name'); c.w1Dmg = val('w1-dmg'); c.w1Range = val('w1-range'); c.w1Props = val('w1-props'); c.w1Max = val('w1-max'); c.w1Cur = parseInt($('w1-cur').textContent)||0;
-  c.w2Preset = val('w2-preset'); c.w2Name = val('w2-name'); c.w2Dmg = val('w2-dmg'); c.w2Range = val('w2-range'); c.w2Props = val('w2-props'); c.w2Max = val('w2-max'); c.w2Cur = parseInt($('w2-cur').textContent)||0;
+  
+  const w1CurEl = $('w1-cur');
+  const w2CurEl = $('w2-cur');
+  c.w1Preset = val('w1-preset'); c.w1Name = val('w1-name'); c.w1Dmg = val('w1-dmg'); c.w1Range = val('w1-range'); c.w1Props = val('w1-props'); c.w1Max = val('w1-max'); c.w1Cur = w1CurEl ? (parseInt(w1CurEl.textContent, 10) || 0) : 0;
+  c.w2Preset = val('w2-preset'); c.w2Name = val('w2-name'); c.w2Dmg = val('w2-dmg'); c.w2Range = val('w2-range'); c.w2Props = val('w2-props'); c.w2Max = val('w2-max'); c.w2Cur = w2CurEl ? (parseInt(w2CurEl.textContent, 10) || 0) : 0;
 
   c.credits = val('credits'); c.inventory = val('inventory');
-  SKILL_LIST.forEach((_, i) => { c.skills['p'+i] = val('sk-p-'+i); c.skills['e'+i] = val('sk-e-'+i); });
+  UM5_SKILLS.forEach((_, i) => { c.skills['p'+i] = val('sk-p-'+i); c.skills['e'+i] = val('sk-e-'+i); });
   
   c.featNotes = val('feat-notes'); c.mpMax = val('mp-max'); c.mpCur = val('mp-cur');
   c.spellDc = val('spell-dc'); c.spellAtk = val('spell-atk'); c.magicSource = val('magic-source'); c.spellList = val('spell-list');
@@ -200,22 +203,25 @@ function loadToForm(c) {
   val('c-ladder', c.ladder); val('c-class', c.className); val('c-lvl', c.lvl);
   
   val('s-str', c.str); val('s-dex', c.dex); val('s-con', c.con); val('s-int', c.int); val('s-wis', c.wis); val('s-cha', c.cha); val('s-vig', c.vig);
-  if(!c.saveProfs) c.saveProfs = {};
+  if (!c.saveProfs) c.saveProfs = {};
   val('svS-str', c.saveProfs.str); val('svS-dex', c.saveProfs.dex); val('svS-con', c.saveProfs.con); val('svS-int', c.saveProfs.int); val('svS-wis', c.saveProfs.wis); val('svS-cha', c.saveProfs.cha); val('svS-vig', c.saveProfs.vig);
   
   val('hp-max', c.hpMax); val('hp-cur', c.hpCur); val('hp-temp', c.hpTemp);
   val('hd-val', c.hd || '1d10'); val('ac-val', c.ac); val('spd-val', c.spd); val('init-val', c.init);
   
-  if(!c.dsS) c.dsS=[false,false,false]; if(!c.dsF) c.dsF=[false,false,false];
+  if (!c.dsS) c.dsS=[false,false,false]; if (!c.dsF) c.dsF=[false,false,false];
   val('ds-s1', c.dsS[0]); val('ds-s2', c.dsS[1]); val('ds-s3', c.dsS[2]);
   val('ds-f1', c.dsF[0]); val('ds-f2', c.dsF[1]); val('ds-f3', c.dsF[2]);
 
   val('armor-preset', c.armorPreset); val('armor-name', c.armorName); val('armor-props', c.armorProps);
-  val('w1-preset', c.w1Preset); val('w1-name', c.w1Name); val('w1-dmg', c.w1Dmg); val('w1-range', c.w1Range); val('w1-props', c.w1Props); val('w1-max', c.w1Max); $('w1-cur').textContent = c.w1Cur || 0;
-  val('w2-preset', c.w2Preset); val('w2-name', c.w2Name); val('w2-dmg', c.w2Dmg); val('w2-range', c.w2Range); val('w2-props', c.w2Props); val('w2-max', c.w2Max); $('w2-cur').textContent = c.w2Cur || 0;
+  val('w1-preset', c.w1Preset); val('w1-name', c.w1Name); val('w1-dmg', c.w1Dmg); val('w1-range', c.w1Range); val('w1-props', c.w1Props); val('w1-max', c.w1Max);
+  if ($('w1-cur')) $('w1-cur').textContent = c.w1Cur || 0;
+  
+  val('w2-preset', c.w2Preset); val('w2-name', c.w2Name); val('w2-dmg', c.w2Dmg); val('w2-range', c.w2Range); val('w2-props', c.w2Props); val('w2-max', c.w2Max);
+  if ($('w2-cur')) $('w2-cur').textContent = c.w2Cur || 0;
 
   val('credits', c.credits); val('inventory', c.inventory);
-  SKILL_LIST.forEach((_, i) => { val('sk-p-'+i, c.skills&&c.skills['p'+i]); val('sk-e-'+i, c.skills&&c.skills['e'+i]); });
+  UM5_SKILLS.forEach((_, i) => { val('sk-p-'+i, c.skills && c.skills['p'+i]); val('sk-e-'+i, c.skills && c.skills['e'+i]); });
   
   val('feat-notes', c.featNotes); val('mp-max', c.mpMax); val('mp-cur', c.mpCur);
   val('spell-dc', c.spellDc); val('spell-atk', c.spellAtk); val('magic-source', c.magicSource); val('spell-list', c.spellList);
@@ -225,7 +231,8 @@ function loadToForm(c) {
 
 function renderRoster() {
   const box = $('roster');
-  if (!chars.length) { box.innerHTML = '<p style="color:var(--muted);text-align:center;">No operatives. Create one.</p>'; return; }
+  if (!box) return;
+  if (!chars.length) { box.innerHTML = '<p style="color:var(--muted);text-align:center;padding:10px;">No operatives. Create one above.</p>'; return; }
   box.innerHTML = chars.map(c => `
     <div class="char-card ${c.id === activeId ? 'active-char' : ''}" data-id="${c.id}">
       <div><strong>${c.name || 'Unnamed'}</strong><br><small>Lvl ${c.lvl||1} ${c.className||''}</small></div>
@@ -234,16 +241,16 @@ function renderRoster() {
 }
 
 function renderAbilities() {
-  const lvl = parseInt(val('c-lvl'),10)||1;
+  const lvl = parseInt(val('c-lvl'), 10) || 1;
   const lad = typeof LADDER_DATA !== 'undefined' ? LADDER_DATA[val('c-ladder')] : null;
   const cls = typeof CLASS_DATA !== 'undefined' ? CLASS_DATA[val('c-class')] : null;
 
-  if (lad) {
+  if (lad && $('ladder-box')) {
     const list = lad.abilities.filter(a => a.level <= lvl);
     $('ladder-box').innerHTML = `<p style="font-size:0.8rem;color:var(--accent2);margin-bottom:10px;">${lad.desc}</p>` + 
       list.map(a => `<div class="ability-entry"><div class="ability-entry-header"><span>${a.name}</span><span class="ability-entry-level">Lvl ${a.level}</span></div><div class="ability-entry-desc">${a.desc}</div></div>`).join('');
   }
-  if (cls) {
+  if (cls && $('class-box')) {
     const list = cls.abilities.filter(a => a.level <= lvl);
     $('class-box').innerHTML = `<p style="font-size:0.8rem;color:var(--accent2);margin-bottom:10px;">${cls.desc} · Hit Die ${cls.hitDie}</p>` + 
       list.map(a => `<div class="ability-entry"><div class="ability-entry-header"><span>${a.name}</span><span class="ability-entry-level">Lvl ${a.level}</span></div><div class="ability-entry-desc">${a.desc}</div></div>`).join('');
@@ -258,34 +265,55 @@ function switchTab(id) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  loadStorage(); populateSelects(); buildSkillsUI();
+  loadStorage();
+  populateSelects();
+  buildSkillsUI();
   
-  document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
-  $('btn-new').addEventListener('click', createChar);
-  $('roster').addEventListener('click', e => {
-    const del = e.target.getAttribute('data-del');
-    if (del) {
-      if (!confirm('Delete this operative?')) return;
-      chars = chars.filter(c => c.id !== del);
-      if (activeId === del) { activeId = chars.length ? chars[0].id : null; if(activeId) loadToForm(chars[0]); }
-      saveStorage(); renderRoster(); return;
-    }
-    const card = e.target.closest('.char-card');
-    if (card) { loadToForm(chars.find(x => x.id === card.dataset.id)); switchTab('tab-core'); }
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
   });
 
-  $('armor-preset').addEventListener('change', applyArmor);
-  $('w1-preset').addEventListener('change', ()=>applyWeapon(1)); $('w2-preset').addEventListener('change', ()=>applyWeapon(2));
-  $('btn-fire-1').addEventListener('click', ()=>fire(1)); $('btn-reload-1').addEventListener('click', ()=>reload(1));
-  $('btn-fire-2').addEventListener('click', ()=>fire(2)); $('btn-reload-2').addEventListener('click', ()=>reload(2));
+  const btnNew = $('btn-new');
+  if (btnNew) btnNew.addEventListener('click', createChar);
+
+  const rosterEl = $('roster');
+  if (rosterEl) {
+    rosterEl.addEventListener('click', e => {
+      const del = e.target.getAttribute('data-del');
+      if (del) {
+        if (!confirm('Delete this operative?')) return;
+        chars = chars.filter(c => c.id !== del);
+        if (activeId === del) { activeId = chars.length ? chars[0].id : null; if(activeId) loadToForm(chars[0]); }
+        saveStorage(); renderRoster(); return;
+      }
+      const card = e.target.closest('.char-card');
+      if (card) { loadToForm(chars.find(x => x.id === card.dataset.id)); switchTab('tab-core'); }
+    });
+  }
+
+  if ($('armor-preset')) $('armor-preset').addEventListener('change', applyArmor);
+  if ($('w1-preset')) $('w1-preset').addEventListener('change', () => applyWeapon(1));
+  if ($('w2-preset')) $('w2-preset').addEventListener('change', () => applyWeapon(2));
+  
+  if ($('btn-fire-1')) $('btn-fire-1').addEventListener('click', () => fire(1));
+  if ($('btn-reload-1')) $('btn-reload-1').addEventListener('click', () => reload(1));
+  if ($('btn-fire-2')) $('btn-fire-2').addEventListener('click', () => fire(2));
+  if ($('btn-reload-2')) $('btn-reload-2').addEventListener('click', () => reload(2));
 
   document.querySelectorAll('input, select, textarea').forEach(el => {
-    el.addEventListener('input', saveCurrent); el.addEventListener('change', saveCurrent);
+    el.addEventListener('input', saveCurrent);
+    el.addEventListener('change', saveCurrent);
   });
   
-  $('c-ladder').addEventListener('change', renderAbilities);
-  $('c-class').addEventListener('change', renderAbilities);
-  $('c-lvl').addEventListener('change', renderAbilities);
+  if ($('c-ladder')) $('c-ladder').addEventListener('change', renderAbilities);
+  if ($('c-class')) $('c-class').addEventListener('change', renderAbilities);
+  if ($('c-lvl')) $('c-lvl').addEventListener('change', renderAbilities);
 
-  if (chars.length) loadToForm(chars[0]); else createChar();
+  if (chars.length) {
+    loadToForm(chars[0]);
+  } else {
+    createChar();
+  }
+  renderRoster();
+  recalc();
 });
