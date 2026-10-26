@@ -8,17 +8,16 @@
 </head>
 <body>
 
-  <!-- HEADER -->
   <header>
     <h1>⚡ UltraModern5 Tactical</h1>
     <p>5E Modern & Cyberpunk System</p>
   </header>
 
-  <!-- NAVIGATION TABS -->
   <div class="tabs">
     <button class="tab-btn active" id="tab-list" onclick="switchPage('list')">📋 Operatives</button>
     <button class="tab-btn" id="tab-sheet" onclick="switchPage('sheet')">🛡️ Tactical</button>
     <button class="tab-btn" id="tab-skills" onclick="switchPage('skills')">🎯 Skills</button>
+    <button class="tab-btn" id="tab-abilities" onclick="switchPage('abilities')">✨ Abilities</button>
   </div>
 
   <!-- PAGE 1: OPERATIVE LIST -->
@@ -34,8 +33,7 @@
   <!-- PAGE 2: TACTICAL SHEET -->
   <div id="page-sheet" class="page">
     <div class="container">
-      
-      <!-- Profile Card -->
+
       <div class="card">
         <div class="card-title">👤 Operative Profile</div>
         <div class="form-row">
@@ -47,39 +45,11 @@
         <div class="form-row">
           <div class="form-group">
             <label>UM5 Ladder</label>
-            <select id="char-ladder" onchange="autoSave()">
-              <option value="">Select Ladder...</option>
-              <option>Born Leader</option>
-              <option>Cyberborn</option>
-              <option>Heavy Armor</option>
-              <option>Infiltrator</option>
-              <option>Juggernaut</option>
-              <option>Martial Artist</option>
-              <option>Outlaw</option>
-              <option>Psion</option>
-              <option>Runner</option>
-              <option>Savant</option>
-              <option>Survivor</option>
-              <option>Techie</option>
-              <option>Veteran</option>
-            </select>
+            <select id="char-ladder" onchange="autoSave()"></select>
           </div>
           <div class="form-group">
             <label>Modern Class</label>
-            <select id="char-class" onchange="autoSave()">
-              <option value="">Select Class...</option>
-              <option>Gunslinger</option>
-              <option>Heavy</option>
-              <option>Infiltrator</option>
-              <option>Martial Artist</option>
-              <option>Medic</option>
-              <option>Officer</option>
-              <option>Sniper</option>
-              <option>Techie</option>
-              <option>Commando</option>
-              <option>Driver / Pilot</option>
-              <option>Other / Custom</option>
-            </select>
+            <select id="char-class" onchange="autoSave()"></select>
           </div>
         </div>
         <div class="form-row">
@@ -98,67 +68,44 @@
         </div>
       </div>
 
-      <!-- Ability Scores -->
       <div class="card">
         <div class="card-title">💪 Core Attributes</div>
         <div class="ability-grid">
-          <div class="ability-box">
-            <div class="ability-label">STR</div>
+          <div class="ability-box"><div class="ability-label">STR</div>
             <input class="ability-input" type="number" id="ability-str" value="10" oninput="updateAll(); autoSave()">
-            <div class="ability-mod" id="mod-str">+0</div>
-          </div>
-          <div class="ability-box">
-            <div class="ability-label">DEX</div>
+            <div class="ability-mod" id="mod-str">+0</div></div>
+          <div class="ability-box"><div class="ability-label">DEX</div>
             <input class="ability-input" type="number" id="ability-dex" value="10" oninput="updateAll(); autoSave()">
-            <div class="ability-mod" id="mod-dex">+0</div>
-          </div>
-          <div class="ability-box">
-            <div class="ability-label">CON</div>
+            <div class="ability-mod" id="mod-dex">+0</div></div>
+          <div class="ability-box"><div class="ability-label">CON</div>
             <input class="ability-input" type="number" id="ability-con" value="10" oninput="updateAll(); autoSave()">
-            <div class="ability-mod" id="mod-con">+0</div>
-          </div>
-          <div class="ability-box">
-            <div class="ability-label">INT</div>
+            <div class="ability-mod" id="mod-con">+0</div></div>
+          <div class="ability-box"><div class="ability-label">INT</div>
             <input class="ability-input" type="number" id="ability-int" value="10" oninput="updateAll(); autoSave()">
-            <div class="ability-mod" id="mod-int">+0</div>
-          </div>
-          <div class="ability-box">
-            <div class="ability-label">WIS</div>
+            <div class="ability-mod" id="mod-int">+0</div></div>
+          <div class="ability-box"><div class="ability-label">WIS</div>
             <input class="ability-input" type="number" id="ability-wis" value="10" oninput="updateAll(); autoSave()">
-            <div class="ability-mod" id="mod-wis">+0</div>
-          </div>
-          <div class="ability-box">
-            <div class="ability-label">CHA</div>
+            <div class="ability-mod" id="mod-wis">+0</div></div>
+          <div class="ability-box"><div class="ability-label">CHA</div>
             <input class="ability-input" type="number" id="ability-cha" value="10" oninput="updateAll(); autoSave()">
-            <div class="ability-mod" id="mod-cha">+0</div>
-          </div>
+            <div class="ability-mod" id="mod-cha">+0</div></div>
         </div>
       </div>
 
-      <!-- Defense & Speed -->
       <div class="card">
         <div class="card-title">🛡️ Defense & Speed</div>
         <div class="combat-grid">
-          <div class="combat-box">
-            <div class="combat-label">Armor Class</div>
-            <input type="number" id="char-ac" value="10" oninput="autoSave()">
-          </div>
-          <div class="combat-box">
-            <div class="combat-label">Initiative</div>
-            <div class="combat-value" id="char-initiative">+0</div>
-          </div>
-          <div class="combat-box">
-            <div class="combat-label">Speed</div>
-            <input type="number" id="char-speed" value="30" oninput="autoSave()">
-          </div>
-          <div class="combat-box">
-            <div class="combat-label">Prof. Bonus</div>
-            <div class="combat-value" id="char-prof">+2</div>
-          </div>
+          <div class="combat-box"><div class="combat-label">Armor Class</div>
+            <input type="number" id="char-ac" value="10" oninput="autoSave()"></div>
+          <div class="combat-box"><div class="combat-label">Initiative</div>
+            <div class="combat-value" id="char-initiative">+0</div></div>
+          <div class="combat-box"><div class="combat-label">Speed</div>
+            <input type="number" id="char-speed" value="30" oninput="autoSave()"></div>
+          <div class="combat-box"><div class="combat-label">Prof. Bonus</div>
+            <div class="combat-value" id="char-prof">+2</div></div>
         </div>
       </div>
 
-      <!-- Hit Points -->
       <div class="card">
         <div class="card-title">❤️ Vitality / Hit Points</div>
         <div class="hp-section">
@@ -178,19 +125,35 @@
         </div>
       </div>
 
-      <!-- Weapons & Ammo -->
+      <!-- WEAPONS SECTION with preset dropdowns -->
       <div class="card">
         <div class="card-title">🔫 Firearms & Ammo Trackers</div>
+
+        <!-- Primary Weapon -->
         <div class="weapon-card">
           <div class="form-row">
             <div class="form-group" style="flex: 2;">
-              <label>Primary Firearm</label>
-              <input type="text" id="wpn-1-name" placeholder="Assault Rifle / SMG" oninput="autoSave()">
+              <label>Preset Weapon</label>
+              <select id="wpn-1-preset" onchange="applyWeaponPreset(1)"></select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group" style="flex: 2;">
+              <label>Weapon Name</label>
+              <input type="text" id="wpn-1-name" placeholder="Primary firearm" oninput="markCustom(1); autoSave()">
             </div>
             <div class="form-group">
               <label>Mag Size</label>
-              <input type="number" id="wpn-1-max-ammo" value="30" oninput="autoSave()">
+              <input type="number" id="wpn-1-max-ammo" value="30" oninput="markCustom(1); autoSave()">
             </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Damage</label>
+              <input type="text" id="wpn-1-damage" placeholder="1d8" oninput="markCustom(1); autoSave()"></div>
+            <div class="form-group"><label>Range</label>
+              <input type="text" id="wpn-1-range" placeholder="150/600" oninput="markCustom(1); autoSave()"></div>
+            <div class="form-group"><label>Properties</label>
+              <input type="text" id="wpn-1-props" placeholder="Automatic" oninput="markCustom(1); autoSave()"></div>
           </div>
           <div class="ammo-bar">
             <label>Ammo:</label>
@@ -200,16 +163,31 @@
           </div>
         </div>
 
+        <!-- Secondary Weapon -->
         <div class="weapon-card">
           <div class="form-row">
             <div class="form-group" style="flex: 2;">
-              <label>Secondary / Sidearm</label>
-              <input type="text" id="wpn-2-name" placeholder="Heavy Pistol / Shotgun" oninput="autoSave()">
+              <label>Preset Weapon</label>
+              <select id="wpn-2-preset" onchange="applyWeaponPreset(2)"></select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group" style="flex: 2;">
+              <label>Weapon Name</label>
+              <input type="text" id="wpn-2-name" placeholder="Secondary weapon" oninput="markCustom(2); autoSave()">
             </div>
             <div class="form-group">
               <label>Mag Size</label>
-              <input type="number" id="wpn-2-max-ammo" value="12" oninput="autoSave()">
+              <input type="number" id="wpn-2-max-ammo" value="12" oninput="markCustom(2); autoSave()">
             </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Damage</label>
+              <input type="text" id="wpn-2-damage" placeholder="1d8" oninput="markCustom(2); autoSave()"></div>
+            <div class="form-group"><label>Range</label>
+              <input type="text" id="wpn-2-range" placeholder="50/150" oninput="markCustom(2); autoSave()"></div>
+            <div class="form-group"><label>Properties</label>
+              <input type="text" id="wpn-2-props" placeholder="Semi-Auto" oninput="markCustom(2); autoSave()"></div>
           </div>
           <div class="ammo-bar">
             <label>Ammo:</label>
@@ -220,7 +198,6 @@
         </div>
       </div>
 
-      <!-- Equipment & Notes -->
       <div class="card">
         <div class="card-title">📦 Cybernetics & Equipment</div>
         <textarea id="char-notes" placeholder="Cyberware implants, armor mods, tactical gear..." oninput="autoSave()"></textarea>
@@ -239,6 +216,25 @@
     </div>
   </div>
 
+  <!-- PAGE 4: ABILITIES (NEW) -->
+  <div id="page-abilities" class="page">
+    <div class="container">
+      <div class="card">
+        <div class="card-title">✨ Ladder Abilities</div>
+        <div id="ladder-abilities-container"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">🎖️ Class Abilities</div>
+        <div id="class-abilities-container"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📝 Custom Abilities / Notes</div>
+        <textarea id="char-abilities-notes" placeholder="Write any custom abilities, feats, or notes here..." oninput="autoSave()"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <script src="database.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
