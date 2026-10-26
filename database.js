@@ -125,8 +125,8 @@ const CLASS_DATA = {
     primaryStat: 'Any',
     abilities: [
       { level: 1, name: 'Bulletproof Ego', desc: 'wear light or no armor, you gain a bonus to AC equal to half your proficiency bonus (rounded up).' },
-      { level: 1, name: 'Double your efforts', desc: 'once per turn on your turn, can make a DC 15 Perception free check; pass, take an additional action. cant use the Attack action or cast spells.' },
-      { level: 2, name: 'Fan the Hammer', desc: 'When you take Attack, fire twice with a pistol (same target or adjacent).' },
+      { level: 1, name: 'Double your efforts', desc: 'once per turn on your turn, can make a DC 15 Perception free check; pass, take an additional action (not for Attack or cast spells).' },
+      { level: 1, name: 'Life Insurance', desc: 'Spend a Hit Die on your turn, regain no hit points, and you gain all the following benefi ts (this requires no action.' },
       { level: 5, name: 'Deadeye', desc: 'Ignore half cover; +1d8 damage on critical hits with firearms.' }
     ]
   },
