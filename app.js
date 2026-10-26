@@ -71,7 +71,7 @@ function populateSelects() {
   }
   if (typeof ARMOR_DATA !== 'undefined' && $('armor-preset')) {
     $('armor-preset').innerHTML = '<option value="__custom__">Custom / Manual</option>' + 
-      Object.keys(ARMOR_DATA).map(k => `<option value="${k}">${k} (AC ${ARMOR_DATA[k].baseAc}) (Type ${ARMOR_DATA[k].type})</option>`).join('');
+      Object.keys(ARMOR_DATA).map(k => `<option value="${k}">${k} (AC ${ARMOR_DATA[k].baseAc}) (${ARMOR_DATA[k].type})</option>`).join('');
   }
 }
 
