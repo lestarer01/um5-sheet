@@ -245,11 +245,12 @@ const WEAPON_DATA = {
 };
 
 const ARMOR_DATA = {
-  'Plain Clothes': { type: 'None', baseAc: 10, maxDex: 99, props: 'Normal clothing' },
-  'Leather Jacket': { type: 'Light', baseAc: 11, maxDex: 99, props: 'Stylish, Concealed' },
-  'Undercover Vest': { type: 'Light', baseAc: 12, maxDex: 99, props: 'Hidden under clothes' },
-  'Tactical Vest': { type: 'Medium', baseAc: 14, maxDex: 2, props: 'Mag pouches, Standard issue' },
-  'Riot Armor': { type: 'Medium', baseAc: 15, maxDex: 2, props: 'Ballistic plates' },
+  'CIRAS Maritime': { type: 'Light', baseAc: 14, maxDex: 99, props: 'Dmg Res Light' },
+  'Modular Scalable Vest': { type: 'Light', baseAc: 15, maxDex: 99, props: 'Dmg Res Light' },
+  'PASGT Vest': { type: 'Light', baseAc: 12, maxDex: 99, props: 'Hidden under clothes' },
+  'Ranger Body Armor': { type: 'Light', baseAc: 15, maxDex: 99, props: 'Mag pouches, Standard issue' },
+  'RBAV Plate Carrier': { type: 'Light', baseAc: 14, maxDex: 99, props: 'Ballistic plates' },
+  'Soviet 6B2 Vest': { type: 'Light', baseAc: 14, maxDex: 99, props: 'Ballistic plates' },
   'Heavy Combat Suit': { type: 'Heavy', baseAc: 17, maxDex: 0, props: 'Full plate modern, No Stealth' },
   'Powered Exosuit': { type: 'Heavy', baseAc: 18, maxDex: 0, props: 'Servo-assisted, Loud' }
 };
