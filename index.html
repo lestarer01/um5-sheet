@@ -3,176 +3,138 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>UM5 Tactical Character Sheet</title>
+  <title>UM5 Character Sheet</title>
   <link rel="stylesheet" href="style.css" />
   <script src="database.js"></script>
   <script src="app.js"></script>
 </head>
 <body>
-  <div class="app-container">
-    <header class="app-header">
-      <h1>ULTRAMODERN5</h1>
-      <p class="subtitle">Tactical Operative System</p>
-    </header>
+  <header>
+    <h1>ULTRAMODERN5</h1>
+  </header>
 
-    <nav class="nav-tabs">
-      <button class="tab-btn active" data-tab="page-list">Operatives</button>
-      <button class="tab-btn" data-tab="page-sheet">Tactical</button>
-      <button class="tab-btn" data-tab="page-skills">Skills</button>
-      <button class="tab-btn" data-tab="page-abilities">Abilities</button>
-    </nav>
+  <nav class="nav-tabs">
+    <button class="tab-btn active" data-tab="tab-list">1: Operatives</button>
+    <button class="tab-btn" data-tab="tab-core">2: Core Stats</button>
+    <button class="tab-btn" data-tab="tab-combat">3: Combat</button>
+    <button class="tab-btn" data-tab="tab-skills">4: Skills</button>
+    <button class="tab-btn" data-tab="tab-abilities">5: Abilities</button>
+    <button class="tab-btn" data-tab="tab-magic">6: Magic</button>
+  </nav>
 
-    <main class="content-area">
+  <main>
+    <!-- TAB 1: OPERATIVES -->
+    <section id="tab-list" class="tab-page active">
+      <div class="card">
+        <h2>Operative Roster</h2>
+        <button id="btn-new" class="btn">+ Create New Operative</button>
+        <div id="roster-list" style="margin-top: 15px;"></div>
+      </div>
+    </section>
 
-      <!-- PAGE 1: OPERATIVE SELECTION -->
-      <section id="page-list" class="tab-page active">
-        <div class="card">
-          <h2>Operative Roster</h2>
-          <button id="btn-new-char" class="btn primary-btn">+ New Operative</button>
-          <div id="character-list" class="char-list-container"></div>
+    <!-- TAB 2: CORE STATS -->
+    <section id="tab-core" class="tab-page">
+      <div class="card">
+        <div class="grid-2">
+          <div class="field-group"><label>Name</label><input type="text" id="c-name"></div>
+          <div class="field-group"><label>Species</label><input type="text" id="c-species"></div>
         </div>
-      </section>
-
-      <!-- PAGE 2: MAIN CHARACTER SHEET -->
-      <section id="page-sheet" class="tab-page">
-        <!-- PROFILE SECTION -->
-        <div class="card profile-card">
-          <!-- Row 1: Name & Species -->
-          <div class="grid-2">
-            <div class="field-group">
-              <label for="char-name">Character Name</label>
-              <input type="text" id="char-name" placeholder="e.g. Jax Vance" />
-            </div>
-            <div class="field-group">
-              <label for="char-species">Species / Genetic Origin</label>
-              <input type="text" id="char-species" placeholder="e.g. Human, Cyborg" />
-            </div>
-          </div>
-
-          <!-- Row 2: Background & Archetype -->
-          <div class="grid-2" style="margin-top: 10px;">
-            <div class="field-group">
-              <label for="char-background">Background</label>
-              <input type="text" id="char-background" placeholder="e.g. Mercenary" />
-            </div>
-            <div class="field-group">
-              <label for="char-archetype">Archetype / Subclass</label>
-              <input type="text" id="char-archetype" placeholder="e.g. Sharpshooter" />
-            </div>
-          </div>
-
-          <!-- Row 3: Ladder, Class, Level -->
-          <div class="grid-3" style="margin-top: 10px;">
-            <div class="field-group">
-              <label for="char-ladder">Ladder</label>
-              <select id="char-ladder"></select>
-            </div>
-            <div class="field-group">
-              <label for="char-class">Class</label>
-              <select id="char-class"></select>
-            </div>
-            <div class="field-group">
-              <label for="char-level">Level</label>
-              <input type="number" id="char-level" value="1" min="1" max="20" />
-            </div>
-          </div>
+        <div class="grid-2">
+          <div class="field-group"><label>Background</label><input type="text" id="c-bg"></div>
+          <div class="field-group"><label>Archetype</label><input type="text" id="c-archetype"></div>
         </div>
-
-        <!-- STATS GRID -->
-        <div class="stats-grid">
-          <div class="stat-box">
-            <label>STR</label>
-            <input type="number" id="stat-str" value="10" />
-            <span class="mod-display" id="mod-str">+0</span>
-          </div>
-          <div class="stat-box">
-            <label>DEX</label>
-            <input type="number" id="stat-dex" value="10" />
-            <span class="mod-display" id="mod-dex">+0</span>
-          </div>
-          <div class="stat-box">
-            <label>CON</label>
-            <input type="number" id="stat-con" value="10" />
-            <span class="mod-display" id="mod-con">+0</span>
-          </div>
-          <div class="stat-box">
-            <label>INT</label>
-            <input type="number" id="stat-int" value="10" />
-            <span class="mod-display" id="mod-int">+0</span>
-          </div>
-          <div class="stat-box">
-            <label>WIS</label>
-            <input type="number" id="stat-wis" value="10" />
-            <span class="mod-display" id="mod-wis">+0</span>
-          </div>
-          <div class="stat-box">
-            <label>CHA</label>
-            <input type="number" id="stat-cha" value="10" />
-            <span class="mod-display" id="mod-cha">+0</span>
-          </div>
+        <div class="grid-3">
+          <div class="field-group"><label>Ladder</label><select id="c-ladder"></select></div>
+          <div class="field-group"><label>Class</label><select id="c-class"></select></div>
+          <div class="field-group"><label>Level</label><input type="number" id="c-lvl" value="1"></div>
         </div>
+      </div>
 
-        <!-- DERIVED STATS -->
-        <div class="card derived-stats">
-          <div>Proficiency: <strong id="prof-bonus-display">+2</strong></div>
-          <div>Passive Perception: <strong id="passive-perception-display">10</strong></div>
+      <div class="stats-grid">
+        <div class="stat-box"><label>STR</label><input type="number" id="s-str" value="10"></div>
+        <div class="stat-box"><label>DEX</label><input type="number" id="s-dex" value="10"></div>
+        <div class="stat-box"><label>CON</label><input type="number" id="s-con" value="10"></div>
+        <div class="stat-box"><label>INT</label><input type="number" id="s-int" value="10"></div>
+        <div class="stat-box"><label>WIS</label><input type="number" id="s-wis" value="10"></div>
+        <div class="stat-box"><label>CHA</label><input type="number" id="s-cha" value="10"></div>
+      </div>
+
+      <div class="card">
+        <div class="grid-3">
+          <div class="field-group"><label>Max HP</label><input type="number" id="hp-max" value="10"></div>
+          <div class="field-group"><label>Current HP</label><input type="number" id="hp-cur" value="10"></div>
+          <div class="field-group"><label>Temp HP</label><input type="number" id="hp-temp" value="0"></div>
         </div>
-
-        <!-- HP & DEFENSE -->
-        <div class="card combat-card">
-          <h3>Combat & Vitality</h3>
-          <div class="grid-3">
-            <div class="field-group">
-              <label>HP Max</label>
-              <input type="number" id="hp-max" value="10" />
-            </div>
-            <div class="field-group">
-              <label>Current HP</label>
-              <input type="number" id="hp-current" value="10" />
-            </div>
-            <div class="field-group">
-              <label>Temp HP</label>
-              <input type="number" id="hp-temp" value="0" />
-            </div>
-          </div>
-          <div class="grid-2">
-            <div class="field-group">
-              <label>Armor Class (AC)</label>
-              <input type="number" id="ac-val" value="10" />
-            </div>
-            <div class="field-group">
-              <label>Speed (ft)</label>
-              <input type="number" id="speed-val" value="30" />
-            </div>
-          </div>
+        <div class="grid-3">
+          <div class="field-group"><label>Armor Class</label><input type="number" id="ac-val" value="10"></div>
+          <div class="field-group"><label>Speed</label><input type="number" id="spd-val" value="30"></div>
+          <div class="field-group"><label>Proficiency</label><input type="text" id="prof-val" value="+2" readonly></div>
         </div>
+        <div class="death-saves">
+          <div class="ds-group"><label>SUCCESS</label> <input type="checkbox" id="ds-s1"> <input type="checkbox" id="ds-s2"> <input type="checkbox" id="ds-s3"></div>
+          <div class="ds-group"><label>FAIL</label> <input type="checkbox" id="ds-f1"> <input type="checkbox" id="ds-f2"> <input type="checkbox" id="ds-f3"></div>
+        </div>
+      </div>
+    </section>
 
-        <!-- WEAPONS -->
-        <div class="card weapons-card">
-          <h3>Firearms & Arsenal</h3>
+    <!-- TAB 3: COMBAT -->
+    <section id="tab-combat" class="tab-page">
+      <div class="card">
+        <h3>Armor</h3>
+        <div class="field-group">
+          <label>Equip Armor Preset (Changes AC automatically)</label>
+          <select id="armor-preset" onchange="applyArmor()"></select>
+        </div>
+      </div>
 
-          <!-- Primary Weapon -->
-          <div class="weapon-block">
-            <h4>Primary Weapon</h4>
-            <div class="field-group">
-              <label>Select Preset</label>
-              <select id="wpn-1-preset" onchange="applyWeaponPreset(1)"></select>
-            </div>
-            <div class="grid-2">
-              <div class="field-group">
-                <label>Weapon Name</label>
-                <input type="text" id="wpn-1-name" oninput="markCustom(1)" placeholder="e.g. M4 Carbine" />
-              </div>
-              <div class="field-group">
-                <label>Damage</label>
-                <input type="text" id="wpn-1-damage" oninput="markCustom(1)" placeholder="2d6" />
-              </div>
-            </div>
-            <div class="grid-2">
-              <div class="field-group">
-                <label>Range</label>
-                <input type="text" id="wpn-1-range" oninput="markCustom(1)" placeholder="80/300" />
-              </div>
-              <div class="field-group">
-                <label>Properties</label>
-                
+      <div class="card">
+        <h3>Primary Weapon</h3>
+        <select id="w1-preset" onchange="applyWpn(1)" style="margin-bottom:10px;"></select>
+        <div class="grid-2">
+          <div class="field-group"><label>Name</label><input type="text" id="w1-name"></div>
+          <div class="field-group"><label>Damage</label><input type="text" id="w1-dmg"></div>
+        </div>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+          <button class="btn" onclick="fire(1)">SHOOT</button>
+          <button class="btn" onclick="reload(1)" style="background:var(--success-color);">RELOAD</button>
+        </div>
+        <p style="margin-top:10px; font-size:0.8rem;">Ammo: <span id="w1-cur">30</span> / <input type="number" id="w1-max" style="width:60px;"></p>
+      </div>
+    </section>
+
+    <!-- TAB 4: SKILLS -->
+    <section id="tab-skills" class="tab-page">
+      <div class="card" id="skills-container"></div>
+    </section>
+
+    <!-- TAB 5: ABILITIES -->
+    <section id="tab-abilities" class="tab-page">
+      <div class="card">
+        <h3 style="color:var(--accent-secondary);">Ladder & Class Features</h3>
+        <div id="abilities-box" style="margin-bottom:20px;"></div>
+        <h3>Custom Features</h3>
+        <textarea id="c-notes" rows="6" placeholder="Add custom feats or cyberware here..."></textarea>
+      </div>
+    </section>
+
+    <!-- TAB 6: MAGIC -->
+    <section id="tab-magic" class="tab-page">
+      <div class="card">
+        <h3>Dark System Magic</h3>
+        <div class="grid-2">
+          <div class="field-group"><label>Max Mana / MP</label><input type="number" id="mp-max"></div>
+          <div class="field-group"><label>Current Mana</label><input type="number" id="mp-cur"></div>
+        </div>
+        <div class="grid-2">
+          <div class="field-group"><label>Spell Save DC</label><input type="number" id="spell-dc"></div>
+          <div class="field-group"><label>Spell Attack Bonus</label><input type="number" id="spell-atk"></div>
+        </div>
+        <div class="field-group" style="margin-top:10px;">
+          <label>Spells Known</label>
+          <textarea id="spell-list" rows="8" placeholder="List spells and effects here..."></textarea>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
