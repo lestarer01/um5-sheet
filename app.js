@@ -328,10 +328,7 @@ function saveCurrent() {
 
   c.armorPreset = val('armor-preset'); c.armorName = val('armor-name'); c.armorProps = val('armor-props');
   
-  const w1CurEl = $('w1-cur');
-  const w2CurEl = $('w2-cur');
-  c.w1Preset = val('w1-preset'); c.w1Name = val('w1-name'); c.w1Dmg = val('w1-dmg'); c.w1Range = val('w1-range'); c.w1Props = val('w1-props'); c.w1Max = val('w1-max'); c.w1Cur = w1CurEl ? (parseInt(w1CurEl.textContent, 10) || 0) : 0;
-  c.w2Preset = val('w2-preset'); c.w2Name = val('w2-name'); c.w2Dmg = val('w2-dmg'); c.w2Range = val('w2-range'); c.w2Props = val('w2-props'); c.w2Max = val('w2-max'); c.w2Cur = w2CurEl ? (parseInt(w2CurEl.textContent, 10) || 0) : 0;
+  readWeaponsFromForm();
 
   c.credits = val('credits'); c.inventory = val('inventory');
   UM5_SKILLS.forEach((_, i) => { c.skills['p'+i] = val('sk-p-'+i); c.skills['e'+i] = val('sk-e-'+i); });
@@ -360,11 +357,36 @@ function loadToForm(c) {
   val('ds-f1', c.dsF[0]); val('ds-f2', c.dsF[1]); val('ds-f3', c.dsF[2]);
 
   val('armor-preset', c.armorPreset); val('armor-name', c.armorName); val('armor-props', c.armorProps);
-  val('w1-preset', c.w1Preset); val('w1-name', c.w1Name); val('w1-dmg', c.w1Dmg); val('w1-range', c.w1Range); val('w1-props', c.w1Props); val('w1-max', c.w1Max);
-  if ($('w1-cur')) $('w1-cur').textContent = c.w1Cur || 0;
-  
-  val('w2-preset', c.w2Preset); val('w2-name', c.w2Name); val('w2-dmg', c.w2Dmg); val('w2-range', c.w2Range); val('w2-props', c.w2Props); val('w2-max', c.w2Max);
-  if ($('w2-cur')) $('w2-cur').textContent = c.w2Cur || 0;
+    
+  // Migrate old w1/w2 characters → new weapons array
+  if (!c.weapons) {
+    c.weapons = [];
+    if (c.w1Name || c.w1Preset) {
+      c.weapons.push({
+        preset: c.w1Preset || '__custom__',
+        name: c.w1Name || '',
+        dmg: c.w1Dmg || '',
+        range: c.w1Range || '',
+        props: c.w1Props || '',
+        max: c.w1Max || 0,
+        cur: c.w1Cur || 0
+      });
+    }
+    if (c.w2Name || c.w2Preset) {
+      c.weapons.push({
+        preset: c.w2Preset || '__custom__',
+        name: c.w2Name || '',
+        dmg: c.w2Dmg || '',
+        range: c.w2Range || '',
+        props: c.w2Props || '',
+        max: c.w2Max || 0,
+        cur: c.w2Cur || 0
+      });
+    }
+    if (!c.weapons.length) c.weapons = [emptyWeapon()];
+  }
+  renderWeapons();
+  bindWeaponEvents();
 
   val('credits', c.credits); val('inventory', c.inventory);
   UM5_SKILLS.forEach((_, i) => { val('sk-p-'+i, c.skills && c.skills['p'+i]); val('sk-e-'+i, c.skills && c.skills['e'+i]); });
@@ -408,6 +430,10 @@ function switchTab(id) {
   document.querySelectorAll('.tab-page').forEach(p => p.classList.toggle('active', p.id === id));
   if (id === 'tab-abilities') renderAbilities();
   if (id === 'tab-skills' || id === 'tab-core') recalc();
+    if (id === 'tab-combat') {
+    renderWeapons();
+    bindWeaponEvents();
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -421,6 +447,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const btnNew = $('btn-new');
   if (btnNew) btnNew.addEventListener('click', createChar);
+
+  const btnAddWpn = $('btn-add-weapon');
+  if (btnAddWpn) btnAddWpn.addEventListener('click', addWeapon);
 
   const rosterEl = $('roster');
   if (rosterEl) {
@@ -438,13 +467,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if ($('armor-preset')) $('armor-preset').addEventListener('change', applyArmor);
-  if ($('w1-preset')) $('w1-preset').addEventListener('change', () => applyWeapon(1));
-  if ($('w2-preset')) $('w2-preset').addEventListener('change', () => applyWeapon(2));
-  
-  if ($('btn-fire-1')) $('btn-fire-1').addEventListener('click', () => fire(1));
-  if ($('btn-reload-1')) $('btn-reload-1').addEventListener('click', () => reload(1));
-  if ($('btn-fire-2')) $('btn-fire-2').addEventListener('click', () => fire(2));
-  if ($('btn-reload-2')) $('btn-reload-2').addEventListener('click', () => reload(2));
 
   document.querySelectorAll('input, select, textarea').forEach(el => {
     el.addEventListener('input', saveCurrent);
