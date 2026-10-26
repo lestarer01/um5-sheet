@@ -119,12 +119,13 @@ const LADDER_DATA = {
 };
 
 const CLASS_DATA = {
-  'Gunslinger': {
-    desc: 'Fast hands, faster bullets.',
-    hitDie: 'd10',
-    primaryStat: 'DEX',
+  'Face': {
+    desc: 'The smooth talker, the negotiator, and the haggler.',
+    hitDie: 'd8',
+    primaryStat: 'Any',
     abilities: [
-      { level: 1, name: 'Quick Draw', desc: 'Draw/stow firearms freely; +2 initiative with a firearm in hand.' },
+      { level: 1, name: 'Bulletproof Ego', desc: 'wear light or no armor, you gain a bonus to AC equal to half your proficiency bonus (rounded up).' },
+      { level: 1, name: 'Double your efforts', desc: 'once per turn on your turn, can make a DC 15 Perception free check; pass, take an additional action. cant use the Attack action or cast spells.' },
       { level: 2, name: 'Fan the Hammer', desc: 'When you take Attack, fire twice with a pistol (same target or adjacent).' },
       { level: 5, name: 'Deadeye', desc: 'Ignore half cover; +1d8 damage on critical hits with firearms.' }
     ]
