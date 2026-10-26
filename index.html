@@ -3,238 +3,267 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>⚡ UltraModern5 Tactical Sheet</title>
+  <title>UM5 Tactical Character Sheet</title>
   <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-
-  <header>
-    <h1>⚡ UltraModern5 Tactical</h1>
-    <p>5E Modern & Cyberpunk System</p>
-  </header>
-
-  <div class="tabs">
-    <button class="tab-btn active" id="tab-list" onclick="switchPage('list')">📋 Operatives</button>
-    <button class="tab-btn" id="tab-sheet" onclick="switchPage('sheet')">🛡️ Tactical</button>
-    <button class="tab-btn" id="tab-skills" onclick="switchPage('skills')">🎯 Skills</button>
-    <button class="tab-btn" id="tab-abilities" onclick="switchPage('abilities')">✨ Abilities</button>
-  </div>
-
-  <!-- PAGE 1: OPERATIVE LIST -->
-  <div id="page-list" class="page active">
-    <div class="container">
-      <div id="character-list"></div>
-      <button class="btn btn-primary" onclick="createNewCharacter()">
-        + Deploy New Operative
-      </button>
-    </div>
-  </div>
-
-  <!-- PAGE 2: TACTICAL SHEET -->
-  <div id="page-sheet" class="page">
-    <div class="container">
-
-      <div class="card">
-        <div class="card-title">👤 Operative Profile</div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Name / Codename</label>
-            <input type="text" id="char-name" placeholder="e.g. Jax Vanguard" oninput="autoSave()">
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>UM5 Ladder</label>
-            <select id="char-ladder" onchange="autoSave()"></select>
-          </div>
-          <div class="form-group">
-            <label>Modern Class</label>
-            <select id="char-class" onchange="autoSave()"></select>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Level</label>
-            <input type="number" id="char-level" value="1" min="1" max="20" oninput="updateAll(); autoSave()">
-          </div>
-          <div class="form-group">
-            <label>Origin / Genetics</label>
-            <input type="text" id="char-race" placeholder="e.g. Human" oninput="autoSave()">
-          </div>
-          <div class="form-group">
-            <label>Credits (₡)</label>
-            <input type="number" id="char-credits" value="500" oninput="autoSave()">
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">💪 Core Attributes</div>
-        <div class="ability-grid">
-          <div class="ability-box"><div class="ability-label">STR</div>
-            <input class="ability-input" type="number" id="ability-str" value="10" oninput="updateAll(); autoSave()">
-            <div class="ability-mod" id="mod-str">+0</div></div>
-          <div class="ability-box"><div class="ability-label">DEX</div>
-            <input class="ability-input" type="number" id="ability-dex" value="10" oninput="updateAll(); autoSave()">
-            <div class="ability-mod" id="mod-dex">+0</div></div>
-          <div class="ability-box"><div class="ability-label">CON</div>
-            <input class="ability-input" type="number" id="ability-con" value="10" oninput="updateAll(); autoSave()">
-            <div class="ability-mod" id="mod-con">+0</div></div>
-          <div class="ability-box"><div class="ability-label">INT</div>
-            <input class="ability-input" type="number" id="ability-int" value="10" oninput="updateAll(); autoSave()">
-            <div class="ability-mod" id="mod-int">+0</div></div>
-          <div class="ability-box"><div class="ability-label">WIS</div>
-            <input class="ability-input" type="number" id="ability-wis" value="10" oninput="updateAll(); autoSave()">
-            <div class="ability-mod" id="mod-wis">+0</div></div>
-          <div class="ability-box"><div class="ability-label">CHA</div>
-            <input class="ability-input" type="number" id="ability-cha" value="10" oninput="updateAll(); autoSave()">
-            <div class="ability-mod" id="mod-cha">+0</div></div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">🛡️ Defense & Speed</div>
-        <div class="combat-grid">
-          <div class="combat-box"><div class="combat-label">Armor Class</div>
-            <input type="number" id="char-ac" value="10" oninput="autoSave()"></div>
-          <div class="combat-box"><div class="combat-label">Initiative</div>
-            <div class="combat-value" id="char-initiative">+0</div></div>
-          <div class="combat-box"><div class="combat-label">Speed</div>
-            <input type="number" id="char-speed" value="30" oninput="autoSave()"></div>
-          <div class="combat-box"><div class="combat-label">Prof. Bonus</div>
-            <div class="combat-value" id="char-prof">+2</div></div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">❤️ Vitality / Hit Points</div>
-        <div class="hp-section">
-          <button class="hp-btn minus" onclick="changeHp(-1)">−</button>
-          <div class="hp-display">
-            <span id="hp-current" style="color: #00f2fe">10</span>
-            <span style="color: #666"> / </span>
-            <span id="hp-max-display" style="color: #8b949e">10</span>
-          </div>
-          <button class="hp-btn plus" onclick="changeHp(1)">+</button>
-        </div>
-        <div class="form-row" style="justify-content: center;">
-          <div class="form-group" style="max-width: 120px;">
-            <label>Max HP</label>
-            <input type="number" id="char-hp" value="10" oninput="updateHpDisplay(); autoSave()">
-          </div>
-        </div>
-      </div>
-
-      <!-- WEAPONS SECTION with preset dropdowns -->
-      <div class="card">
-        <div class="card-title">🔫 Firearms & Ammo Trackers</div>
-
-        <!-- Primary Weapon -->
-        <div class="weapon-card">
-          <div class="form-row">
-            <div class="form-group" style="flex: 2;">
-              <label>Preset Weapon</label>
-              <select id="wpn-1-preset" onchange="applyWeaponPreset(1)"></select>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group" style="flex: 2;">
-              <label>Weapon Name</label>
-              <input type="text" id="wpn-1-name" placeholder="Primary firearm" oninput="markCustom(1); autoSave()">
-            </div>
-            <div class="form-group">
-              <label>Mag Size</label>
-              <input type="number" id="wpn-1-max-ammo" value="30" oninput="markCustom(1); autoSave()">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group"><label>Damage</label>
-              <input type="text" id="wpn-1-damage" placeholder="1d8" oninput="markCustom(1); autoSave()"></div>
-            <div class="form-group"><label>Range</label>
-              <input type="text" id="wpn-1-range" placeholder="150/600" oninput="markCustom(1); autoSave()"></div>
-            <div class="form-group"><label>Properties</label>
-              <input type="text" id="wpn-1-props" placeholder="Automatic" oninput="markCustom(1); autoSave()"></div>
-          </div>
-          <div class="ammo-bar">
-            <label>Ammo:</label>
-            <span id="wpn-1-ammo-text" style="font-weight:800; color:#00f2fe;">30 / 30</span>
-            <button class="btn-action btn-shoot" onclick="shootWeapon(1)">💥 Shoot</button>
-            <button class="btn-action" onclick="reloadWeapon(1)">🔄 Reload</button>
-          </div>
-        </div>
-
-        <!-- Secondary Weapon -->
-        <div class="weapon-card">
-          <div class="form-row">
-            <div class="form-group" style="flex: 2;">
-              <label>Preset Weapon</label>
-              <select id="wpn-2-preset" onchange="applyWeaponPreset(2)"></select>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group" style="flex: 2;">
-              <label>Weapon Name</label>
-              <input type="text" id="wpn-2-name" placeholder="Secondary weapon" oninput="markCustom(2); autoSave()">
-            </div>
-            <div class="form-group">
-              <label>Mag Size</label>
-              <input type="number" id="wpn-2-max-ammo" value="12" oninput="markCustom(2); autoSave()">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group"><label>Damage</label>
-              <input type="text" id="wpn-2-damage" placeholder="1d8" oninput="markCustom(2); autoSave()"></div>
-            <div class="form-group"><label>Range</label>
-              <input type="text" id="wpn-2-range" placeholder="50/150" oninput="markCustom(2); autoSave()"></div>
-            <div class="form-group"><label>Properties</label>
-              <input type="text" id="wpn-2-props" placeholder="Semi-Auto" oninput="markCustom(2); autoSave()"></div>
-          </div>
-          <div class="ammo-bar">
-            <label>Ammo:</label>
-            <span id="wpn-2-ammo-text" style="font-weight:800; color:#00f2fe;">12 / 12</span>
-            <button class="btn-action btn-shoot" onclick="shootWeapon(2)">💥 Shoot</button>
-            <button class="btn-action" onclick="reloadWeapon(2)">🔄 Reload</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">📦 Cybernetics & Equipment</div>
-        <textarea id="char-notes" placeholder="Cyberware implants, armor mods, tactical gear..." oninput="autoSave()"></textarea>
-      </div>
-    </div>
-  </div>
-
-  <!-- PAGE 3: SKILLS -->
-  <div id="page-skills" class="page">
-    <div class="container">
-      <div class="card">
-        <div class="card-title">🎯 Modern & Sci-Fi Skills</div>
-        <p style="font-size: 11px; color:#8b949e; margin-bottom: 12px;">Check box if proficient.</p>
-        <div class="skills-grid" id="skills-container"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PAGE 4: ABILITIES (NEW) -->
-  <div id="page-abilities" class="page">
-    <div class="container">
-      <div class="card">
-        <div class="card-title">✨ Ladder Abilities</div>
-        <div id="ladder-abilities-container"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">🎖️ Class Abilities</div>
-        <div id="class-abilities-container"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">📝 Custom Abilities / Notes</div>
-        <textarea id="char-abilities-notes" placeholder="Write any custom abilities, feats, or notes here..." oninput="autoSave()"></textarea>
-      </div>
-    </div>
-  </div>
-
   <script src="database.js"></script>
   <script src="app.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <h1>ULTRAMODERN5</h1>
+      <p class="subtitle">Tactical Operative System</p>
+    </header>
+
+    <nav class="nav-tabs">
+      <button class="tab-btn active" data-tab="page-list">Operatives</button>
+      <button class="tab-btn" data-tab="page-sheet">Tactical</button>
+      <button class="tab-btn" data-tab="page-skills">Skills</button>
+      <button class="tab-btn" data-tab="page-abilities">Abilities</button>
+    </nav>
+
+    <main class="content-area">
+
+      <!-- PAGE 1: OPERATIVE SELECTION -->
+      <section id="page-list" class="tab-page active">
+        <div class="card">
+          <h2>Operative Roster</h2>
+          <button id="btn-new-char" class="btn primary-btn">+ New Operative</button>
+          <div id="character-list" class="char-list-container"></div>
+        </div>
+      </section>
+
+      <!-- PAGE 2: MAIN CHARACTER SHEET -->
+      <section id="page-sheet" class="tab-page">
+        <!-- PROFILE SECTION -->
+        <div class="card profile-card">
+          <div class="profile-grid">
+            <div class="field-group">
+              <label for="char-name">Character Name</label>
+              <input type="text" id="char-name" placeholder="e.g. Jax Vance" />
+            </div>
+
+            <div class="field-group">
+              <label for="char-species">Species / Genetic Origin</label>
+              <input type="text" id="char-species" placeholder="e.g. Human, Cyborg" />
+            </div>
+
+            <div class="field-group">
+              <label for="char-background">Background</label>
+              <input type="text" id="char-background" placeholder="e.g. Mercenary" />
+            </div>
+
+            <div class="field-group">
+              <label for="char-ladder">Ladder</label>
+              <select id="char-ladder"></select>
+            </div>
+
+            <div class="field-group">
+              <label for="char-class">Class</label>
+              <select id="char-class"></select>
+            </div>
+
+            <div class="field-group">
+              <label for="char-archetype">Archetype</label>
+              <input type="text" id="char-archetype" placeholder="e.g. Subclass" />
+            </div>
+
+            <div class="field-group level-group">
+              <label for="char-level">Level</label>
+              <input type="number" id="char-level" value="1" min="1" max="20" />
+            </div>
+          </div>
+        </div>
+
+        <!-- STATS GRID -->
+        <div class="stats-grid">
+          <div class="stat-box">
+            <label>STR</label>
+            <input type="number" id="stat-str" value="10" />
+            <span class="mod-display" id="mod-str">+0</span>
+          </div>
+          <div class="stat-box">
+            <label>DEX</label>
+            <input type="number" id="stat-dex" value="10" />
+            <span class="mod-display" id="mod-dex">+0</span>
+          </div>
+          <div class="stat-box">
+            <label>CON</label>
+            <input type="number" id="stat-con" value="10" />
+            <span class="mod-display" id="mod-con">+0</span>
+          </div>
+          <div class="stat-box">
+            <label>INT</label>
+            <input type="number" id="stat-int" value="10" />
+            <span class="mod-display" id="mod-int">+0</span>
+          </div>
+          <div class="stat-box">
+            <label>WIS</label>
+            <input type="number" id="stat-wis" value="10" />
+            <span class="mod-display" id="mod-wis">+0</span>
+          </div>
+          <div class="stat-box">
+            <label>CHA</label>
+            <input type="number" id="stat-cha" value="10" />
+            <span class="mod-display" id="mod-cha">+0</span>
+          </div>
+        </div>
+
+        <!-- DERIVED STATS -->
+        <div class="card derived-stats">
+          <div>Proficiency: <strong id="prof-bonus-display">+2</strong></div>
+          <div>Passive Perception: <strong id="passive-perception-display">10</strong></div>
+        </div>
+
+        <!-- HP & DEFENSE -->
+        <div class="card combat-card">
+          <h3>Combat & Vitality</h3>
+          <div class="grid-3">
+            <div class="field-group">
+              <label>HP Max</label>
+              <input type="number" id="hp-max" value="10" />
+            </div>
+            <div class="field-group">
+              <label>Current HP</label>
+              <input type="number" id="hp-current" value="10" />
+            </div>
+            <div class="field-group">
+              <label>Temp HP</label>
+              <input type="number" id="hp-temp" value="0" />
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="field-group">
+              <label>Armor Class (AC)</label>
+              <input type="number" id="ac-val" value="10" />
+            </div>
+            <div class="field-group">
+              <label>Speed (ft)</label>
+              <input type="number" id="speed-val" value="30" />
+            </div>
+          </div>
+        </div>
+
+        <!-- WEAPONS -->
+        <div class="card weapons-card">
+          <h3>Firearms & Arsenal</h3>
+
+          <!-- Primary Weapon -->
+          <div class="weapon-block">
+            <h4>Primary Weapon</h4>
+            <div class="field-group">
+              <label>Select Preset</label>
+              <select id="wpn-1-preset" onchange="applyWeaponPreset(1)"></select>
+            </div>
+            <div class="grid-2">
+              <div class="field-group">
+                <label>Weapon Name</label>
+                <input type="text" id="wpn-1-name" oninput="markCustom(1)" placeholder="e.g. M4 Carbine" />
+              </div>
+              <div class="field-group">
+                <label>Damage</label>
+                <input type="text" id="wpn-1-damage" oninput="markCustom(1)" placeholder="2d6" />
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="field-group">
+                <label>Range</label>
+                <input type="text" id="wpn-1-range" oninput="markCustom(1)" placeholder="80/300" />
+              </div>
+              <div class="field-group">
+                <label>Properties</label>
+                <input type="text" id="wpn-1-props" oninput="markCustom(1)" placeholder="Burst, Reload" />
+              </div>
+            </div>
+            <div class="ammo-controls">
+              <span>Ammo: <strong id="wpn-1-cur-display">30</strong> / <input type="number" id="wpn-1-max-ammo" value="30" style="width: 60px; display: inline-block;" oninput="markCustom(1)" /></span>
+              <button class="btn ammo-btn" onclick="fireWeapon(1)">SHOOT (-1)</button>
+              <button class="btn ammo-btn reload-btn" onclick="reloadWeapon(1)">RELOAD</button>
+              <input type="hidden" id="wpn-1-cur-ammo" value="30" />
+            </div>
+          </div>
+
+          <!-- Secondary Weapon -->
+          <div class="weapon-block" style="margin-top: 15px;">
+            <h4>Secondary Weapon</h4>
+            <div class="field-group">
+              <label>Select Preset</label>
+              <select id="wpn-2-preset" onchange="applyWeaponPreset(2)"></select>
+            </div>
+            <div class="grid-2">
+              <div class="field-group">
+                <label>Weapon Name</label>
+                <input type="text" id="wpn-2-name" oninput="markCustom(2)" placeholder="e.g. Glock 17" />
+              </div>
+              <div class="field-group">
+                <label>Damage</label>
+                <input type="text" id="wpn-2-damage" oninput="markCustom(2)" placeholder="1d6" />
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="field-group">
+                <label>Range</label>
+                <input type="text" id="wpn-2-range" oninput="markCustom(2)" placeholder="50/150" />
+              </div>
+              <div class="field-group">
+                <label>Properties</label>
+                <input type="text" id="wpn-2-props" oninput="markCustom(2)" placeholder="Light" />
+              </div>
+            </div>
+            <div class="ammo-controls">
+              <span>Ammo: <strong id="wpn-2-cur-display">15</strong> / <input type="number" id="wpn-2-max-ammo" value="15" style="width: 60px; display: inline-block;" oninput="markCustom(2)" /></span>
+              <button class="btn ammo-btn" onclick="fireWeapon(2)">SHOOT (-1)</button>
+              <button class="btn ammo-btn reload-btn" onclick="reloadWeapon(2)">RELOAD</button>
+              <input type="hidden" id="wpn-2-cur-ammo" value="15" />
+            </div>
+          </div>
+        </div>
+
+        <!-- INVENTORY & CREDITS -->
+        <div class="card inventory-card">
+          <h3>Inventory & Funds</h3>
+          <div class="field-group">
+            <label>Credits (₡)</label>
+            <input type="number" id="credits-val" value="500" />
+          </div>
+          <div class="field-group">
+            <label>Tactical Gear & Items</label>
+            <textarea id="inventory-val" rows="4" placeholder="List items, armor, gadgets..."></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE 3: SKILLS -->
+      <section id="page-skills" class="tab-page">
+        <div class="card">
+          <h2>Skill Proficiencies</h2>
+          <div id="skills-list" class="skills-container"></div>
+        </div>
+      </section>
+
+      <!-- PAGE 4: ABILITIES -->
+      <section id="page-abilities" class="tab-page">
+        <div class="card">
+          <h2>Tactical Abilities & Features</h2>
+          
+          <div class="abilities-section">
+            <h3 class="section-title">Ladder Features</h3>
+            <div id="ladder-abilities-container"></div>
+          </div>
+
+          <div class="abilities-section" style="margin-top: 20px;">
+            <h3 class="section-title">Class Features</h3>
+            <div id="class-abilities-container"></div>
+          </div>
+
+          <div class="abilities-section" style="margin-top: 20px;">
+            <h3 class="section-title">Custom Features & Notes</h3>
+            <textarea id="char-abilities-notes" rows="6" placeholder="Add custom feats, cyberware, or personal features here..."></textarea>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
 </body>
 </html>
