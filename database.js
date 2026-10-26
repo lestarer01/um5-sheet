@@ -245,12 +245,12 @@ const WEAPON_DATA = {
 };
 
 const ARMOR_DATA = {
-  'CIRAS Maritime': { type: 'Light', baseAc: 14, maxDex: 99, props: 'Dmg Res Light' },
-  'Modular Scalable Vest': { type: 'Light', baseAc: 15, maxDex: 99, props: 'Dmg Res Light' },
-  'PASGT Vest': { type: 'Light', baseAc: 12, maxDex: 99, props: 'Hidden under clothes' },
-  'Ranger Body Armor': { type: 'Light', baseAc: 15, maxDex: 99, props: 'Mag pouches, Standard issue' },
-  'RBAV Plate Carrier': { type: 'Light', baseAc: 14, maxDex: 99, props: 'Ballistic plates' },
-  'Soviet 6B2 Vest': { type: 'Light', baseAc: 14, maxDex: 99, props: 'Ballistic plates' },
-  'Heavy Combat Suit': { type: 'Heavy', baseAc: 17, maxDex: 0, props: 'Full plate modern, No Stealth' },
-  'Powered Exosuit': { type: 'Heavy', baseAc: 18, maxDex: 0, props: 'Servo-assisted, Loud' }
+  'CIRAS Maritime': { type: 'Light Armor', baseAc: 14, maxDex: 99, props: 'Dmg Res Light' },
+  'Modular Scalable Vest': { type: 'Light Armor', baseAc: 15, maxDex: 99, props: 'Dmg Res Light' },
+  'PASGT Vest': { type: 'Light Armor', baseAc: 12, maxDex: 99, props: 'Hidden under clothes' },
+  'Ranger Body Armor': { type: 'Light Armor', baseAc: 15, maxDex: 99, props: 'Mag pouches, Standard issue' },
+  'RBAV Plate Carrier': { type: 'Light Armor', baseAc: 14, maxDex: 99, props: 'Ballistic plates' },
+  'Soviet 6B2 Vest': { type: 'Light Armor', baseAc: 14, maxDex: 99, props: 'Ballistic plates' },
+  'Heavy Combat Suit': { type: 'Heavy Armor', baseAc: 17, maxDex: 0, props: 'Full plate modern, No Stealth' },
+  'Powered Exosuit': { type: 'Heavy Armor', baseAc: 18, maxDex: 0, props: 'Servo-assisted, Loud' }
 };
