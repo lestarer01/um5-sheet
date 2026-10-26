@@ -2,7 +2,7 @@ const LADDER_DATA = {
   'Born Leader': {
     desc: 'You inspire allies and dominate the social battlefield.',
     abilities: [
-      { level: 1, name: 'Commanding Presence', desc: 'Allies in 30 ft gain +1 to attack rolls while you are conscious.' },
+      { level: 1, name: 'Brains and good looks', desc: 'Can choose to use Int for Insight and Perception checks; after finishing a long rest, you gain a +2 bonus to Cha or Int (select one) until you make an attack roll or cast a spell.' },
       { level: 2, name: 'Tactical Order', desc: 'Bonus action: one ally can move or reload without using their reaction.' },
       { level: 5, name: 'Rally', desc: 'Once per rest, grant temporary HP equal to your level + CHA mod to allies in 30 ft.' },
       { level: 10, name: 'Battlefield Authority', desc: 'Your Commanding Presence bonus becomes +2.' }
