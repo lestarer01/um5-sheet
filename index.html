@@ -31,128 +31,135 @@
       </div>
     </section>
 
-    <!-- TAB 2: CORE (Profile + Scores + HP + AC/Speed + Death Saves) -->
+    <!-- TAB 2: CORE (REDESIGNED VITAL & STAT BLOCKS) -->
     <section id="tab-core" class="tab-page">
-      <div class="card">
-        <h3>Profile</h3>
+      
+      <!-- Collapsed Profile Card to save space -->
+      <div class="card" style="padding-bottom: 5px;">
         <div class="grid-2">
-          <div class="field-group">
-            <label>Character Name</label>
-            <input type="text" id="c-name" placeholder="Jax Vance" />
-          </div>
-          <div class="field-group">
-            <label>Species / Genetic Origin</label>
-            <input type="text" id="c-species" placeholder="Human, Cyborg..." />
+          <div class="field-group"><label>Name</label><input type="text" id="c-name" /></div>
+          <div class="field-group"><label>Species</label><input type="text" id="c-species" /></div>
+          <div class="field-group"><label>Class</label><select id="c-class"></select></div>
+          <div class="field-group"><label>Level</label><input type="number" id="c-lvl" value="1" /></div>
+          <div class="field-group"><label>Ladder</label><select id="c-ladder"></select></div>
+          <div class="field-group"><label>Archetype</label><input type="text" id="c-arch" /></div>
+        </div>
+      </div>
+
+      <!-- BIG VITALS ROW 1 -->
+      <div class="vitals-row">
+        <div class="vital-box">
+          <label>Initiative</label>
+          <input type="number" id="init-val" class="massive" value="0" />
+        </div>
+        <div class="vital-box" style="border-color: var(--accent);">
+          <label style="color: var(--accent);">HP (Current)</label>
+          <input type="number" id="hp-cur" class="massive" value="10" />
+          <div class="hp-sub">
+            <input type="number" id="hp-max" placeholder="Max" />
+            <input type="number" id="hp-temp" placeholder="Temp" />
           </div>
         </div>
-        <div class="grid-2">
-          <div class="field-group">
-            <label>Background</label>
-            <input type="text" id="c-bg" placeholder="Mercenary" />
-          </div>
-          <div class="field-group">
-            <label>Archetype</label>
-            <input type="text" id="c-arch" placeholder="Subclass / Role" />
+        <div class="vital-box">
+          <label>Speed</label>
+          <input type="number" id="spd-val" class="massive" value="30" />
+        </div>
+      </div>
+
+      <!-- BIG VITALS ROW 2 -->
+      <div class="vitals-row">
+        <div class="vital-box">
+          <label>Hit Dice</label>
+          <input type="text" id="hd-val" class="massive" value="1d10" />
+        </div>
+        <div class="vital-box">
+          <label>Armor Class</label>
+          <input type="number" id="ac-val" class="massive" value="10" />
+        </div>
+        <div class="vital-box">
+          <label>Proficiency</label>
+          <div id="prof-display" class="massive">+2</div>
+        </div>
+      </div>
+
+      <!-- 2-COLUMN STATS GRID -->
+      <div class="stats-grid-2col">
+        <!-- STR -->
+        <div class="stat-card-new">
+          <div class="stat-name">Strength</div>
+          <div class="stat-cols">
+            <div class="stat-col"><label>Score</label><input type="number" id="s-str" class="stat-score" value="10"></div>
+            <div class="stat-col"><label>Mod</label><span id="m-str" class="stat-mod">+0</span></div>
+            <div class="stat-col"><label><input type="checkbox" id="svS-str"> Save</label><span id="sv-str" class="stat-mod">+0</span></div>
           </div>
         </div>
-        <div class="grid-3">
-          <div class="field-group">
-            <label>Ladder</label>
-            <select id="c-ladder"></select>
+        <!-- INT -->
+        <div class="stat-card-new">
+          <div class="stat-name">Intelligence</div>
+          <div class="stat-cols">
+            <div class="stat-col"><label>Score</label><input type="number" id="s-int" class="stat-score" value="10"></div>
+            <div class="stat-col"><label>Mod</label><span id="m-int" class="stat-mod">+0</span></div>
+            <div class="stat-col"><label><input type="checkbox" id="svS-int"> Save</label><span id="sv-int" class="stat-mod">+0</span></div>
           </div>
-          <div class="field-group">
-            <label>Class</label>
-            <select id="c-class"></select>
+        </div>
+        <!-- DEX -->
+        <div class="stat-card-new">
+          <div class="stat-name">Dexterity</div>
+          <div class="stat-cols">
+            <div class="stat-col"><label>Score</label><input type="number" id="s-dex" class="stat-score" value="10"></div>
+            <div class="stat-col"><label>Mod</label><span id="m-dex" class="stat-mod">+0</span></div>
+            <div class="stat-col"><label><input type="checkbox" id="svS-dex"> Save</label><span id="sv-dex" class="stat-mod">+0</span></div>
           </div>
-          <div class="field-group">
-            <label>Level</label>
-            <input type="number" id="c-lvl" min="1" max="20" value="1" />
+        </div>
+        <!-- WIS -->
+        <div class="stat-card-new">
+          <div class="stat-name">Wisdom</div>
+          <div class="stat-cols">
+            <div class="stat-col"><label>Score</label><input type="number" id="s-wis" class="stat-score" value="10"></div>
+            <div class="stat-col"><label>Mod</label><span id="m-wis" class="stat-mod">+0</span></div>
+            <div class="stat-col"><label><input type="checkbox" id="svS-wis"> Save</label><span id="sv-wis" class="stat-mod">+0</span></div>
+          </div>
+        </div>
+        <!-- CON -->
+        <div class="stat-card-new">
+          <div class="stat-name">Constitution</div>
+          <div class="stat-cols">
+            <div class="stat-col"><label>Score</label><input type="number" id="s-con" class="stat-score" value="10"></div>
+            <div class="stat-col"><label>Mod</label><span id="m-con" class="stat-mod">+0</span></div>
+            <div class="stat-col"><label><input type="checkbox" id="svS-con"> Save</label><span id="sv-con" class="stat-mod">+0</span></div>
+          </div>
+        </div>
+        <!-- CHA -->
+        <div class="stat-card-new">
+          <div class="stat-name">Charisma</div>
+          <div class="stat-cols">
+            <div class="stat-col"><label>Score</label><input type="number" id="s-cha" class="stat-score" value="10"></div>
+            <div class="stat-col"><label>Mod</label><span id="m-cha" class="stat-mod">+0</span></div>
+            <div class="stat-col"><label><input type="checkbox" id="svS-cha"> Save</label><span id="sv-cha" class="stat-mod">+0</span></div>
+          </div>
+        </div>
+        <!-- VIGOR (Spans Full Width at Bottom) -->
+        <div class="stat-card-new full-width">
+          <div class="stat-name">Vigor</div>
+          <div class="stat-cols">
+            <div class="stat-col"><label>Score</label><input type="number" id="s-vig" class="stat-score" value="10"></div>
+            <div class="stat-col"><label>Mod</label><span id="m-vig" class="stat-mod">+0</span></div>
+            <div class="stat-col"><label><input type="checkbox" id="svS-vig"> Save</label><span id="sv-vig" class="stat-mod">+0</span></div>
           </div>
         </div>
       </div>
 
-      <!-- 7 ABILITY SCORES including VIGOR -->
-      <div class="stats-grid">
-        <div class="stat-box">
-          <label>STR</label>
-          <input type="number" id="s-str" value="10" />
-          <span class="mod" id="m-str">+0</span>
-        </div>
-        <div class="stat-box">
-          <label>DEX</label>
-          <input type="number" id="s-dex" value="10" />
-          <span class="mod" id="m-dex">+0</span>
-        </div>
-        <div class="stat-box">
-          <label>CON</label>
-          <input type="number" id="s-con" value="10" />
-          <span class="mod" id="m-con">+0</span>
-        </div>
-        <div class="stat-box">
-          <label>INT</label>
-          <input type="number" id="s-int" value="10" />
-          <span class="mod" id="m-int">+0</span>
-        </div>
-        <div class="stat-box">
-          <label>WIS</label>
-          <input type="number" id="s-wis" value="10" />
-          <span class="mod" id="m-wis">+0</span>
-        </div>
-        <div class="stat-box">
-          <label>CHA</label>
-          <input type="number" id="s-cha" value="10" />
-          <span class="mod" id="m-cha">+0</span>
-        </div>
-        <div class="stat-box">
-          <label>VIG</label>
-          <input type="number" id="s-vig" value="10" />
-          <span class="mod" id="m-vig">+0</span>
-        </div>
-      </div>
-
+      <!-- SEPARATE DEATH SAVES CARD -->
       <div class="card">
-        <h3>Combat Vitals</h3>
-        <div class="grid-3">
-          <div class="field-group">
-            <label>HP Max</label>
-            <input type="number" id="hp-max" value="10" />
-          </div>
-          <div class="field-group">
-            <label>Current HP</label>
-            <input type="number" id="hp-cur" value="10" />
-          </div>
-          <div class="field-group">
-            <label>Temp HP</label>
-            <input type="number" id="hp-temp" value="0" />
-          </div>
-        </div>
-        <div class="grid-3">
-          <div class="field-group">
-            <label>Armor Class</label>
-            <input type="number" id="ac-val" value="10" />
-          </div>
-          <div class="field-group">
-            <label>Speed</label>
-            <input type="number" id="spd-val" value="30" />
-          </div>
-          <div class="field-group">
-            <label>Initiative</label>
-            <input type="number" id="init-val" value="0" />
-          </div>
-        </div>
-        <div class="derived-row">
-          <div>Proficiency <strong id="prof-display">+2</strong></div>
-          <div>Passive Perc <strong id="pass-perc">10</strong></div>
-          <div>VIG Save <strong id="vig-save">+0</strong></div>
-        </div>
+        <h3>Death Saves</h3>
         <div class="death-box">
-          <div class="death-group">
+          <div class="death-group success">
             SUCCESS
             <input type="checkbox" id="ds-s1" />
             <input type="checkbox" id="ds-s2" />
             <input type="checkbox" id="ds-s3" />
           </div>
-          <div class="death-group">
+          <div class="death-group fail">
             FAIL
             <input type="checkbox" id="ds-f1" />
             <input type="checkbox" id="ds-f2" />
@@ -160,6 +167,7 @@
           </div>
         </div>
       </div>
+
     </section>
 
     <!-- TAB 3: COMBAT (Armor + Weapons) -->
@@ -171,103 +179,51 @@
           <select id="armor-preset"></select>
         </div>
         <div class="grid-2">
-          <div class="field-group">
-            <label>Armor Name</label>
-            <input type="text" id="armor-name" placeholder="Custom armor" />
-          </div>
-          <div class="field-group">
-            <label>Properties</label>
-            <input type="text" id="armor-props" placeholder="Ballistic, Sealed..." />
-          </div>
+          <div class="field-group"><label>Armor Name</label><input type="text" id="armor-name" /></div>
+          <div class="field-group"><label>Properties</label><input type="text" id="armor-props" /></div>
         </div>
       </div>
 
       <div class="card">
         <h3>Primary Weapon</h3>
         <div class="weapon-block">
-          <div class="field-group">
-            <label>Weapon Preset</label>
-            <select id="w1-preset"></select>
+          <div class="field-group"><label>Weapon Preset</label><select id="w1-preset"></select></div>
+          <div class="grid-2">
+            <div class="field-group"><label>Name</label><input type="text" id="w1-name" /></div>
+            <div class="field-group"><label>Damage</label><input type="text" id="w1-dmg" /></div>
           </div>
           <div class="grid-2">
-            <div class="field-group">
-              <label>Name</label>
-              <input type="text" id="w1-name" />
-            </div>
-            <div class="field-group">
-              <label>Damage</label>
-              <input type="text" id="w1-dmg" />
-            </div>
-          </div>
-          <div class="grid-2">
-            <div class="field-group">
-              <label>Range</label>
-              <input type="text" id="w1-range" />
-            </div>
-            <div class="field-group">
-              <label>Properties</label>
-              <input type="text" id="w1-props" />
-            </div>
+            <div class="field-group"><label>Range</label><input type="text" id="w1-range" /></div>
+            <div class="field-group"><label>Properties</label><input type="text" id="w1-props" /></div>
           </div>
           <div class="ammo-row">
-            <span>Ammo: <strong id="w1-cur">0</strong> /
-              <input type="number" id="w1-max" style="width:58px;display:inline-block;padding:4px;" />
-            </span>
-            <div class="ammo-btns">
-              <button type="button" class="btn btn-shoot" id="btn-fire-1">SHOOT</button>
-              <button type="button" class="btn btn-reload" id="btn-reload-1">RELOAD</button>
-            </div>
+            <span>Ammo: <strong id="w1-cur">0</strong> / <input type="number" id="w1-max" style="width:50px;display:inline-block;padding:4px;" /></span>
+            <div><button type="button" class="btn btn-shoot" id="btn-fire-1">SHOOT</button> <button type="button" class="btn btn-reload" id="btn-reload-1">RELOAD</button></div>
           </div>
         </div>
 
-        <h3 style="margin-top:8px;">Secondary Weapon</h3>
+        <h3>Secondary Weapon</h3>
         <div class="weapon-block">
-          <div class="field-group">
-            <label>Weapon Preset</label>
-            <select id="w2-preset"></select>
+          <div class="field-group"><label>Weapon Preset</label><select id="w2-preset"></select></div>
+          <div class="grid-2">
+            <div class="field-group"><label>Name</label><input type="text" id="w2-name" /></div>
+            <div class="field-group"><label>Damage</label><input type="text" id="w2-dmg" /></div>
           </div>
           <div class="grid-2">
-            <div class="field-group">
-              <label>Name</label>
-              <input type="text" id="w2-name" />
-            </div>
-            <div class="field-group">
-              <label>Damage</label>
-              <input type="text" id="w2-dmg" />
-            </div>
-          </div>
-          <div class="grid-2">
-            <div class="field-group">
-              <label>Range</label>
-              <input type="text" id="w2-range" />
-            </div>
-            <div class="field-group">
-              <label>Properties</label>
-              <input type="text" id="w2-props" />
-            </div>
+            <div class="field-group"><label>Range</label><input type="text" id="w2-range" /></div>
+            <div class="field-group"><label>Properties</label><input type="text" id="w2-props" /></div>
           </div>
           <div class="ammo-row">
-            <span>Ammo: <strong id="w2-cur">0</strong> /
-              <input type="number" id="w2-max" style="width:58px;display:inline-block;padding:4px;" />
-            </span>
-            <div class="ammo-btns">
-              <button type="button" class="btn btn-shoot" id="btn-fire-2">SHOOT</button>
-              <button type="button" class="btn btn-reload" id="btn-reload-2">RELOAD</button>
-            </div>
+            <span>Ammo: <strong id="w2-cur">0</strong> / <input type="number" id="w2-max" style="width:50px;display:inline-block;padding:4px;" /></span>
+            <div><button type="button" class="btn btn-shoot" id="btn-fire-2">SHOOT</button> <button type="button" class="btn btn-reload" id="btn-reload-2">RELOAD</button></div>
           </div>
         </div>
       </div>
 
       <div class="card">
         <h3>Credits & Gear</h3>
-        <div class="field-group">
-          <label>Credits (₡)</label>
-          <input type="number" id="credits" value="500" />
-        </div>
-        <div class="field-group">
-          <label>Inventory</label>
-          <textarea id="inventory" placeholder="Armor mods, gadgets, ammo boxes..."></textarea>
-        </div>
+        <div class="field-group"><label>Credits (₡)</label><input type="number" id="credits" /></div>
+        <div class="field-group"><label>Inventory</label><textarea id="inventory" rows="4"></textarea></div>
       </div>
     </section>
 
@@ -275,61 +231,32 @@
     <section id="tab-skills" class="tab-page">
       <div class="card">
         <h2>Skill Proficiencies</h2>
-        <p style="font-size:0.75rem;color:var(--muted);margin-bottom:10px;">
-          Check Prof for proficiency. Check Exp for expertise (double bonus).
-        </p>
+        <p style="font-size:0.75rem;color:var(--muted);margin-bottom:10px;">Check Prof for proficiency. Check Exp for expertise (double bonus).</p>
         <div id="skills-box"></div>
       </div>
     </section>
 
     <!-- TAB 5: ABILITIES -->
     <section id="tab-abilities" class="tab-page">
-      <div class="card">
-        <h2>Ladder Features</h2>
-        <div id="ladder-box"></div>
-      </div>
-      <div class="card">
-        <h2>Class Features</h2>
-        <div id="class-box"></div>
-      </div>
-      <div class="card">
-        <h2>Custom Notes</h2>
-        <textarea id="feat-notes" rows="5" placeholder="Feats, cyberware, boons..."></textarea>
-      </div>
+      <div class="card"><h2>Ladder Features</h2><div id="ladder-box"></div></div>
+      <div class="card"><h2>Class Features</h2><div id="class-box"></div></div>
+      <div class="card"><h2>Custom Notes</h2><textarea id="feat-notes" rows="5"></textarea></div>
     </section>
 
-    <!-- TAB 6: DARK SYSTEM MAGIC -->
+    <!-- TAB 6: MAGIC -->
     <section id="tab-magic" class="tab-page">
       <div class="card">
         <h2>Dark System Magic</h2>
         <div class="grid-2">
-          <div class="field-group">
-            <label>Max Mana / MP</label>
-            <input type="number" id="mp-max" value="0" />
-          </div>
-          <div class="field-group">
-            <label>Current Mana</label>
-            <input type="number" id="mp-cur" value="0" />
-          </div>
+          <div class="field-group"><label>Max Mana / MP</label><input type="number" id="mp-max" /></div>
+          <div class="field-group"><label>Current Mana</label><input type="number" id="mp-cur" /></div>
         </div>
         <div class="grid-2">
-          <div class="field-group">
-            <label>Spell Save DC</label>
-            <input type="number" id="spell-dc" value="10" />
-          </div>
-          <div class="field-group">
-            <label>Spell Attack</label>
-            <input type="number" id="spell-atk" value="0" />
-          </div>
+          <div class="field-group"><label>Spell Save DC</label><input type="number" id="spell-dc" /></div>
+          <div class="field-group"><label>Spell Attack</label><input type="number" id="spell-atk" /></div>
         </div>
-        <div class="field-group">
-          <label>Magic Tradition / Source</label>
-          <input type="text" id="magic-source" placeholder="Psionic, Occult, Nano-Magic..." />
-        </div>
-        <div class="field-group">
-          <label>Spells & Dark Powers</label>
-          <textarea id="spell-list" rows="10" placeholder="List spells, costs, and effects..."></textarea>
-        </div>
+        <div class="field-group"><label>Magic Tradition / Source</label><input type="text" id="magic-source" /></div>
+        <div class="field-group"><label>Spells & Dark Powers</label><textarea id="spell-list" rows="10"></textarea></div>
       </div>
     </section>
   </main>
