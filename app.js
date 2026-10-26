@@ -1,410 +1,197 @@
-// LocalStorage & State Management
-const STORAGE_KEY = 'um5_chars';
-let characterList = [];
-let currentCharacterId = null;
-let memoryBackup = [];
+let chars = JSON.parse(localStorage.getItem('um5_chars') || '[]');
+let activeId = null;
 
-function loadStorage() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch (e) {
-    console.warn('localStorage read failed, using memory backup');
-  }
-  return memoryBackup;
-}
-
-function saveStorage(data) {
-  memoryBackup = data;
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  } catch (e) {
-    console.warn('localStorage save failed');
-  }
-}
-
-// Helpers
-function getValue(id) {
+function val(id, v) { 
   const el = document.getElementById(id);
-  return el ? el.value : '';
+  if (!el) return;
+  if (v !== undefined) el.type === 'checkbox' ? el.checked = v : el.value = v;
+  return el.type === 'checkbox' ? el.checked : el.value;
 }
 
-function setValue(id, val) {
-  const el = document.getElementById(id);
-  if (el) el.value = val;
-}
-
-function calcMod(score) {
-  return Math.floor((parseInt(score || 10) - 10) / 2);
-}
-
-function calcProf(level) {
-  const lvl = parseInt(level || 1);
-  if (lvl >= 17) return 6;
-  if (lvl >= 13) return 5;
-  if (lvl >= 9) return 4;
-  if (lvl >= 5) return 3;
-  return 2;
-}
-
-// Populate Dropdowns from database.js
-function populateDropdowns() {
-  const ladderSelect = document.getElementById('char-ladder');
-  const classSelect = document.getElementById('char-class');
-  const wpn1Select = document.getElementById('wpn-1-preset');
-  const wpn2Select = document.getElementById('wpn-2-preset');
-
-  if (ladderSelect && typeof LADDER_DATA !== 'undefined') {
-    ladderSelect.innerHTML = Object.keys(LADDER_DATA)
-      .map(l => `<option value="${l}">${l}</option>`)
-      .join('');
-  }
-
-  if (classSelect && typeof CLASS_DATA !== 'undefined') {
-    classSelect.innerHTML = Object.keys(CLASS_DATA)
-      .map(c => `<option value="${c}">${c}</option>`)
-      .join('');
-  }
-
-  if (typeof WEAPON_DATA !== 'undefined') {
-    const weaponOptions = [
-      '<option value="__custom__">-- Custom / Manual Entry --</option>',
-      ...Object.keys(WEAPON_DATA).map(w => `<option value="${w}">${w} (${WEAPON_DATA[w].type})</option>`)
-    ].join('');
-
-    if (wpn1Select) wpn1Select.innerHTML = weaponOptions;
-    if (wpn2Select) wpn2Select.innerHTML = weaponOptions;
-  }
-}
-
-// Apply Weapon Presets
-function applyWeaponPreset(num) {
-  const selectId = `wpn-${num}-preset`;
-  const selected = getValue(selectId);
-  if (selected === '__custom__' || !WEAPON_DATA[selected]) return;
-
-  const w = WEAPON_DATA[selected];
-  setValue(`wpn-${num}-name`, selected);
-  setValue(`wpn-${num}-damage`, w.damage);
-  setValue(`wpn-${num}-range`, w.range);
-  setValue(`wpn-${num}-props`, w.properties);
-  setValue(`wpn-${num}-max-ammo`, w.magSize);
-  setValue(`wpn-${num}-cur-ammo`, w.magSize);
-
-  const curDisplay = document.getElementById(`wpn-${num}-cur-display`);
-  if (curDisplay) curDisplay.innerText = w.magSize;
-
-  readForm();
-}
-
-function markCustom(num) {
-  setValue(`wpn-${num}-preset`, '__custom__');
-}
-
-function fireWeapon(num) {
-  let cur = parseInt(getValue(`wpn-${num}-cur-ammo`)) || 0;
-  if (cur > 0) {
-    cur -= 1;
-    setValue(`wpn-${num}-cur-ammo`, cur);
-    const display = document.getElementById(`wpn-${num}-cur-display`);
-    if (display) display.innerText = cur;
-    readForm();
-  }
-}
-
-function reloadWeapon(num) {
-  const max = parseInt(getValue(`wpn-${num}-max-ammo`)) || 0;
-  setValue(`wpn-${num}-cur-ammo`, max);
-  const display = document.getElementById(`wpn-${num}-cur-display`);
-  if (display) display.innerText = max;
-  readForm();
-}
-
-// Character Operations
-function createNewCharacter() {
-  const newChar = {
-    id: 'char_' + Date.now(),
-    name: 'New Operative',
-    species: 'Human',
-    background: 'Mercenary',
-    ladder: 'Born Leader',
-    class: 'Gunslinger',
-    archetype: '',
-    level: 1,
-
-    str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10,
-    hpMax: 10, hpCurrent: 10, hpTemp: 0,
-    ac: 10, speed: 30,
-
-    wpn1Preset: '__custom__', wpn1Name: 'Sidearm', wpn1MaxAmmo: 12, wpn1CurrentAmmo: 12, wpn1Damage: '1d6', wpn1Range: '50/150', wpn1Props: 'Light',
-    wpn2Preset: '__custom__', wpn2Name: '', wpn2MaxAmmo: 0, wpn2CurrentAmmo: 0, wpn2Damage: '', wpn2Range: '', wpn2Props: '',
-
-    credits: 500,
-    inventory: 'Standard Tactical Gear, Commlink',
-    abilitiesNotes: ''
-  };
-
-  characterList.push(newChar);
-  currentCharacterId = newChar.id;
-  saveStorage(characterList);
-  loadCharacterToForm(newChar);
-  renderCharacterList();
-}
-
-function readForm() {
-  if (!currentCharacterId) return null;
-  const char = characterList.find(c => c.id === currentCharacterId);
-  if (!char) return null;
-
-  char.name = getValue('char-name') || 'Unnamed Operative';
-  char.species = getValue('char-species');
-  char.background = getValue('char-background');
-  char.ladder = getValue('char-ladder');
-  char.class = getValue('char-class');
-  char.archetype = getValue('char-archetype');
-  char.level = parseInt(getValue('char-level')) || 1;
-
-  char.str = parseInt(getValue('stat-str')) || 10;
-  char.dex = parseInt(getValue('stat-dex')) || 10;
-  char.con = parseInt(getValue('stat-con')) || 10;
-  char.int = parseInt(getValue('stat-int')) || 10;
-  char.wis = parseInt(getValue('stat-wis')) || 10;
-  char.cha = parseInt(getValue('stat-cha')) || 10;
-
-  char.hpMax = parseInt(getValue('hp-max')) || 10;
-  char.hpCurrent = parseInt(getValue('hp-current')) || 0;
-  char.hpTemp = parseInt(getValue('hp-temp')) || 0;
-  char.ac = parseInt(getValue('ac-val')) || 10;
-  char.speed = parseInt(getValue('speed-val')) || 30;
-
-  char.wpn1Preset = getValue('wpn-1-preset');
-  char.wpn1Name = getValue('wpn-1-name');
-  char.wpn1MaxAmmo = parseInt(getValue('wpn-1-max-ammo')) || 0;
-  char.wpn1CurrentAmmo = parseInt(getValue('wpn-1-cur-ammo')) || 0;
-  char.wpn1Damage = getValue('wpn-1-damage');
-  char.wpn1Range = getValue('wpn-1-range');
-  char.wpn1Props = getValue('wpn-1-props');
-
-  char.wpn2Preset = getValue('wpn-2-preset');
-  char.wpn2Name = getValue('wpn-2-name');
-  char.wpn2MaxAmmo = parseInt(getValue('wpn-2-max-ammo')) || 0;
-  char.wpn2CurrentAmmo = parseInt(getValue('wpn-2-cur-ammo')) || 0;
-  char.wpn2Damage = getValue('wpn-2-damage');
-  char.wpn2Range = getValue('wpn-2-range');
-  char.wpn2Props = getValue('wpn-2-props');
-
-  char.credits = parseInt(getValue('credits-val')) || 0;
-  char.inventory = getValue('inventory-val');
-  char.abilitiesNotes = getValue('char-abilities-notes');
-
-  saveStorage(characterList);
-  recalculateCalculatedFields();
-  return char;
-}
-
-function loadCharacterToForm(c) {
-  if (!c) return;
-
-  setValue('char-name', c.name || '');
-  setValue('char-species', c.species || '');
-  setValue('char-background', c.background || '');
-  setValue('char-ladder', c.ladder || '');
-  setValue('char-class', c.class || '');
-  setValue('char-archetype', c.archetype || '');
-  setValue('char-level', c.level || 1);
-
-  setValue('stat-str', c.str || 10);
-  setValue('stat-dex', c.dex || 10);
-  setValue('stat-con', c.con || 10);
-  setValue('stat-int', c.int || 10);
-  setValue('stat-wis', c.wis || 10);
-  setValue('stat-cha', c.cha || 10);
-
-  setValue('hp-max', c.hpMax || 10);
-  setValue('hp-current', c.hpCurrent || 10);
-  setValue('hp-temp', c.hpTemp || 0);
-  setValue('ac-val', c.ac || 10);
-  setValue('speed-val', c.speed || 30);
-
-  setValue('wpn-1-preset', c.wpn1Preset || '__custom__');
-  setValue('wpn-1-name', c.wpn1Name || '');
-  setValue('wpn-1-max-ammo', c.wpn1MaxAmmo || 0);
-  setValue('wpn-1-cur-ammo', c.wpn1CurrentAmmo || 0);
-  setValue('wpn-1-damage', c.wpn1Damage || '');
-  setValue('wpn-1-range', c.wpn1Range || '');
-  setValue('wpn-1-props', c.wpn1Props || '');
-
-  setValue('wpn-2-preset', c.wpn2Preset || '__custom__');
-  setValue('wpn-2-name', c.wpn2Name || '');
-  setValue('wpn-2-max-ammo', c.wpn2MaxAmmo || 0);
-  setValue('wpn-2-cur-ammo', c.wpn2CurrentAmmo || 0);
-  setValue('wpn-2-damage', c.wpn2Damage || '');
-  setValue('wpn-2-range', c.wpn2Range || '');
-  setValue('wpn-2-props', c.wpn2Props || '');
-
-  const cur1 = document.getElementById('wpn-1-cur-display');
-  if (cur1) cur1.innerText = c.wpn1CurrentAmmo || 0;
-
-  const cur2 = document.getElementById('wpn-2-cur-display');
-  if (cur2) cur2.innerText = c.wpn2CurrentAmmo || 0;
-
-  setValue('credits-val', c.credits || 0);
-  setValue('inventory-val', c.inventory || '');
-  setValue('char-abilities-notes', c.abilitiesNotes || '');
-
-  recalculateCalculatedFields();
-}
-
-function recalculateCalculatedFields() {
-  const stats = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
-  stats.forEach(s => {
-    const score = parseInt(getValue(`stat-${s}`)) || 10;
-    const mod = calcMod(score);
-    const modEl = document.getElementById(`mod-${s}`);
-    if (modEl) modEl.innerText = (mod >= 0 ? '+' : '') + mod;
+// SETUP DROPDOWNS & TABS
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn, .tab-page').forEach(e => e.classList.remove('active'));
+      b.classList.add('active');
+      document.getElementById(b.dataset.tab).classList.add('active');
+      if (b.dataset.tab === 'tab-abilities') renderAbilities();
+    });
   });
 
-  const level = parseInt(getValue('char-level')) || 1;
-  const prof = calcProf(level);
+  const ladSel = document.getElementById('c-ladder');
+  const clsSel = document.getElementById('c-class');
+  const wpnSel = document.getElementById('w1-preset');
+  const armSel = document.getElementById('armor-preset');
 
-  const profEl = document.getElementById('prof-bonus-display');
-  if (profEl) profEl.innerText = '+' + prof;
+  if(ladSel) ladSel.innerHTML = Object.keys(LADDER_DATA).map(k=>`<option value="${k}">${k}</option>`).join('');
+  if(clsSel) clsSel.innerHTML = Object.keys(CLASS_DATA).map(k=>`<option value="${k}">${k}</option>`).join('');
+  
+  const wOpts = '<option value="">--Custom--</option>' + Object.keys(WEAPON_DATA).map(k=>`<option value="${k}">${k}</option>`).join('');
+  if(wpnSel) wpnSel.innerHTML = wOpts;
 
-  const wisMod = calcMod(getValue('stat-wis'));
-  const passivePerc = 10 + wisMod;
-  const percEl = document.getElementById('passive-perception-display');
-  if (percEl) percEl.innerText = passivePerc;
+  const aOpts = '<option value="">--Custom / Unarmored--</option>' + Object.keys(ARMOR_DATA).map(k=>`<option value="${k}">${k}</option>`).join('');
+  if(armSel) armSel.innerHTML = aOpts;
+
+  document.getElementById('btn-new').addEventListener('click', createChar);
+  
+  // Setup Skills UI
+  document.getElementById('skills-container').innerHTML = SKILL_LIST.map((s, i) => `
+    <div class="skill-row">
+      <strong>${s}</strong>
+      <div class="skill-checks">
+        <label><input type="checkbox" id="sk-p-${i}"> Prof</label>
+        <label><input type="checkbox" id="sk-e-${i}"> Exp</label>
+      </div>
+    </div>
+  `).join('');
+
+  // Auto-save on inputs
+  document.querySelectorAll('input, select, textarea').forEach(i => i.addEventListener('input', saveChar));
+
+  if (chars.length > 0) loadChar(chars[0].id);
+  renderRoster();
+});
+
+function createChar() {
+  const c = { 
+    id: Date.now().toString(), name: 'New Operative', 
+    str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10,
+    hpMax: 10, hpCur: 10, ac: 10, w1Max: 12, w1Cur: 12, skills: {} 
+  };
+  chars.push(c);
+  loadChar(c.id);
+  renderRoster();
 }
 
-// Render Functions
-function renderCharacterList() {
-  const container = document.getElementById('character-list');
-  if (!container) return;
+function loadChar(id) {
+  activeId = id;
+  const c = chars.find(x => x.id === id);
+  if (!c) return;
 
-  if (characterList.length === 0) {
-    container.innerHTML = '<p class="empty-msg">No operatives active. Create one above.</p>';
-    return;
+  val('c-name', c.name || ''); val('c-species', c.species || '');
+  val('c-bg', c.bg || ''); val('c-archetype', c.archetype || '');
+  val('c-ladder', c.ladder || 'Born Leader'); val('c-class', c.class || 'Gunslinger');
+  val('c-lvl', c.lvl || 1);
+
+  val('s-str', c.str); val('s-dex', c.dex); val('s-con', c.con);
+  val('s-int', c.int); val('s-wis', c.wis); val('s-cha', c.cha);
+
+  val('hp-max', c.hpMax); val('hp-cur', c.hpCur); val('hp-temp', c.hpTemp || 0);
+  val('ac-val', c.ac); val('spd-val', c.spd || 30);
+  
+  val('ds-s1', c.dsS1); val('ds-s2', c.dsS2); val('ds-s3', c.dsS3);
+  val('ds-f1', c.dsF1); val('ds-f2', c.dsF2); val('ds-f3', c.dsF3);
+
+  val('armor-preset', c.armorPreset || '');
+  val('w1-preset', c.w1Preset || ''); val('w1-name', c.w1Name || '');
+  val('w1-dmg', c.w1Dmg || ''); val('w1-max', c.w1Max);
+  document.getElementById('w1-cur').innerText = c.w1Cur || 0;
+
+  SKILL_LIST.forEach((s, i) => {
+    val(`sk-p-${i}`, c.skills[`p${i}`]);
+    val(`sk-e-${i}`, c.skills[`e${i}`]);
+  });
+
+  val('c-notes', c.notes || '');
+  val('mp-max', c.mpMax || 0); val('mp-cur', c.mpCur || 0);
+  val('spell-dc', c.spellDc || 10); val('spell-atk', c.spellAtk || 0);
+  val('spell-list', c.spellList || '');
+}
+
+function saveChar() {
+  if (!activeId) return;
+  const c = chars.find(x => x.id === activeId);
+  
+  c.name = val('c-name'); c.species = val('c-species');
+  c.bg = val('c-bg'); c.archetype = val('c-archetype');
+  c.ladder = val('c-ladder'); c.class = val('c-class'); c.lvl = val('c-lvl');
+
+  c.str = val('s-str'); c.dex = val('s-dex'); c.con = val('s-con');
+  c.int = val('s-int'); c.wis = val('s-wis'); c.cha = val('s-cha');
+
+  c.hpMax = val('hp-max'); c.hpCur = val('hp-cur'); c.hpTemp = val('hp-temp');
+  c.ac = val('ac-val'); c.spd = val('spd-val');
+  
+  c.dsS1 = val('ds-s1'); c.dsS2 = val('ds-s2'); c.dsS3 = val('ds-s3');
+  c.dsF1 = val('ds-f1'); c.dsF2 = val('ds-f2'); c.dsF3 = val('ds-f3');
+
+  c.armorPreset = val('armor-preset');
+  c.w1Preset = val('w1-preset'); c.w1Name = val('w1-name');
+  c.w1Dmg = val('w1-dmg'); c.w1Max = val('w1-max'); 
+  c.w1Cur = parseInt(document.getElementById('w1-cur').innerText) || 0;
+
+  SKILL_LIST.forEach((s, i) => {
+    c.skills[`p${i}`] = val(`sk-p-${i}`);
+    c.skills[`e${i}`] = val(`sk-e-${i}`);
+  });
+
+  c.notes = val('c-notes');
+  c.mpMax = val('mp-max'); c.mpCur = val('mp-cur');
+  c.spellDc = val('spell-dc'); c.spellAtk = val('spell-atk');
+  c.spellList = val('spell-list');
+
+  // Calc Prof
+  let lvl = parseInt(c.lvl) || 1;
+  let prof = (lvl >= 17) ? 6 : (lvl >= 13) ? 5 : (lvl >= 9) ? 4 : (lvl >= 5) ? 3 : 2;
+  val('prof-val', '+' + prof);
+
+  localStorage.setItem('um5_chars', JSON.stringify(chars));
+  renderRoster();
+}
+
+function applyArmor() {
+  const p = val('armor-preset');
+  if (ARMOR_DATA[p]) {
+    let base = ARMOR_DATA[p].baseAc;
+    let dex = Math.floor((val('s-dex') - 10) / 2);
+    if (dex > ARMOR_DATA[p].maxDex) dex = ARMOR_DATA[p].maxDex;
+    val('ac-val', base + dex);
+    saveChar();
   }
+}
 
-  container.innerHTML = characterList.map(c => `
-    <div class="char-card ${c.id === currentCharacterId ? 'active-char' : ''}" onclick="selectCharacter('${c.id}')">
-      <div>
-        <strong>${c.name}</strong>
-        <span class="char-sub">${c.species || 'Human'} • Lvl ${c.level} ${c.ladder} ${c.class}</span>
-      </div>
-      <button class="btn danger-btn" onclick="deleteCharacter(event, '${c.id}')">Delete</button>
+function applyWpn(n) {
+  const p = val(`w${n}-preset`);
+  if (WEAPON_DATA[p]) {
+    val(`w${n}-name`, p);
+    val(`w${n}-dmg`, WEAPON_DATA[p].damage);
+    val(`w${n}-max`, WEAPON_DATA[p].magSize);
+    document.getElementById(`w${n}-cur`).innerText = WEAPON_DATA[p].magSize;
+    saveChar();
+  }
+}
+
+function fire(n) {
+  let c = parseInt(document.getElementById(`w${n}-cur`).innerText);
+  if (c > 0) document.getElementById(`w${n}-cur`).innerText = c - 1;
+  saveChar();
+}
+function reload(n) {
+  document.getElementById(`w${n}-cur`).innerText = val(`w${n}-max`);
+  saveChar();
+}
+
+function renderRoster() {
+  document.getElementById('roster-list').innerHTML = chars.map(c => `
+    <div style="border:1px solid #30363d; padding:10px; margin-bottom:10px; border-radius:4px; display:flex; justify-content:space-between; ${c.id === activeId ? 'border-color:#00f2fe' : ''}" onclick="loadChar('${c.id}')">
+      <div><strong>${c.name}</strong><br><small>Lvl ${c.lvl || 1} ${c.class}</small></div>
+      <button class="btn danger" onclick="event.stopPropagation(); chars = chars.filter(x=>x.id!=='${c.id}'); localStorage.setItem('um5_chars', JSON.stringify(chars)); renderRoster();">Del</button>
     </div>
   `).join('');
 }
 
-function selectCharacter(id) {
-  currentCharacterId = id;
-  const c = characterList.find(char => char.id === id);
-  if (c) loadCharacterToForm(c);
-  renderCharacterList();
-  switchPage('page-sheet');
-}
-
-function deleteCharacter(event, id) {
-  event.stopPropagation();
-  if (!confirm('Delete this operative?')) return;
-  characterList = characterList.filter(c => c.id !== id);
-  saveStorage(characterList);
-  if (currentCharacterId === id) {
-    currentCharacterId = characterList.length ? characterList[0].id : null;
-    if (currentCharacterId) {
-      loadCharacterToForm(characterList[0]);
-    }
-  }
-  renderCharacterList();
-}
-
-function switchPage(pageId) {
-  document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-
-  const targetPage = document.getElementById(pageId);
-  const targetBtn = document.querySelector(`[data-tab="${pageId}"]`);
-
-  if (targetPage) targetPage.classList.add('active');
-  if (targetBtn) targetBtn.classList.add('active');
-
-  if (pageId === 'page-abilities') renderAbilities();
-}
-
 function renderAbilities() {
-  const ladderBox = document.getElementById('ladder-abilities-container');
-  const classBox = document.getElementById('class-abilities-container');
-
-  const ladderName = getValue('char-ladder');
-  const className = getValue('char-class');
-  const level = parseInt(getValue('char-level')) || 1;
-
-  if (ladderBox && typeof LADDER_DATA !== 'undefined' && LADDER_DATA[ladderName]) {
-    const lData = LADDER_DATA[ladderName];
-    const unlocked = lData.abilities.filter(a => a.level <= level);
-
-    ladderBox.innerHTML = `
-      <p class="ladder-desc">${lData.desc}</p>
-      ${unlocked.map(a => `
-        <div class="ability-entry">
-          <div class="ability-entry-header">
-            <span class="ability-entry-name">${a.name}</span>
-            <span class="ability-entry-level">Level ${a.level}</span>
-          </div>
-          <p class="ability-entry-desc">${a.desc}</p>
-        </div>
-      `).join('')}
-    `;
+  const lad = val('c-ladder');
+  const cls = val('c-class');
+  let html = '';
+  if (LADDER_DATA[lad]) {
+    html += `<strong>Ladder: ${lad}</strong><p style="font-size:0.8rem; color:#8b949e; margin-bottom:10px;">${LADDER_DATA[lad].desc}</p>`;
+    LADDER_DATA[lad].abilities.forEach(a => html += `<div style="background:#0d1117; padding:8px; border-left:3px solid #00f2fe; margin-bottom:5px;"><strong>${a.name} (Lvl ${a.level})</strong><br><small>${a.desc}</small></div>`);
   }
-
-  if (classBox && typeof CLASS_DATA !== 'undefined' && CLASS_DATA[className]) {
-    const cData = CLASS_DATA[className];
-    const unlocked = cData.abilities.filter(a => a.level <= level);
-
-    classBox.innerHTML = `
-      <p class="ladder-desc">Hit Die: ${cData.hitDie} | Primary: ${cData.primaryStat}</p>
-      ${unlocked.map(a => `
-        <div class="ability-entry">
-          <div class="ability-entry-header">
-            <span class="ability-entry-name">${a.name}</span>
-            <span class="ability-entry-level">Level ${a.level}</span>
-          </div>
-          <p class="ability-entry-desc">${a.desc}</p>
-        </div>
-      `).join('')}
-    `;
+  if (CLASS_DATA[cls]) {
+    html += `<strong style="display:block; margin-top:15px;">Class: ${cls}</strong><p style="font-size:0.8rem; color:#8b949e; margin-bottom:10px;">${CLASS_DATA[cls].desc} | Hit Die: ${CLASS_DATA[cls].hitDie}</p>`;
+    CLASS_DATA[cls].abilities.forEach(a => html += `<div style="background:#0d1117; padding:8px; border-left:3px solid #00f2fe; margin-bottom:5px;"><strong>${a.name} (Lvl ${a.level})</strong><br><small>${a.desc}</small></div>`);
   }
+  document.getElementById('abilities-box').innerHTML = html;
 }
-
-// Global Event Listeners
-document.addEventListener('DOMContentLoaded', () => {
-  characterList = loadStorage();
-  populateDropdowns();
-
-  if (characterList.length > 0) {
-    currentCharacterId = characterList[0].id;
-    loadCharacterToForm(characterList[0]);
-  } else {
-    createNewCharacter();
-  }
-
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => switchPage(btn.dataset.tab));
-  });
-
-  const btnNew = document.getElementById('btn-new-char');
-  if (btnNew) btnNew.addEventListener('click', createNewCharacter);
-
-  document.querySelectorAll('#page-sheet input, #page-sheet select, #page-sheet textarea').forEach(input => {
-    input.addEventListener('input', readForm);
-    input.addEventListener('change', readForm);
-  });
-
-  const notes = document.getElementById('char-abilities-notes');
-  if (notes) {
-    notes.addEventListener('input', readForm);
-  }
-
-  renderCharacterList();
-});
