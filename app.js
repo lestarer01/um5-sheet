@@ -1,35 +1,34 @@
 const UM5_SKILLS = [
-  { name: 'Athletics', stat: 'str' },
   { name: 'Acrobatics', stat: 'dex' },
-  { name: 'Sleight of Hands', stat: 'dex' },
-  { name: 'Stealth', stat: 'dex' },
-  { name: 'Survival', stat: 'dex' },
-  { name: 'Detection', stat: 'vig' },
-  { name: 'Commune', stat: 'vig' },
-  { name: 'Induce', stat: 'vig' },
-  { name: 'Arcana', stat: 'int' },
-  { name: 'Investigation', stat: 'int' },
-  { name: 'History', stat: 'int' },
-  { name: 'Nature', stat: 'int' },
-  { name: 'Religion', stat: 'int' },
-  { name: 'Sciences', stat: 'int' },
-  { name: 'Demolitions', stat: 'int' },
-  { name: 'Computer use', stat: 'int' },
-  { name: 'Engineering', stat: 'int' },
-  { name: 'Animal Handling', stat: 'wis' },
-  { name: 'Insight', stat: 'wis' },
-  { name: 'Perception', stat: 'wis' },
-  { name: 'Medicine', stat: 'wis' },
+  { name: 'Athletics', stat: 'str' },
+  { name: 'Computers', stat: 'int' },
   { name: 'Deception', stat: 'cha' },
+  { name: 'Demolitions', stat: 'int' },
+  { name: 'Driving', stat: 'dex' },
+  { name: 'Electronics', stat: 'int' },
+  { name: 'Insight', stat: 'wis' },
   { name: 'Intimidation', stat: 'cha' },
+  { name: 'Investigation', stat: 'int' },
+  { name: 'Medicine', stat: 'wis' },
+  { name: 'Perception', stat: 'wis' },
   { name: 'Performance', stat: 'cha' },
+  { name: 'Persuasion', stat: 'cha' },
+  { name: 'Piloting', stat: 'dex' },
+  { name: 'Science', stat: 'int' },
+  { name: 'Sleight of Hand', stat: 'dex' },
+  { name: 'Stealth', stat: 'dex' },
+  { name: 'Survival', stat: 'wis' },
+  { name: 'Technology', stat: 'int' },
+  { name: 'Vehicle (Air/Sea)', stat: 'dex' },
+  { name: 'Heavy Weapons', stat: 'str' }
 ];
 
-const STORAGE_KEY = 'um5_chars_v4';
+const STORAGE_KEY = 'um5_chars_v5';
 let chars = [];
 let activeId = null;
 
 function $(id) { return document.getElementById(id); }
+
 function val(id, v) {
   const el = $(id);
   if (!el) return null;
@@ -39,6 +38,7 @@ function val(id, v) {
   }
   return el.type === 'checkbox' ? el.checked : el.value;
 }
+
 function mod(score) { return Math.floor((parseInt(score || 10, 10) - 10) / 2); }
 function fmtMod(n) { return (n >= 0 ? '+' : '') + n; }
 function profBonus(level) {
@@ -48,11 +48,18 @@ function profBonus(level) {
 }
 
 function loadStorage() {
-  try { const raw = localStorage.getItem(STORAGE_KEY); chars = raw ? JSON.parse(raw) : []; } 
-  catch (e) { chars = []; }
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    chars = raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    chars = [];
+  }
 }
+
 function saveStorage() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(chars)); } catch (e) {}
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(chars));
+  } catch (e) {}
 }
 
 function populateSelects() {
@@ -63,12 +70,8 @@ function populateSelects() {
     $('c-class').innerHTML = Object.keys(CLASS_DATA).map(k => `<option value="${k}">${k}</option>`).join('');
   }
   if (typeof ARMOR_DATA !== 'undefined' && $('armor-preset')) {
-    $('armor-preset').innerHTML = '<option value="__custom__">Custom / Manual</option>' + Object.keys(ARMOR_DATA).map(k => `<option value="${k}">${k} (AC ${ARMOR_DATA[k].baseAc})</option>`).join('');
-  }
-  if (typeof WEAPON_DATA !== 'undefined') {
-    const wOpts = '<option value="__custom__">Custom / Manual</option>' + Object.keys(WEAPON_DATA).map(k => `<option value="${k}">${k} (${WEAPON_DATA[k].type})</option>`).join('');
-    if ($('w1-preset')) $('w1-preset').innerHTML = wOpts;
-    if ($('w2-preset')) $('w2-preset').innerHTML = wOpts;
+    $('armor-preset').innerHTML = '<option value="__custom__">Custom / Manual</option>' + 
+      Object.keys(ARMOR_DATA).map(k => `<option value="${k}">${k} (AC ${ARMOR_DATA[k].baseAc})</option>`).join('');
   }
 }
 
@@ -87,6 +90,168 @@ function buildSkillsUI() {
     </div>
   `).join('');
 }
+
+/* --- WEAPONS SYSTEM --- */
+
+function emptyWeapon() {
+  return { preset: '__custom__', name: '', dmg: '', range: '', props: '', max: 0, cur: 0 };
+}
+
+function renderWeapons() {
+  const box = $('weapons-container');
+  if (!box) return;
+
+  const c = chars.find(x => x.id === activeId);
+  if (!c) return;
+
+  if (!c.weapons || !Array.isArray(c.weapons) || c.weapons.length === 0) {
+    c.weapons = [emptyWeapon()];
+  }
+
+  const wOpts = '<option value="__custom__">Custom / Manual</option>' +
+    (typeof WEAPON_DATA !== 'undefined'
+      ? Object.keys(WEAPON_DATA).map(k => `<option value="${k}">${k} (${WEAPON_DATA[k].type})</option>`).join('')
+      : '');
+
+  box.innerHTML = c.weapons.map((w, i) => `
+    <div class="weapon-block" data-wpn-idx="${i}">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <h4 style="color:var(--accent2); margin:0;">Weapon ${i + 1}</h4>
+        ${c.weapons.length > 1 ? `<button type="button" class="btn btn-danger btn-remove-wpn" data-idx="${i}">Remove</button>` : ''}
+      </div>
+      <div class="field-group">
+        <label>Weapon Preset</label>
+        <select class="wpn-preset-select" data-idx="${i}">${wOpts}</select>
+      </div>
+      <div class="grid-2">
+        <div class="field-group"><label>Name</label><input type="text" class="wpn-input-name" data-idx="${i}" value="${w.name || ''}" /></div>
+        <div class="field-group"><label>Damage</label><input type="text" class="wpn-input-dmg" data-idx="${i}" value="${w.dmg || ''}" /></div>
+      </div>
+      <div class="grid-2">
+        <div class="field-group"><label>Range</label><input type="text" class="wpn-input-range" data-idx="${i}" value="${w.range || ''}" /></div>
+        <div class="field-group"><label>Properties</label><input type="text" class="wpn-input-props" data-idx="${i}" value="${w.props || ''}" /></div>
+      </div>
+      <div class="ammo-row">
+        <span>Ammo: <strong id="wpn-cur-display-${i}">${w.cur || 0}</strong> / 
+          <input type="number" class="wpn-input-max" data-idx="${i}" value="${w.max || 0}" style="width:50px; display:inline-block; padding:4px;" />
+        </span>
+        <div>
+          <button type="button" class="btn btn-shoot btn-fire-wpn" data-idx="${i}">SHOOT</button>
+          <button type="button" class="btn btn-reload btn-reload-wpn" data-idx="${i}">RELOAD</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  // Set selected dropdown values
+  c.weapons.forEach((w, i) => {
+    const sel = box.querySelector(`.wpn-preset-select[data-idx="${i}"]`);
+    if (sel) sel.value = w.preset || '__custom__';
+  });
+
+  bindWeaponEvents();
+}
+
+function bindWeaponEvents() {
+  const box = $('weapons-container');
+  if (!box) return;
+
+  // Preset Select
+  box.querySelectorAll('.wpn-preset-select').forEach(sel => {
+    sel.onchange = (e) => {
+      const idx = parseInt(e.target.dataset.idx, 10);
+      const key = e.target.value;
+      const c = chars.find(x => x.id === activeId);
+      if (!c || !c.weapons[idx]) return;
+
+      if (key !== '__custom__' && typeof WEAPON_DATA !== 'undefined' && WEAPON_DATA[key]) {
+        const data = WEAPON_DATA[key];
+        c.weapons[idx] = {
+          preset: key,
+          name: key,
+          dmg: data.damage,
+          range: data.range,
+          props: data.properties,
+          max: data.magSize,
+          cur: data.magSize
+        };
+      } else {
+        c.weapons[idx].preset = '__custom__';
+      }
+      saveStorage();
+      renderWeapons();
+    };
+  });
+
+  // Shoot
+  box.querySelectorAll('.btn-fire-wpn').forEach(btn => {
+    btn.onclick = (e) => {
+      const idx = parseInt(e.target.dataset.idx, 10);
+      const c = chars.find(x => x.id === activeId);
+      if (c && c.weapons[idx] && c.weapons[idx].cur > 0) {
+        c.weapons[idx].cur -= 1;
+        saveStorage();
+        const display = $(`wpn-cur-display-${idx}`);
+        if (display) display.textContent = c.weapons[idx].cur;
+      }
+    };
+  });
+
+  // Reload
+  box.querySelectorAll('.btn-reload-wpn').forEach(btn => {
+    btn.onclick = (e) => {
+      const idx = parseInt(e.target.dataset.idx, 10);
+      const c = chars.find(x => x.id === activeId);
+      if (c && c.weapons[idx]) {
+        c.weapons[idx].cur = c.weapons[idx].max || 0;
+        saveStorage();
+        const display = $(`wpn-cur-display-${idx}`);
+        if (display) display.textContent = c.weapons[idx].cur;
+      }
+    };
+  });
+
+  // Remove
+  box.querySelectorAll('.btn-remove-wpn').forEach(btn => {
+    btn.onclick = (e) => {
+      const idx = parseInt(e.target.dataset.idx, 10);
+      const c = chars.find(x => x.id === activeId);
+      if (c && c.weapons && c.weapons.length > 1) {
+        c.weapons.splice(idx, 1);
+        saveStorage();
+        renderWeapons();
+      }
+    };
+  });
+
+  // Text Inputs
+  box.querySelectorAll('input').forEach(inp => {
+    inp.oninput = (e) => {
+      const idx = parseInt(e.target.dataset.idx, 10);
+      const c = chars.find(x => x.id === activeId);
+      if (!c || !c.weapons[idx]) return;
+
+      if (e.target.classList.contains('wpn-input-name')) c.weapons[idx].name = e.target.value;
+      if (e.target.classList.contains('wpn-input-dmg')) c.weapons[idx].dmg = e.target.value;
+      if (e.target.classList.contains('wpn-input-range')) c.weapons[idx].range = e.target.value;
+      if (e.target.classList.contains('wpn-input-props')) c.weapons[idx].props = e.target.value;
+      if (e.target.classList.contains('wpn-input-max')) c.weapons[idx].max = parseInt(e.target.value, 10) || 0;
+
+      saveStorage();
+    };
+  });
+}
+
+function addWeapon() {
+  const c = chars.find(x => x.id === activeId);
+  if (!c) return;
+  if (!c.weapons) c.weapons = [];
+  c.weapons.push(emptyWeapon());
+  saveStorage();
+  renderWeapons();
+}
+
+/* --- CORE CALCULATIONS & RECALC --- */
 
 function recalc() {
   const lvl = val('c-lvl') || 1;
@@ -120,176 +285,9 @@ function applyArmor() {
   let dex = mod(val('s-dex'));
   if (dex > a.maxDex) dex = a.maxDex;
   val('ac-val', a.baseAc + dex);
-  val('armor-name', key); val('armor-props', a.props || a.type);
+  val('armor-name', key);
+  val('armor-props', a.props || a.type);
   saveCurrent();
-}
-
-function emptyWeapon() {
-  return { preset: '__custom__', name: '', dmg: '', range: '', props: '', max: 0, cur: 0 };
-}
-
-function renderWeapons() {
-  const box = $('weapons-container');
-  if (!box) return;
-  const c = chars.find(x => x.id === activeId);
-  if (!c) return;
-  if (!c.weapons || !c.weapons.length) c.weapons = [emptyWeapon()];
-
-  box.innerHTML = c.weapons.map((w, i) => `
-    <div class="weapon-block" data-wpn="${i}">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <h4 style="color:var(--accent2);margin:0;">Weapon ${i + 1}</h4>
-        ${c.weapons.length > 1 ? `<button type="button" class="btn btn-danger" data-remove-wpn="${i}">Remove</button>` : ''}
-      </div>
-      <div class="field-group">
-        <label>Weapon Preset</label>
-        <select id="wpn-${i}-preset" data-wpn-preset="${i}"></select>
-      </div>
-      <div class="grid-2">
-        <div class="field-group"><label>Name</label><input type="text" id="wpn-${i}-name" value="${w.name || ''}" /></div>
-        <div class="field-group"><label>Damage</label><input type="text" id="wpn-${i}-dmg" value="${w.dmg || ''}" /></div>
-      </div>
-      <div class="grid-2">
-        <div class="field-group"><label>Range</label><input type="text" id="wpn-${i}-range" value="${w.range || ''}" /></div>
-        <div class="field-group"><label>Properties</label><input type="text" id="wpn-${i}-props" value="${w.props || ''}" /></div>
-      </div>
-      <div class="ammo-row">
-        <span>Ammo: <strong id="wpn-${i}-cur">${w.cur || 0}</strong> /
-          <input type="number" id="wpn-${i}-max" value="${w.max || 0}" style="width:50px;display:inline-block;padding:4px;" />
-        </span>
-        <div>
-          <button type="button" class="btn btn-shoot" data-fire="${i}">SHOOT</button>
-          <button type="button" class="btn btn-reload" data-reload="${i}">RELOAD</button>
-        </div>
-      </div>
-    </div>
-  `).join('');
-
-  // Fill preset dropdowns
-  const wOpts = '<option value="__custom__">Custom / Manual</option>' +
-    (typeof WEAPON_DATA !== 'undefined'
-      ? Object.keys(WEAPON_DATA).map(k => `<option value="${k}">${k} (${WEAPON_DATA[k].type})</option>`).join('')
-      : '');
-
-  c.weapons.forEach((w, i) => {
-    const sel = $(`wpn-${i}-preset`);
-    if (sel) {
-      sel.innerHTML = wOpts;
-      sel.value = w.preset || '__custom__';
-    }
-  });
-}
-
-function applyWeaponPreset(i) {
-  const c = chars.find(x => x.id === activeId);
-  if (!c || !c.weapons[i]) return;
-  const key = val(`wpn-${i}-preset`);
-  if (!key || key === '__custom__' || typeof WEAPON_DATA === 'undefined' || !WEAPON_DATA[key]) {
-    c.weapons[i].preset = '__custom__';
-    saveCurrent();
-    return;
-  }
-  const w = WEAPON_DATA[key];
-  c.weapons[i].preset = key;
-  c.weapons[i].name = key;
-  c.weapons[i].dmg = w.damage;
-  c.weapons[i].range = w.range;
-  c.weapons[i].props = w.properties;
-  c.weapons[i].max = w.magSize;
-  c.weapons[i].cur = w.magSize;
-  val(`wpn-${i}-name`, key);
-  val(`wpn-${i}-dmg`, w.damage);
-  val(`wpn-${i}-range`, w.range);
-  val(`wpn-${i}-props`, w.properties);
-  val(`wpn-${i}-max`, w.magSize);
-  const curEl = $(`wpn-${i}-cur`);
-  if (curEl) curEl.textContent = w.magSize;
-  saveCurrent();
-}
-
-function readWeaponsFromForm() {
-  const c = chars.find(x => x.id === activeId);
-  if (!c || !c.weapons) return;
-  c.weapons.forEach((w, i) => {
-    w.preset = val(`wpn-${i}-preset`) || '__custom__';
-    w.name = val(`wpn-${i}-name`) || '';
-    w.dmg = val(`wpn-${i}-dmg`) || '';
-    w.range = val(`wpn-${i}-range`) || '';
-    w.props = val(`wpn-${i}-props`) || '';
-    w.max = parseInt(val(`wpn-${i}-max`), 10) || 0;
-    const curEl = $(`wpn-${i}-cur`);
-    w.cur = curEl ? (parseInt(curEl.textContent, 10) || 0) : 0;
-  });
-}
-
-function addWeapon() {
-  const c = chars.find(x => x.id === activeId);
-  if (!c) return;
-  if (!c.weapons) c.weapons = [];
-  c.weapons.push(emptyWeapon());
-  saveStorage();
-  renderWeapons();
-  bindWeaponEvents();
-}
-
-function removeWeapon(i) {
-  const c = chars.find(x => x.id === activeId);
-  if (!c || !c.weapons || c.weapons.length <= 1) return;
-  c.weapons.splice(i, 1);
-  saveStorage();
-  renderWeapons();
-  bindWeaponEvents();
-}
-
-function fireWeapon(i) {
-  const c = chars.find(x => x.id === activeId);
-  if (!c || !c.weapons[i]) return;
-  if (c.weapons[i].cur > 0) {
-    c.weapons[i].cur -= 1;
-    const curEl = $(`wpn-${i}-cur`);
-    if (curEl) curEl.textContent = c.weapons[i].cur;
-    saveCurrent();
-  }
-}
-
-function reloadWeapon(i) {
-  const c = chars.find(x => x.id === activeId);
-  if (!c || !c.weapons[i]) return;
-  c.weapons[i].cur = c.weapons[i].max || 0;
-  const curEl = $(`wpn-${i}-cur`);
-  if (curEl) curEl.textContent = c.weapons[i].cur;
-  saveCurrent();
-}
-
-function bindWeaponEvents() {
-  // Preset change
-  document.querySelectorAll('[data-wpn-preset]').forEach(sel => {
-    sel.onchange = () => applyWeaponPreset(parseInt(sel.getAttribute('data-wpn-preset'), 10));
-  });
-  // Fire / Reload / Remove
-  document.querySelectorAll('[data-fire]').forEach(btn => {
-    btn.onclick = () => fireWeapon(parseInt(btn.getAttribute('data-fire'), 10));
-  });
-  document.querySelectorAll('[data-reload]').forEach(btn => {
-    btn.onclick = () => reloadWeapon(parseInt(btn.getAttribute('data-reload'), 10));
-  });
-  document.querySelectorAll('[data-remove-wpn]').forEach(btn => {
-    btn.onclick = () => removeWeapon(parseInt(btn.getAttribute('data-remove-wpn'), 10));
-  });
-  // Manual edit → mark custom
-  document.querySelectorAll('#weapons-container input').forEach(inp => {
-    inp.oninput = () => {
-      const block = inp.closest('[data-wpn]');
-      if (!block) return;
-      const i = parseInt(block.getAttribute('data-wpn'), 10);
-      const preset = $(`wpn-${i}-preset`);
-      if (preset && preset.value !== '__custom__') {
-        // if user types in name/dmg/etc, keep preset unless they want custom
-      }
-      readWeaponsFromForm();
-      saveCurrent();
-    };
-  });
 }
 
 function blankChar() {
@@ -300,22 +298,26 @@ function blankChar() {
     hpMax: 10, hpCur: 10, hpTemp: 0, hd: '1d10', ac: 10, spd: 30, init: 0,
     dsS: [false,false,false], dsF: [false,false,false],
     armorPreset: 'Plain Clothes', armorName: 'Plain Clothes', armorProps: '',
-    weapons: [
-      { preset: '__custom__', name: '', dmg: '', range: '', props: '', max: 0, cur: 0 }
-    ],
+    weapons: [emptyWeapon()],
     credits: 500, inventory: '', skills: {}, featNotes: '',
     mpMax: 0, mpCur: 0, spellDc: 10, spellAtk: 0, magicSource: '', spellList: ''
   };
 }
 
 function createChar() {
-  const c = blankChar(); chars.push(c); activeId = c.id;
-  saveStorage(); loadToForm(c); renderRoster(); switchTab('tab-core');
+  const c = blankChar();
+  chars.push(c);
+  activeId = c.id;
+  saveStorage();
+  loadToForm(c);
+  renderRoster();
+  switchTab('tab-core');
 }
 
 function saveCurrent() {
   const c = chars.find(x => x.id === activeId);
   if (!c) return;
+
   c.name = val('c-name'); c.species = val('c-species'); c.arch = val('c-arch');
   c.ladder = val('c-ladder'); c.className = val('c-class'); c.lvl = val('c-lvl');
   
@@ -327,21 +329,22 @@ function saveCurrent() {
   c.dsS = [val('ds-s1'), val('ds-s2'), val('ds-s3')]; c.dsF = [val('ds-f1'), val('ds-f2'), val('ds-f3')];
 
   c.armorPreset = val('armor-preset'); c.armorName = val('armor-name'); c.armorProps = val('armor-props');
-  
-  readWeaponsFromForm();
-
   c.credits = val('credits'); c.inventory = val('inventory');
+
   UM5_SKILLS.forEach((_, i) => { c.skills['p'+i] = val('sk-p-'+i); c.skills['e'+i] = val('sk-e-'+i); });
   
   c.featNotes = val('feat-notes'); c.mpMax = val('mp-max'); c.mpCur = val('mp-cur');
   c.spellDc = val('spell-dc'); c.spellAtk = val('spell-atk'); c.magicSource = val('magic-source'); c.spellList = val('spell-list');
 
-  saveStorage(); recalc(); renderRoster();
+  saveStorage();
+  recalc();
+  renderRoster();
 }
 
 function loadToForm(c) {
   if (!c) return;
   activeId = c.id;
+
   val('c-name', c.name); val('c-species', c.species); val('c-arch', c.arch);
   val('c-ladder', c.ladder); val('c-class', c.className); val('c-lvl', c.lvl);
   
@@ -357,44 +360,17 @@ function loadToForm(c) {
   val('ds-f1', c.dsF[0]); val('ds-f2', c.dsF[1]); val('ds-f3', c.dsF[2]);
 
   val('armor-preset', c.armorPreset); val('armor-name', c.armorName); val('armor-props', c.armorProps);
-    
-  // Migrate old w1/w2 characters → new weapons array
-  if (!c.weapons) {
-    c.weapons = [];
-    if (c.w1Name || c.w1Preset) {
-      c.weapons.push({
-        preset: c.w1Preset || '__custom__',
-        name: c.w1Name || '',
-        dmg: c.w1Dmg || '',
-        range: c.w1Range || '',
-        props: c.w1Props || '',
-        max: c.w1Max || 0,
-        cur: c.w1Cur || 0
-      });
-    }
-    if (c.w2Name || c.w2Preset) {
-      c.weapons.push({
-        preset: c.w2Preset || '__custom__',
-        name: c.w2Name || '',
-        dmg: c.w2Dmg || '',
-        range: c.w2Range || '',
-        props: c.w2Props || '',
-        max: c.w2Max || 0,
-        cur: c.w2Cur || 0
-      });
-    }
-    if (!c.weapons.length) c.weapons = [emptyWeapon()];
-  }
-  renderWeapons();
-  bindWeaponEvents();
-
   val('credits', c.credits); val('inventory', c.inventory);
+
   UM5_SKILLS.forEach((_, i) => { val('sk-p-'+i, c.skills && c.skills['p'+i]); val('sk-e-'+i, c.skills && c.skills['e'+i]); });
   
   val('feat-notes', c.featNotes); val('mp-max', c.mpMax); val('mp-cur', c.mpCur);
   val('spell-dc', c.spellDc); val('spell-atk', c.spellAtk); val('magic-source', c.magicSource); val('spell-list', c.spellList);
   
-  recalc(); renderAbilities(); renderRoster();
+  renderWeapons();
+  recalc();
+  renderAbilities();
+  renderRoster();
 }
 
 function renderRoster() {
@@ -430,10 +406,7 @@ function switchTab(id) {
   document.querySelectorAll('.tab-page').forEach(p => p.classList.toggle('active', p.id === id));
   if (id === 'tab-abilities') renderAbilities();
   if (id === 'tab-skills' || id === 'tab-core') recalc();
-    if (id === 'tab-combat') {
-    renderWeapons();
-    bindWeaponEvents();
-  }
+  if (id === 'tab-combat') renderWeapons();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
