@@ -195,4 +195,60 @@ const CLASS_DATA = {
     primaryStat: 'INT',
     abilities: [
       { level: 1, name: 'Tech Expertise', desc: 'Double proficiency on Computers, Electronics, and Technology.' },
-      { level: 2, name: 'Deployable', desc: 'Deploy a turret or 
+      { level: 2, name: 'Deployable', desc: 'Deploy a turret or scanner (stats scale with level).' },
+      { level: 5, name: 'System Crack', desc: 'Action: shut down or hijack a device within 30 ft (INT contest).' }
+    ]
+  },
+  'Commando': {
+    desc: 'Elite all-range combatant.',
+    hitDie: 'd10',
+    primaryStat: 'STR / DEX',
+    abilities: [
+      { level: 1, name: 'Assault Doctrine', desc: 'Proficiency in Athletics and Stealth; +5 ft speed.' },
+      { level: 2, name: 'Breach and Clear', desc: 'After moving 15+ ft, first attack deals +1d6 and may shove.' },
+      { level: 5, name: 'Special Ops', desc: 'Ignore reload once per turn; advantage on initiative in planned assaults.' }
+    ]
+  },
+  'Driver/Pilot': {
+    desc: 'If it moves, you can weaponize it.',
+    hitDie: 'd8',
+    primaryStat: 'DEX',
+    abilities: [
+      { level: 1, name: 'Wheelman', desc: 'Vehicles you drive gain +2 AC and you have advantage on Driving/Piloting.' },
+      { level: 2, name: 'Ram', desc: 'Vehicle melee attack dealing collision damage; DEX save or prone.' },
+      { level: 5, name: 'Evasive Pattern', desc: 'While driving, impose disadvantage on attacks against your vehicle.' }
+    ]
+  }
+};
+
+const WEAPON_DATA = {
+  'M4 Carbine': { type: 'Assault Rifle', damage: '2d6', magSize: 30, range: '80/300', properties: 'Burst, Two-Handed' },
+  'AK-47': { type: 'Assault Rifle', damage: '2d6+1', magSize: 30, range: '70/280', properties: 'Burst, Reliable' },
+  'FN SCAR': { type: 'Assault Rifle', damage: '2d6+1', magSize: 30, range: '90/320', properties: 'Burst, Accurate' },
+  'MP5': { type: 'SMG', damage: '1d8', magSize: 30, range: '40/160', properties: 'Burst, Light' },
+  'Uzi': { type: 'SMG', damage: '1d8', magSize: 25, range: '30/120', properties: 'Spray, Light' },
+  'P90': { type: 'SMG', damage: '1d10', magSize: 50, range: '50/150', properties: 'Burst, High-Cap' },
+  'Glock 17': { type: 'Pistol', damage: '1d6', magSize: 17, range: '50/150', properties: 'Light, Reload' },
+  'Desert Eagle': { type: 'Pistol', damage: '1d10', magSize: 7, range: '40/120', properties: 'Heavy Kick' },
+  'M9 Beretta': { type: 'Pistol', damage: '1d6', magSize: 15, range: '50/150', properties: 'Light' },
+  '.44 Magnum': { type: 'Revolver', damage: '2d6', magSize: 6, range: '40/120', properties: 'Powerful, Reload' },
+  'Combat Shotgun': { type: 'Shotgun', damage: '2d8', magSize: 8, range: '20/60', properties: 'Spread, Reload' },
+  'Sawed-Off': { type: 'Shotgun', damage: '2d8', magSize: 2, range: '10/30', properties: 'Scatter, Concealable' },
+  'Sniper Rifle': { type: 'Sniper', damage: '2d10', magSize: 5, range: '150/600', properties: 'Accurate, Two-Handed' },
+  'Anti-Materiel': { type: 'Sniper', damage: '2d12', magSize: 4, range: '200/800', properties: 'Armor Piercing, Heavy' },
+  'LMG': { type: 'Heavy', damage: '2d8', magSize: 100, range: '80/300', properties: 'Suppressive, Two-Handed' },
+  'Rocket Launcher': { type: 'Heavy', damage: '4d10', magSize: 1, range: '100/400', properties: 'Explosive, Reload' },
+  'Combat Knife': { type: 'Melee', damage: '1d4', magSize: 0, range: '5', properties: 'Finesse, Light' },
+  'Katana': { type: 'Melee', damage: '1d8', magSize: 0, range: '5', properties: 'Finesse, Slash' },
+  'Stun Baton': { type: 'Melee', damage: '1d6', magSize: 0, range: '5', properties: 'Shock, Nonlethal' }
+};
+
+const ARMOR_DATA = {
+  'Plain Clothes': { type: 'None', baseAc: 10, maxDex: 99, props: 'Normal clothing' },
+  'Leather Jacket': { type: 'Light', baseAc: 11, maxDex: 99, props: 'Stylish, Concealed' },
+  'Undercover Vest': { type: 'Light', baseAc: 12, maxDex: 99, props: 'Hidden under clothes' },
+  'Tactical Vest': { type: 'Medium', baseAc: 14, maxDex: 2, props: 'Mag pouches, Standard issue' },
+  'Riot Armor': { type: 'Medium', baseAc: 15, maxDex: 2, props: 'Ballistic plates' },
+  'Heavy Combat Suit': { type: 'Heavy', baseAc: 17, maxDex: 0, props: 'Full plate modern, No Stealth' },
+  'Powered Exosuit': { type: 'Heavy', baseAc: 18, maxDex: 0, props: 'Servo-assisted, Loud' }
+};
