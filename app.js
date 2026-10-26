@@ -1,3 +1,29 @@
+// SKILL LIST DEFINITION
+const SKILL_LIST = [
+  { name: 'Acrobatics', stat: 'dex' },
+  { name: 'Athletics', stat: 'str' },
+  { name: 'Computers', stat: 'int' },
+  { name: 'Deception', stat: 'cha' },
+  { name: 'Demolitions', stat: 'int' },
+  { name: 'Driving', stat: 'dex' },
+  { name: 'Electronics', stat: 'int' },
+  { name: 'Insight', stat: 'wis' },
+  { name: 'Intimidation', stat: 'cha' },
+  { name: 'Investigation', stat: 'int' },
+  { name: 'Medicine', stat: 'wis' },
+  { name: 'Perception', stat: 'wis' },
+  { name: 'Performance', stat: 'cha' },
+  { name: 'Persuasion', stat: 'cha' },
+  { name: 'Piloting', stat: 'dex' },
+  { name: 'Science', stat: 'int' },
+  { name: 'Sleight of Hand', stat: 'dex' },
+  { name: 'Stealth', stat: 'dex' },
+  { name: 'Survival', stat: 'wis' },
+  { name: 'Technology', stat: 'int' },
+  { name: 'Vehicle (Air/Sea)', stat: 'dex' },
+  { name: 'Heavy Weapons', stat: 'str' }
+];
+
 const STORAGE_KEY = 'um5_chars_v3';
 let chars = [];
 let activeId = null;
@@ -29,25 +55,38 @@ function saveStorage() {
 }
 
 function populateSelects() {
-  $('c-ladder').innerHTML = Object.keys(LADDER_DATA).map(k => `<option value="${k}">${k}</option>`).join('');
-  $('c-class').innerHTML = Object.keys(CLASS_DATA).map(k => `<option value="${k}">${k}</option>`).join('');
-  $('armor-preset').innerHTML = '<option value="__custom__">Custom / Manual</option>' + Object.keys(ARMOR_DATA).map(k => `<option value="${k}">${k} (AC ${ARMOR_DATA[k].baseAc})</option>`).join('');
-  const wOpts = '<option value="__custom__">Custom / Manual</option>' + Object.keys(WEAPON_DATA).map(k => `<option value="${k}">${k} (${WEAPON_DATA[k].type})</option>`).join('');
-  $('w1-preset').innerHTML = wOpts; $('w2-preset').innerHTML = wOpts;
+  if (typeof LADDER_DATA !== 'undefined') {
+    $('c-ladder').innerHTML = Object.keys(LADDER_DATA).map(k => `<option value="${k}">${k}</option>`).join('');
+  }
+  if (typeof CLASS_DATA !== 'undefined') {
+    $('c-class').innerHTML = Object.keys(CLASS_DATA).map(k => `<option value="${k}">${k}</option>`).join('');
+  }
+  if (typeof ARMOR_DATA !== 'undefined') {
+    $('armor-preset').innerHTML = '<option value="__custom__">Custom / Manual</option>' + Object.keys(ARMOR_DATA).map(k => `<option value="${k}">${k} (AC ${ARMOR_DATA[k].baseAc})</option>`).join('');
+  }
+  if (typeof WEAPON_DATA !== 'undefined') {
+    const wOpts = '<option value="__custom__">Custom / Manual</option>' + Object.keys(WEAPON_DATA).map(k => `<option value="${k}">${k} (${WEAPON_DATA[k].type})</option>`).join('');
+    $('w1-preset').innerHTML = wOpts; 
+    $('w2-preset').innerHTML = wOpts;
+  }
 }
 
 function buildSkillsUI() {
-  $('skills-box').innerHTML = SKILL_LIST.map((sk, i) => `
-    <div class="skill-row">
-      <span style="font-size:0.85rem; flex:1;">${sk.name}</span>
-      <span style="font-size:0.65rem; color:var(--muted); width:34px;">${sk.stat}</span>
-      <span class="skill-bonus" id="sk-bonus-${i}">+0</span>
-      <div class="skill-checks">
-        <label><input type="checkbox" id="sk-p-${i}" /> Prof</label>
-        <label><input type="checkbox" id="sk-e-${i}" /> Exp</label>
+  $('skills-box').innerHTML = SKILL_LIST.map((sk, i) => {
+    const name = typeof sk === 'string' ? sk : (sk.name || 'Skill');
+    const stat = typeof sk === 'object' ? (sk.stat || 'str') : 'str';
+    return `
+      <div class="skill-row">
+        <span style="font-size:0.85rem; flex:1;">${name}</span>
+        <span style="font-size:0.65rem; color:var(--muted); width:34px; text-transform:uppercase;">${stat}</span>
+        <span class="skill-bonus" id="sk-bonus-${i}">+0</span>
+        <div class="skill-checks">
+          <label><input type="checkbox" id="sk-p-${i}" /> Prof</label>
+          <label><input type="checkbox" id="sk-e-${i}" /> Exp</label>
+        </div>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 function recalc() {
@@ -69,7 +108,8 @@ function recalc() {
 
   // Skills
   SKILL_LIST.forEach((sk, i) => {
-    const statMod = mod(val('s-' + sk.stat));
+    const statKey = typeof sk === 'object' ? sk.stat : 'str';
+    const statMod = mod(val('s-' + statKey));
     let total = statMod;
     if (val('sk-p-' + i)) total += pb;
     if (val('sk-e-' + i)) total += pb;
@@ -79,7 +119,7 @@ function recalc() {
 
 function applyArmor() {
   const key = val('armor-preset');
-  if (!key || key === '__custom__' || !ARMOR_DATA[key]) return;
+  if (!key || key === '__custom__' || typeof ARMOR_DATA === 'undefined' || !ARMOR_DATA[key]) return;
   const a = ARMOR_DATA[key];
   let dex = mod(val('s-dex'));
   if (dex > a.maxDex) dex = a.maxDex;
@@ -90,7 +130,7 @@ function applyArmor() {
 
 function applyWeapon(n) {
   const key = val(`w${n}-preset`);
-  if (!key || key === '__custom__' || !WEAPON_DATA[key]) return;
+  if (!key || key === '__custom__' || typeof WEAPON_DATA === 'undefined' || !WEAPON_DATA[key]) return;
   const w = WEAPON_DATA[key];
   val(`w${n}-name`, key); val(`w${n}-dmg`, w.damage); val(`w${n}-range`, w.range);
   val(`w${n}-props`, w.properties); val(`w${n}-max`, w.magSize);
@@ -195,8 +235,8 @@ function renderRoster() {
 
 function renderAbilities() {
   const lvl = parseInt(val('c-lvl'),10)||1;
-  const lad = LADDER_DATA[val('c-ladder')];
-  const cls = CLASS_DATA[val('c-class')];
+  const lad = typeof LADDER_DATA !== 'undefined' ? LADDER_DATA[val('c-ladder')] : null;
+  const cls = typeof CLASS_DATA !== 'undefined' ? CLASS_DATA[val('c-class')] : null;
 
   if (lad) {
     const list = lad.abilities.filter(a => a.level <= lvl);
