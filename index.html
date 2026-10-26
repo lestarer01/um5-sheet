@@ -185,39 +185,9 @@
       </div>
 
       <div class="card">
-        <h3>Primary Weapon</h3>
-        <div class="weapon-block">
-          <div class="field-group"><label>Weapon Preset</label><select id="w1-preset"></select></div>
-          <div class="grid-2">
-            <div class="field-group"><label>Name</label><input type="text" id="w1-name" /></div>
-            <div class="field-group"><label>Damage</label><input type="text" id="w1-dmg" /></div>
-          </div>
-          <div class="grid-2">
-            <div class="field-group"><label>Range</label><input type="text" id="w1-range" /></div>
-            <div class="field-group"><label>Properties</label><input type="text" id="w1-props" /></div>
-          </div>
-          <div class="ammo-row">
-            <span>Ammo: <strong id="w1-cur">0</strong> / <input type="number" id="w1-max" style="width:50px;display:inline-block;padding:4px;" /></span>
-            <div><button type="button" class="btn btn-shoot" id="btn-fire-1">SHOOT</button> <button type="button" class="btn btn-reload" id="btn-reload-1">RELOAD</button></div>
-          </div>
-        </div>
-
-        <h3>Secondary Weapon</h3>
-        <div class="weapon-block">
-          <div class="field-group"><label>Weapon Preset</label><select id="w2-preset"></select></div>
-          <div class="grid-2">
-            <div class="field-group"><label>Name</label><input type="text" id="w2-name" /></div>
-            <div class="field-group"><label>Damage</label><input type="text" id="w2-dmg" /></div>
-          </div>
-          <div class="grid-2">
-            <div class="field-group"><label>Range</label><input type="text" id="w2-range" /></div>
-            <div class="field-group"><label>Properties</label><input type="text" id="w2-props" /></div>
-          </div>
-          <div class="ammo-row">
-            <span>Ammo: <strong id="w2-cur">0</strong> / <input type="number" id="w2-max" style="width:50px;display:inline-block;padding:4px;" /></span>
-            <div><button type="button" class="btn btn-shoot" id="btn-fire-2">SHOOT</button> <button type="button" class="btn btn-reload" id="btn-reload-2">RELOAD</button></div>
-          </div>
-        </div>
+        <h3>Weapons</h3>
+        <div id="weapons-container"></div>
+        <button type="button" id="btn-add-weapon" class="btn btn-primary" style="margin-top:10px;">+ Add Weapon</button>
       </div>
 
       <div class="card">
