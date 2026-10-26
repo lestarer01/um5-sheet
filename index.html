@@ -37,8 +37,6 @@
       <section id="page-sheet" class="tab-page">
         <!-- PROFILE SECTION -->
         <div class="card profile-card">
-                <!-- PROFILE SECTION -->
-        <div class="card profile-card">
           <!-- Row 1: Name & Species -->
           <div class="grid-2">
             <div class="field-group">
@@ -177,98 +175,4 @@
               </div>
               <div class="field-group">
                 <label>Properties</label>
-                <input type="text" id="wpn-1-props" oninput="markCustom(1)" placeholder="Burst, Reload" />
-              </div>
-            </div>
-            <div class="ammo-controls">
-              <span>Ammo: <strong id="wpn-1-cur-display">30</strong> / <input type="number" id="wpn-1-max-ammo" value="30" style="width: 60px; display: inline-block;" oninput="markCustom(1)" /></span>
-              <button class="btn ammo-btn" onclick="fireWeapon(1)">SHOOT (-1)</button>
-              <button class="btn ammo-btn reload-btn" onclick="reloadWeapon(1)">RELOAD</button>
-              <input type="hidden" id="wpn-1-cur-ammo" value="30" />
-            </div>
-          </div>
-
-          <!-- Secondary Weapon -->
-          <div class="weapon-block" style="margin-top: 15px;">
-            <h4>Secondary Weapon</h4>
-            <div class="field-group">
-              <label>Select Preset</label>
-              <select id="wpn-2-preset" onchange="applyWeaponPreset(2)"></select>
-            </div>
-            <div class="grid-2">
-              <div class="field-group">
-                <label>Weapon Name</label>
-                <input type="text" id="wpn-2-name" oninput="markCustom(2)" placeholder="e.g. Glock 17" />
-              </div>
-              <div class="field-group">
-                <label>Damage</label>
-                <input type="text" id="wpn-2-damage" oninput="markCustom(2)" placeholder="1d6" />
-              </div>
-            </div>
-            <div class="grid-2">
-              <div class="field-group">
-                <label>Range</label>
-                <input type="text" id="wpn-2-range" oninput="markCustom(2)" placeholder="50/150" />
-              </div>
-              <div class="field-group">
-                <label>Properties</label>
-                <input type="text" id="wpn-2-props" oninput="markCustom(2)" placeholder="Light" />
-              </div>
-            </div>
-            <div class="ammo-controls">
-              <span>Ammo: <strong id="wpn-2-cur-display">15</strong> / <input type="number" id="wpn-2-max-ammo" value="15" style="width: 60px; display: inline-block;" oninput="markCustom(2)" /></span>
-              <button class="btn ammo-btn" onclick="fireWeapon(2)">SHOOT (-1)</button>
-              <button class="btn ammo-btn reload-btn" onclick="reloadWeapon(2)">RELOAD</button>
-              <input type="hidden" id="wpn-2-cur-ammo" value="15" />
-            </div>
-          </div>
-        </div>
-
-        <!-- INVENTORY & CREDITS -->
-        <div class="card inventory-card">
-          <h3>Inventory & Funds</h3>
-          <div class="field-group">
-            <label>Credits (₡)</label>
-            <input type="number" id="credits-val" value="500" />
-          </div>
-          <div class="field-group">
-            <label>Tactical Gear & Items</label>
-            <textarea id="inventory-val" rows="4" placeholder="List items, armor, gadgets..."></textarea>
-          </div>
-        </div>
-      </section>
-
-      <!-- PAGE 3: SKILLS -->
-      <section id="page-skills" class="tab-page">
-        <div class="card">
-          <h2>Skill Proficiencies</h2>
-          <div id="skills-list" class="skills-container"></div>
-        </div>
-      </section>
-
-      <!-- PAGE 4: ABILITIES -->
-      <section id="page-abilities" class="tab-page">
-        <div class="card">
-          <h2>Tactical Abilities & Features</h2>
-          
-          <div class="abilities-section">
-            <h3 class="section-title">Ladder Features</h3>
-            <div id="ladder-abilities-container"></div>
-          </div>
-
-          <div class="abilities-section" style="margin-top: 20px;">
-            <h3 class="section-title">Class Features</h3>
-            <div id="class-abilities-container"></div>
-          </div>
-
-          <div class="abilities-section" style="margin-top: 20px;">
-            <h3 class="section-title">Custom Features & Notes</h3>
-            <textarea id="char-abilities-notes" rows="6" placeholder="Add custom feats, cyberware, or personal features here..."></textarea>
-          </div>
-        </div>
-      </section>
-
-    </main>
-  </div>
-</body>
-</html>
+                
