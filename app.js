@@ -1,482 +1,410 @@
-/* ===== SAFE STORAGE ===== */
+// LocalStorage & State Management
+const STORAGE_KEY = 'um5_chars';
+let characterList = [];
+let currentCharacterId = null;
 let memoryBackup = [];
+
 function loadStorage() {
   try {
-    const raw = localStorage.getItem('um5_chars');
-    return raw ? JSON.parse(raw) : [];
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
   } catch (e) {
-    return memoryBackup;
+    console.warn('localStorage read failed, using memory backup');
   }
+  return memoryBackup;
 }
+
 function saveStorage(data) {
   memoryBackup = data;
   try {
-    localStorage.setItem('um5_chars', JSON.stringify(data));
-  } catch (e) {}
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch (e) {
+    console.warn('localStorage save failed');
+  }
 }
 
-/* ===== SKILLS LIST ===== */
-const SKILLS = [
-  { name: 'Acrobatics', stat: 'dex' },
-  { name: 'Athletics', stat: 'str' },
-  { name: 'Computers', stat: 'int' },
-  { name: 'Demolitions', stat: 'int' },
-  { name: 'Driving', stat: 'dex' },
-  { name: 'Electronics', stat: 'int' },
-  { name: 'Heavy Weapons', stat: 'str' },
-  { name: 'History', stat: 'int' },
-  { name: 'Insight', stat: 'wis' },
-  { name: 'Investigation', stat: 'int' },
-  { name: 'Medicine', stat: 'wis' },
-  { name: 'Perception', stat: 'wis' },
-  { name: 'Persuasion', stat: 'cha' },
-  { name: 'Sleight of Hand', stat: 'dex' },
-  { name: 'Stealth', stat: 'dex' },
-  { name: 'Survival', stat: 'wis' },
-  { name: 'Technology', stat: 'int' },
-  { name: 'Vehicle (Air/Sea)', stat: 'dex' }
-];
+// Helpers
+function getValue(id) {
+  const el = document.getElementById(id);
+  return el ? el.value : '';
+}
 
-let characters = loadStorage();
-let currentCharId = null;
-let saveTimeout = null;
+function setValue(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.value = val;
+}
 
-/* ===== POPULATE DROPDOWNS FROM DATABASE ===== */
+function calcMod(score) {
+  return Math.floor((parseInt(score || 10) - 10) / 2);
+}
+
+function calcProf(level) {
+  const lvl = parseInt(level || 1);
+  if (lvl >= 17) return 6;
+  if (lvl >= 13) return 5;
+  if (lvl >= 9) return 4;
+  if (lvl >= 5) return 3;
+  return 2;
+}
+
+// Populate Dropdowns from database.js
 function populateDropdowns() {
-  // Ladder dropdown
   const ladderSelect = document.getElementById('char-ladder');
-  ladderSelect.innerHTML = '<option value="">Select Ladder...</option>';
-  Object.keys(LADDER_DATA).forEach(name => {
-    ladderSelect.innerHTML += `<option value="${name}">${name}</option>`;
-  });
-
-  // Class dropdown
   const classSelect = document.getElementById('char-class');
-  classSelect.innerHTML = '<option value="">Select Class...</option>';
-  Object.keys(CLASS_DATA).forEach(name => {
-    classSelect.innerHTML += `<option value="${name}">${name}</option>`;
-  });
+  const wpn1Select = document.getElementById('wpn-1-preset');
+  const wpn2Select = document.getElementById('wpn-2-preset');
 
-  // Weapon preset dropdowns
-  [1, 2].forEach(num => {
-    const wpnSelect = document.getElementById(`wpn-${num}-preset`);
-    wpnSelect.innerHTML = `
-      <option value="">-- Select Preset or Edit Manually --</option>
-      <option value="__custom__">✏️ Custom (Manual Entry)</option>
-    `;
-    // Group by type
-    const grouped = {};
-    Object.entries(WEAPON_DATA).forEach(([name, data]) => {
-      if (!grouped[data.type]) grouped[data.type] = [];
-      grouped[data.type].push(name);
-    });
-    Object.keys(grouped).sort().forEach(type => {
-      wpnSelect.innerHTML += `<optgroup label="${type}">`;
-      grouped[type].forEach(name => {
-        wpnSelect.innerHTML += `<option value="${name}">${name}</option>`;
-      });
-      wpnSelect.innerHTML += `</optgroup>`;
-    });
-  });
+  if (ladderSelect && typeof LADDER_DATA !== 'undefined') {
+    ladderSelect.innerHTML = Object.keys(LADDER_DATA)
+      .map(l => `<option value="${l}">${l}</option>`)
+      .join('');
+  }
+
+  if (classSelect && typeof CLASS_DATA !== 'undefined') {
+    classSelect.innerHTML = Object.keys(CLASS_DATA)
+      .map(c => `<option value="${c}">${c}</option>`)
+      .join('');
+  }
+
+  if (typeof WEAPON_DATA !== 'undefined') {
+    const weaponOptions = [
+      '<option value="__custom__">-- Custom / Manual Entry --</option>',
+      ...Object.keys(WEAPON_DATA).map(w => `<option value="${w}">${w} (${WEAPON_DATA[w].type})</option>`)
+    ].join('');
+
+    if (wpn1Select) wpn1Select.innerHTML = weaponOptions;
+    if (wpn2Select) wpn2Select.innerHTML = weaponOptions;
+  }
 }
 
-/* ===== APPLY WEAPON PRESET ===== */
-window.applyWeaponPreset = function(num) {
-  const presetName = document.getElementById(`wpn-${num}-preset`).value;
-  if (!presetName || presetName === '__custom__') {
-    autoSave();
-    return;
+// Apply Weapon Presets
+function applyWeaponPreset(num) {
+  const selectId = `wpn-${num}-preset`;
+  const selected = getValue(selectId);
+  if (selected === '__custom__' || !WEAPON_DATA[selected]) return;
+
+  const w = WEAPON_DATA[selected];
+  setValue(`wpn-${num}-name`, selected);
+  setValue(`wpn-${num}-damage`, w.damage);
+  setValue(`wpn-${num}-range`, w.range);
+  setValue(`wpn-${num}-props`, w.properties);
+  setValue(`wpn-${num}-max-ammo`, w.magSize);
+  setValue(`wpn-${num}-cur-ammo`, w.magSize);
+
+  const curDisplay = document.getElementById(`wpn-${num}-cur-display`);
+  if (curDisplay) curDisplay.innerText = w.magSize;
+
+  readForm();
+}
+
+function markCustom(num) {
+  setValue(`wpn-${num}-preset`, '__custom__');
+}
+
+function fireWeapon(num) {
+  let cur = parseInt(getValue(`wpn-${num}-cur-ammo`)) || 0;
+  if (cur > 0) {
+    cur -= 1;
+    setValue(`wpn-${num}-cur-ammo`, cur);
+    const display = document.getElementById(`wpn-${num}-cur-display`);
+    if (display) display.innerText = cur;
+    readForm();
   }
+}
 
-  const data = WEAPON_DATA[presetName];
-  if (!data) return;
+function reloadWeapon(num) {
+  const max = parseInt(getValue(`wpn-${num}-max-ammo`)) || 0;
+  setValue(`wpn-${num}-cur-ammo`, max);
+  const display = document.getElementById(`wpn-${num}-cur-display`);
+  if (display) display.innerText = max;
+  readForm();
+}
 
-  document.getElementById(`wpn-${num}-name`).value = presetName;
-  document.getElementById(`wpn-${num}-max-ammo`).value = data.magSize;
-  document.getElementById(`wpn-${num}-damage`).value = data.damage;
-  document.getElementById(`wpn-${num}-range`).value = data.range;
-  document.getElementById(`wpn-${num}-props`).value = data.properties;
+// Character Operations
+function createNewCharacter() {
+  const newChar = {
+    id: 'char_' + Date.now(),
+    name: 'New Operative',
+    species: 'Human',
+    background: 'Mercenary',
+    ladder: 'Born Leader',
+    class: 'Gunslinger',
+    archetype: '',
+    level: 1,
 
-  // Fully refill ammo on preset change
-  const c = characters.find(ch => ch.id === currentCharId);
-  if (c) {
-    if (num === 1) c.wpn1CurrentAmmo = data.magSize;
-    if (num === 2) c.wpn2CurrentAmmo = data.magSize;
-  }
+    str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10,
+    hpMax: 10, hpCurrent: 10, hpTemp: 0,
+    ac: 10, speed: 30,
 
-  updateAmmoDisplay();
-  autoSave();
-};
+    wpn1Preset: '__custom__', wpn1Name: 'Sidearm', wpn1MaxAmmo: 12, wpn1CurrentAmmo: 12, wpn1Damage: '1d6', wpn1Range: '50/150', wpn1Props: 'Light',
+    wpn2Preset: '__custom__', wpn2Name: '', wpn2MaxAmmo: 0, wpn2CurrentAmmo: 0, wpn2Damage: '', wpn2Range: '', wpn2Props: '',
 
-/* When user types in a weapon field, mark it as custom */
-window.markCustom = function(num) {
-  const presetSelect = document.getElementById(`wpn-${num}-preset`);
-  if (presetSelect.value !== '__custom__' && presetSelect.value !== '') {
-    presetSelect.value = '__custom__';
-  }
-};
+    credits: 500,
+    inventory: 'Standard Tactical Gear, Commlink',
+    abilitiesNotes: ''
+  };
 
-/* ===== PAGE NAVIGATION ===== */
-window.switchPage = function(page) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+  characterList.push(newChar);
+  currentCharacterId = newChar.id;
+  saveStorage(characterList);
+  loadCharacterToForm(newChar);
+  renderCharacterList();
+}
 
-  const targetPage = document.getElementById('page-' + page);
-  const targetTab = document.getElementById('tab-' + page);
+function readForm() {
+  if (!currentCharacterId) return null;
+  const char = characterList.find(c => c.id === currentCharacterId);
+  if (!char) return null;
 
-  if (targetPage) targetPage.classList.add('active');
-  if (targetTab) targetTab.classList.add('active');
+  char.name = getValue('char-name') || 'Unnamed Operative';
+  char.species = getValue('char-species');
+  char.background = getValue('char-background');
+  char.ladder = getValue('char-ladder');
+  char.class = getValue('char-class');
+  char.archetype = getValue('char-archetype');
+  char.level = parseInt(getValue('char-level')) || 1;
 
-  if (page === 'list') renderCharacterList();
-  if (page === 'skills') renderSkills();
-  if (page === 'abilities') renderAbilities();
-};
+  char.str = parseInt(getValue('stat-str')) || 10;
+  char.dex = parseInt(getValue('stat-dex')) || 10;
+  char.con = parseInt(getValue('stat-con')) || 10;
+  char.int = parseInt(getValue('stat-int')) || 10;
+  char.wis = parseInt(getValue('stat-wis')) || 10;
+  char.cha = parseInt(getValue('stat-cha')) || 10;
 
-/* ===== OPERATIVE LIST ===== */
-window.renderCharacterList = function() {
+  char.hpMax = parseInt(getValue('hp-max')) || 10;
+  char.hpCurrent = parseInt(getValue('hp-current')) || 0;
+  char.hpTemp = parseInt(getValue('hp-temp')) || 0;
+  char.ac = parseInt(getValue('ac-val')) || 10;
+  char.speed = parseInt(getValue('speed-val')) || 30;
+
+  char.wpn1Preset = getValue('wpn-1-preset');
+  char.wpn1Name = getValue('wpn-1-name');
+  char.wpn1MaxAmmo = parseInt(getValue('wpn-1-max-ammo')) || 0;
+  char.wpn1CurrentAmmo = parseInt(getValue('wpn-1-cur-ammo')) || 0;
+  char.wpn1Damage = getValue('wpn-1-damage');
+  char.wpn1Range = getValue('wpn-1-range');
+  char.wpn1Props = getValue('wpn-1-props');
+
+  char.wpn2Preset = getValue('wpn-2-preset');
+  char.wpn2Name = getValue('wpn-2-name');
+  char.wpn2MaxAmmo = parseInt(getValue('wpn-2-max-ammo')) || 0;
+  char.wpn2CurrentAmmo = parseInt(getValue('wpn-2-cur-ammo')) || 0;
+  char.wpn2Damage = getValue('wpn-2-damage');
+  char.wpn2Range = getValue('wpn-2-range');
+  char.wpn2Props = getValue('wpn-2-props');
+
+  char.credits = parseInt(getValue('credits-val')) || 0;
+  char.inventory = getValue('inventory-val');
+  char.abilitiesNotes = getValue('char-abilities-notes');
+
+  saveStorage(characterList);
+  recalculateCalculatedFields();
+  return char;
+}
+
+function loadCharacterToForm(c) {
+  if (!c) return;
+
+  setValue('char-name', c.name || '');
+  setValue('char-species', c.species || '');
+  setValue('char-background', c.background || '');
+  setValue('char-ladder', c.ladder || '');
+  setValue('char-class', c.class || '');
+  setValue('char-archetype', c.archetype || '');
+  setValue('char-level', c.level || 1);
+
+  setValue('stat-str', c.str || 10);
+  setValue('stat-dex', c.dex || 10);
+  setValue('stat-con', c.con || 10);
+  setValue('stat-int', c.int || 10);
+  setValue('stat-wis', c.wis || 10);
+  setValue('stat-cha', c.cha || 10);
+
+  setValue('hp-max', c.hpMax || 10);
+  setValue('hp-current', c.hpCurrent || 10);
+  setValue('hp-temp', c.hpTemp || 0);
+  setValue('ac-val', c.ac || 10);
+  setValue('speed-val', c.speed || 30);
+
+  setValue('wpn-1-preset', c.wpn1Preset || '__custom__');
+  setValue('wpn-1-name', c.wpn1Name || '');
+  setValue('wpn-1-max-ammo', c.wpn1MaxAmmo || 0);
+  setValue('wpn-1-cur-ammo', c.wpn1CurrentAmmo || 0);
+  setValue('wpn-1-damage', c.wpn1Damage || '');
+  setValue('wpn-1-range', c.wpn1Range || '');
+  setValue('wpn-1-props', c.wpn1Props || '');
+
+  setValue('wpn-2-preset', c.wpn2Preset || '__custom__');
+  setValue('wpn-2-name', c.wpn2Name || '');
+  setValue('wpn-2-max-ammo', c.wpn2MaxAmmo || 0);
+  setValue('wpn-2-cur-ammo', c.wpn2CurrentAmmo || 0);
+  setValue('wpn-2-damage', c.wpn2Damage || '');
+  setValue('wpn-2-range', c.wpn2Range || '');
+  setValue('wpn-2-props', c.wpn2Props || '');
+
+  const cur1 = document.getElementById('wpn-1-cur-display');
+  if (cur1) cur1.innerText = c.wpn1CurrentAmmo || 0;
+
+  const cur2 = document.getElementById('wpn-2-cur-display');
+  if (cur2) cur2.innerText = c.wpn2CurrentAmmo || 0;
+
+  setValue('credits-val', c.credits || 0);
+  setValue('inventory-val', c.inventory || '');
+  setValue('char-abilities-notes', c.abilitiesNotes || '');
+
+  recalculateCalculatedFields();
+}
+
+function recalculateCalculatedFields() {
+  const stats = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
+  stats.forEach(s => {
+    const score = parseInt(getValue(`stat-${s}`)) || 10;
+    const mod = calcMod(score);
+    const modEl = document.getElementById(`mod-${s}`);
+    if (modEl) modEl.innerText = (mod >= 0 ? '+' : '') + mod;
+  });
+
+  const level = parseInt(getValue('char-level')) || 1;
+  const prof = calcProf(level);
+
+  const profEl = document.getElementById('prof-bonus-display');
+  if (profEl) profEl.innerText = '+' + prof;
+
+  const wisMod = calcMod(getValue('stat-wis'));
+  const passivePerc = 10 + wisMod;
+  const percEl = document.getElementById('passive-perception-display');
+  if (percEl) percEl.innerText = passivePerc;
+}
+
+// Render Functions
+function renderCharacterList() {
   const container = document.getElementById('character-list');
   if (!container) return;
 
-  if (!characters || characters.length === 0) {
-    container.innerHTML = `
-      <div style="text-align:center; padding: 30px; color:#8b949e;">
-        <div style="font-size: 40px; margin-bottom:8px;">🛡️</div>
-        <h3>No Operatives Deployed</h3>
-        <p style="font-size: 11px; margin-top: 4px;">Click button below to create your first operative.</p>
-      </div>
-    `;
+  if (characterList.length === 0) {
+    container.innerHTML = '<p class="empty-msg">No operatives active. Create one above.</p>';
     return;
   }
 
-  container.innerHTML = characters.map(c => {
-    const initial = (c.name && c.name.length > 0) ? c.name[0].toUpperCase() : '?';
-    return `
-      <div class="char-card" onclick="openCharacter('${c.id}')">
-        <div style="display:flex; align-items:center;">
-          <div class="char-avatar">${initial}</div>
-          <div>
-            <div style="font-weight:800; font-size:15px; color:#fff;">${c.name || 'Unnamed Operative'}</div>
-            <div style="font-size:11px; color:#8b949e;">Lvl ${c.level || 1} ${c.ladder || ''} ${c.class || ''}</div>
-            <div style="font-size:11px; color:#00f2fe; margin-top:2px;">HP: ${c.currentHp || 10}/${c.maxHp || 10} | Credits: ₡${c.credits || 0}</div>
-          </div>
-        </div>
-        <button class="icon-btn" onclick="event.stopPropagation(); deleteCharacter('${c.id}')">🗑</button>
+  container.innerHTML = characterList.map(c => `
+    <div class="char-card ${c.id === currentCharacterId ? 'active-char' : ''}" onclick="selectCharacter('${c.id}')">
+      <div>
+        <strong>${c.name}</strong>
+        <span class="char-sub">${c.species || 'Human'} • Lvl ${c.level} ${c.ladder} ${c.class}</span>
       </div>
-    `;
-  }).join('');
-};
+      <button class="btn danger-btn" onclick="deleteCharacter(event, '${c.id}')">Delete</button>
+    </div>
+  `).join('');
+}
 
-window.createNewCharacter = function() {
-  const newChar = {
-    id: 'c_' + Date.now(),
-    name: '', ladder: '', class: '', race: '', level: 1, credits: 500,
-    str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10,
-    ac: 10, maxHp: 10, currentHp: 10, speed: 30, notes: '',
-    abilitiesNotes: '',
-    wpn1Preset: '', wpn1Name: '', wpn1MaxAmmo: 30, wpn1CurrentAmmo: 30,
-    wpn1Damage: '', wpn1Range: '', wpn1Props: '',
-    wpn2Preset: '', wpn2Name: '', wpn2MaxAmmo: 12, wpn2CurrentAmmo: 12,
-    wpn2Damage: '', wpn2Range: '', wpn2Props: '',
-    proficientSkills: []
-  };
-  characters.push(newChar);
-  saveStorage(characters);
-  openCharacter(newChar.id);
-};
+function selectCharacter(id) {
+  currentCharacterId = id;
+  const c = characterList.find(char => char.id === id);
+  if (c) loadCharacterToForm(c);
+  renderCharacterList();
+  switchPage('page-sheet');
+}
 
-window.openCharacter = function(id) {
-  currentCharId = id;
-  const c = characters.find(char => char.id === id);
-  if (!c) return;
-
-  document.getElementById('char-name').value = c.name || '';
-  document.getElementById('char-ladder').value = c.ladder || '';
-  document.getElementById('char-class').value = c.class || '';
-  document.getElementById('char-race').value = c.race || '';
-  document.getElementById('char-level').value = c.level || 1;
-  document.getElementById('char-credits').value = c.credits || 0;
-
-  document.getElementById('ability-str').value = c.str || 10;
-  document.getElementById('ability-dex').value = c.dex || 10;
-  document.getElementById('ability-con').value = c.con || 10;
-  document.getElementById('ability-int').value = c.int || 10;
-  document.getElementById('ability-wis').value = c.wis || 10;
-  document.getElementById('ability-cha').value = c.cha || 10;
-
-  document.getElementById('char-ac').value = c.ac || 10;
-  document.getElementById('char-hp').value = c.maxHp || 10;
-  document.getElementById('char-speed').value = c.speed || 30;
-  document.getElementById('char-notes').value = c.notes || '';
-  document.getElementById('char-abilities-notes').value = c.abilitiesNotes || '';
-
-  // Weapon 1
-  document.getElementById('wpn-1-preset').value = c.wpn1Preset || '';
-  document.getElementById('wpn-1-name').value = c.wpn1Name || '';
-  document.getElementById('wpn-1-max-ammo').value = c.wpn1MaxAmmo || 30;
-  document.getElementById('wpn-1-damage').value = c.wpn1Damage || '';
-  document.getElementById('wpn-1-range').value = c.wpn1Range || '';
-  document.getElementById('wpn-1-props').value = c.wpn1Props || '';
-
-  // Weapon 2
-  document.getElementById('wpn-2-preset').value = c.wpn2Preset || '';
-  document.getElementById('wpn-2-name').value = c.wpn2Name || '';
-  document.getElementById('wpn-2-max-ammo').value = c.wpn2MaxAmmo || 12;
-  document.getElementById('wpn-2-damage').value = c.wpn2Damage || '';
-  document.getElementById('wpn-2-range').value = c.wpn2Range || '';
-  document.getElementById('wpn-2-props').value = c.wpn2Props || '';
-
-  updateAll();
-  switchPage('sheet');
-};
-
-window.deleteCharacter = function(id) {
-  if (confirm('Delete this operative?')) {
-    characters = characters.filter(c => c.id !== id);
-    saveStorage(characters);
-    renderCharacterList();
+function deleteCharacter(event, id) {
+  event.stopPropagation();
+  if (!confirm('Delete this operative?')) return;
+  characterList = characterList.filter(c => c.id !== id);
+  saveStorage(characterList);
+  if (currentCharacterId === id) {
+    currentCharacterId = characterList.length ? characterList[0].id : null;
+    if (currentCharacterId) {
+      loadCharacterToForm(characterList[0]);
+    }
   }
-};
+  renderCharacterList();
+}
 
-/* ===== CALCULATIONS ===== */
-function calcMod(score) { return Math.floor((score - 10) / 2); }
-function modStr(score) { const m = calcMod(score); return m >= 0 ? '+' + m : '' + m; }
+function switchPage(pageId) {
+  document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
 
-window.updateAll = function() {
-  ['str', 'dex', 'con', 'int', 'wis', 'cha'].forEach(s => {
-    const val = parseInt(document.getElementById('ability-' + s).value) || 10;
-    document.getElementById('mod-' + s).textContent = modStr(val);
+  const targetPage = document.getElementById(pageId);
+  const targetBtn = document.querySelector(`[data-tab="${pageId}"]`);
+
+  if (targetPage) targetPage.classList.add('active');
+  if (targetBtn) targetBtn.classList.add('active');
+
+  if (pageId === 'page-abilities') renderAbilities();
+}
+
+function renderAbilities() {
+  const ladderBox = document.getElementById('ladder-abilities-container');
+  const classBox = document.getElementById('class-abilities-container');
+
+  const ladderName = getValue('char-ladder');
+  const className = getValue('char-class');
+  const level = parseInt(getValue('char-level')) || 1;
+
+  if (ladderBox && typeof LADDER_DATA !== 'undefined' && LADDER_DATA[ladderName]) {
+    const lData = LADDER_DATA[ladderName];
+    const unlocked = lData.abilities.filter(a => a.level <= level);
+
+    ladderBox.innerHTML = `
+      <p class="ladder-desc">${lData.desc}</p>
+      ${unlocked.map(a => `
+        <div class="ability-entry">
+          <div class="ability-entry-header">
+            <span class="ability-entry-name">${a.name}</span>
+            <span class="ability-entry-level">Level ${a.level}</span>
+          </div>
+          <p class="ability-entry-desc">${a.desc}</p>
+        </div>
+      `).join('')}
+    `;
+  }
+
+  if (classBox && typeof CLASS_DATA !== 'undefined' && CLASS_DATA[className]) {
+    const cData = CLASS_DATA[className];
+    const unlocked = cData.abilities.filter(a => a.level <= level);
+
+    classBox.innerHTML = `
+      <p class="ladder-desc">Hit Die: ${cData.hitDie} | Primary: ${cData.primaryStat}</p>
+      ${unlocked.map(a => `
+        <div class="ability-entry">
+          <div class="ability-entry-header">
+            <span class="ability-entry-name">${a.name}</span>
+            <span class="ability-entry-level">Level ${a.level}</span>
+          </div>
+          <p class="ability-entry-desc">${a.desc}</p>
+        </div>
+      `).join('')}
+    `;
+  }
+}
+
+// Global Event Listeners
+document.addEventListener('DOMContentLoaded', () => {
+  characterList = loadStorage();
+  populateDropdowns();
+
+  if (characterList.length > 0) {
+    currentCharacterId = characterList[0].id;
+    loadCharacterToForm(characterList[0]);
+  } else {
+    createNewCharacter();
+  }
+
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => switchPage(btn.dataset.tab));
   });
 
-  const dex = parseInt(document.getElementById('ability-dex').value) || 10;
-  document.getElementById('char-initiative').textContent = modStr(dex);
+  const btnNew = document.getElementById('btn-new-char');
+  if (btnNew) btnNew.addEventListener('click', createNewCharacter);
 
-  const lvl = parseInt(document.getElementById('char-level').value) || 1;
-  let prof = 2;
-  if (lvl >= 17) prof = 6;
-  else if (lvl >= 13) prof = 5;
-  else if (lvl >= 9) prof = 4;
-  else if (lvl >= 5) prof = 3;
-  document.getElementById('char-prof').textContent = '+' + prof;
+  document.querySelectorAll('#page-sheet input, #page-sheet select, #page-sheet textarea').forEach(input => {
+    input.addEventListener('input', readForm);
+    input.addEventListener('change', readForm);
+  });
 
-  updateHpDisplay();
-  updateAmmoDisplay();
-};
-
-window.updateHpDisplay = function() {
-  const c = characters.find(char => char.id === currentCharId);
-  if (!c) return;
-  const maxHp = parseInt(document.getElementById('char-hp').value) || 10;
-  const curHp = (c.currentHp !== undefined) ? c.currentHp : maxHp;
-  document.getElementById('hp-current').textContent = curHp;
-  document.getElementById('hp-max-display').textContent = maxHp;
-};
-
-window.changeHp = function(amt) {
-  const c = characters.find(char => char.id === currentCharId);
-  if (!c) return;
-  const maxHp = parseInt(document.getElementById('char-hp').value) || 10;
-  const curHp = (c.currentHp !== undefined) ? c.currentHp : maxHp;
-  c.currentHp = Math.max(0, Math.min(maxHp, curHp + amt));
-  saveStorage(characters);
-  updateHpDisplay();
-};
-
-/* ===== AMMO ===== */
-window.updateAmmoDisplay = function() {
-  const c = characters.find(char => char.id === currentCharId);
-  if (!c) return;
-
-  const m1 = parseInt(document.getElementById('wpn-1-max-ammo').value) || 0;
-  const m2 = parseInt(document.getElementById('wpn-2-max-ammo').value) || 0;
-
-  const a1 = (c.wpn1CurrentAmmo !== undefined) ? Math.min(m1, c.wpn1CurrentAmmo) : m1;
-  const a2 = (c.wpn2CurrentAmmo !== undefined) ? Math.min(m2, c.wpn2CurrentAmmo) : m2;
-
-  document.getElementById('wpn-1-ammo-text').textContent = a1 + ' / ' + m1;
-  document.getElementById('wpn-2-ammo-text').textContent = a2 + ' / ' + m2;
-};
-
-window.shootWeapon = function(num) {
-  const c = characters.find(char => char.id === currentCharId);
-  if (!c) return;
-  if (num === 1 && c.wpn1CurrentAmmo > 0) c.wpn1CurrentAmmo--;
-  if (num === 2 && c.wpn2CurrentAmmo > 0) c.wpn2CurrentAmmo--;
-  saveStorage(characters);
-  updateAmmoDisplay();
-};
-
-window.reloadWeapon = function(num) {
-  const c = characters.find(char => char.id === currentCharId);
-  if (!c) return;
-  if (num === 1) c.wpn1CurrentAmmo = parseInt(document.getElementById('wpn-1-max-ammo').value) || 0;
-  if (num === 2) c.wpn2CurrentAmmo = parseInt(document.getElementById('wpn-2-max-ammo').value) || 0;
-  saveStorage(characters);
-  updateAmmoDisplay();
-};
-
-/* ===== SKILLS PAGE ===== */
-window.renderSkills = function() {
-  const c = characters.find(char => char.id === currentCharId);
-  const container = document.getElementById('skills-container');
-  if (!container) return;
-  if (!c) {
-    container.innerHTML = '<p style="color:#8b949e; font-size:12px;">Select an operative first.</p>';
-    return;
+  const notes = document.getElementById('char-abilities-notes');
+  if (notes) {
+    notes.addEventListener('input', readForm);
   }
 
-  const lvl = parseInt(document.getElementById('char-level').value) || 1;
-  let profBonus = 2;
-  if (lvl >= 17) profBonus = 6;
-  else if (lvl >= 13) profBonus = 5;
-  else if (lvl >= 9) profBonus = 4;
-  else if (lvl >= 5) profBonus = 3;
-
-  c.proficientSkills = c.proficientSkills || [];
-
-  container.innerHTML = SKILLS.map(s => {
-    const statScore = c[s.stat] || 10;
-    const mod = calcMod(statScore);
-    const isProf = c.proficientSkills.includes(s.name);
-    const total = mod + (isProf ? profBonus : 0);
-
-    return `
-      <div class="skill-item">
-        <div class="skill-left">
-          <input type="checkbox" ${isProf ? 'checked' : ''} onchange="toggleSkill('${s.name}')">
-          <span>${s.name} <small style="color:#8b949e">(${s.stat.toUpperCase()})</small></span>
-        </div>
-        <div class="skill-val">${total >= 0 ? '+' + total : total}</div>
-      </div>
-    `;
-  }).join('');
-};
-
-window.toggleSkill = function(name) {
-  const c = characters.find(char => char.id === currentCharId);
-  if (!c) return;
-  c.proficientSkills = c.proficientSkills || [];
-  if (c.proficientSkills.includes(name)) {
-    c.proficientSkills = c.proficientSkills.filter(s => s !== name);
-  } else {
-    c.proficientSkills.push(name);
-  }
-  saveStorage(characters);
-  renderSkills();
-};
-
-/* ===== ABILITIES PAGE (NEW) ===== */
-window.renderAbilities = function() {
-  const c = characters.find(char => char.id === currentCharId);
-  const ladderContainer = document.getElementById('ladder-abilities-container');
-  const classContainer = document.getElementById('class-abilities-container');
-
-  if (!c) {
-    ladderContainer.innerHTML = '<p class="empty-abilities">Select an operative first.</p>';
-    classContainer.innerHTML = '<p class="empty-abilities">Select an operative first.</p>';
-    return;
-  }
-
-  const level = c.level || 1;
-
-  // --- LADDER ABILITIES ---
-  if (c.ladder && LADDER_DATA[c.ladder]) {
-    const ladder = LADDER_DATA[c.ladder];
-    const availableAbilities = ladder.abilities.filter(a => a.level <= level);
-
-    let html = `<div class="ladder-desc">${ladder.desc}</div>`;
-
-    if (availableAbilities.length === 0) {
-      html += '<p class="empty-abilities">No abilities available at this level yet.</p>';
-    } else {
-      html += availableAbilities.map(a => `
-        <div class="ability-entry">
-          <div class="ability-entry-header">
-            <div class="ability-entry-name">${a.name}</div>
-            <div class="ability-entry-level">Lvl ${a.level}</div>
-          </div>
-          <div class="ability-entry-desc">${a.desc}</div>
-        </div>
-      `).join('');
-    }
-    ladderContainer.innerHTML = html;
-  } else {
-    ladderContainer.innerHTML = '<p class="empty-abilities">Select a Ladder on the Tactical page to see abilities.</p>';
-  }
-
-  // --- CLASS ABILITIES ---
-  if (c.class && CLASS_DATA[c.class]) {
-    const cls = CLASS_DATA[c.class];
-    const availableAbilities = cls.abilities.filter(a => a.level <= level);
-
-    let html = `<div class="ladder-desc">${cls.desc} • Hit Die: ${cls.hitDie} • Primary: ${cls.primaryStat}</div>`;
-
-    if (availableAbilities.length === 0) {
-      html += '<p class="empty-abilities">No abilities available at this level yet.</p>';
-    } else {
-      html += availableAbilities.map(a => `
-        <div class="ability-entry">
-          <div class="ability-entry-header">
-            <div class="ability-entry-name">${a.name}</div>
-            <div class="ability-entry-level">Lvl ${a.level}</div>
-          </div>
-          <div class="ability-entry-desc">${a.desc}</div>
-        </div>
-      `).join('');
-    }
-    classContainer.innerHTML = html;
-  } else {
-    classContainer.innerHTML = '<p class="empty-abilities">Select a Class on the Tactical page to see abilities.</p>';
-  }
-};
-
-/* ===== AUTO SAVE ===== */
-window.autoSave = function() {
-  if (!currentCharId) return;
-  clearTimeout(saveTimeout);
-  saveTimeout = setTimeout(() => {
-    const c = characters.find(char => char.id === currentCharId);
-    if (!c) return;
-
-    c.name = document.getElementById('char-name').value;
-    c.ladder = document.getElementById('char-ladder').value;
-    c.class = document.getElementById('char-class').value;
-    c.race = document.getElementById('char-race').value;
-    c.level = parseInt(document.getElementById('char-level').value) || 1;
-    c.credits = parseInt(document.getElementById('char-credits').value) || 0;
-
-    c.str = parseInt(document.getElementById('ability-str').value) || 10;
-    c.dex = parseInt(document.getElementById('ability-dex').value) || 10;
-    c.con = parseInt(document.getElementById('ability-con').value) || 10;
-    c.int = parseInt(document.getElementById('ability-int').value) || 10;
-    c.wis = parseInt(document.getElementById('ability-wis').value) || 10;
-    c.cha = parseInt(document.getElementById('ability-cha').value) || 10;
-
-    c.ac = parseInt(document.getElementById('char-ac').value) || 10;
-    c.maxHp = parseInt(document.getElementById('char-hp').value) || 10;
-    c.speed = parseInt(document.getElementById('char-speed').value) || 30;
-    c.notes = document.getElementById('char-notes').value;
-    c.abilitiesNotes = document.getElementById('char-abilities-notes').value;
-
-    c.wpn1Preset = document.getElementById('wpn-1-preset').value;
-    c.wpn1Name = document.getElementById('wpn-1-name').value;
-    c.wpn1MaxAmmo = parseInt(document.getElementById('wpn-1-max-ammo').value) || 0;
-    c.wpn1Damage = document.getElementById('wpn-1-damage').value;
-    c.wpn1Range = document.getElementById('wpn-1-range').value;
-    c.wpn1Props = document.getElementById('wpn-1-props').value;
-
-    c.wpn2Preset = document.getElementById('wpn-2-preset').value;
-    c.wpn2Name = document.getElementById('wpn-2-name').value;
-    c.wpn2MaxAmmo = parseInt(document.getElementById('wpn-2-max-ammo').value) || 0;
-    c.wpn2Damage = document.getElementById('wpn-2-damage').value;
-    c.wpn2Range = document.getElementById('wpn-2-range').value;
-    c.wpn2Props = document.getElementById('wpn-2-props').value;
-
-    saveStorage(characters);
-  }, 300);
-};
-
-/* ===== INIT ===== */
-window.onload = function() {
-  populateDropdowns();
   renderCharacterList();
-};
+});
