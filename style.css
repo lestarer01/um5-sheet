@@ -393,3 +393,12 @@ textarea {
   font-size: 12px;
   padding: 10px;
 }
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.level-group {
+  max-width: 100px;
+}
