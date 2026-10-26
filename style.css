@@ -1,4 +1,3 @@
-/* --- DARK CYBERPUNK THEME --- */
 :root {
   --bg-color: #090d16;
   --card-bg: #161b22;
@@ -8,300 +7,69 @@
   --accent-secondary: #4facfe;
   --text-main: #c9d1d9;
   --text-muted: #8b949e;
-  --danger-color: #da3633;
-  --success-color: #238636;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
 
 body {
-  background-color: var(--bg-color);
-  color: var(--text-main);
-  padding: 10px;
-  max-width: 600px;
-  margin: 0 auto;
+  background-color: var(--bg-color); color: var(--text-main);
+  padding: 10px; max-width: 600px; margin: 0 auto;
 }
 
-.app-container {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
+header { text-align: center; padding: 10px 0; }
+header h1 { color: var(--accent-color); letter-spacing: 2px; }
 
-/* HEADER */
-.app-header {
-  text-align: center;
-  padding: 10px 0 5px 0;
-}
-
-.app-header h1 {
-  color: var(--accent-color);
-  font-size: 1.5rem;
-  letter-spacing: 2px;
-}
-
-.subtitle {
-  color: var(--text-muted);
-  font-size: 0.75rem;
-  letter-spacing: 1px;
-}
-
-/* NAVIGATION TABS */
+/* 6 SCROLLING TABS FOR MOBILE */
 .nav-tabs {
-  display: flex;
-  border-bottom: 2px solid var(--border-color);
-  background: var(--card-bg);
+  display: flex; overflow-x: auto; white-space: nowrap;
+  background: var(--card-bg); border-bottom: 2px solid var(--border-color);
   border-radius: 8px 8px 0 0;
 }
-
+.nav-tabs::-webkit-scrollbar { display: none; }
 .tab-btn {
-  flex: 1;
-  padding: 12px 5px;
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  font-weight: bold;
-  font-size: 0.8rem;
-  cursor: pointer;
-  text-transform: uppercase;
+  flex-shrink: 0; padding: 12px 15px; background: none; border: none;
+  color: var(--text-muted); font-weight: bold; font-size: 0.8rem; text-transform: uppercase;
 }
-
 .tab-btn.active {
-  color: var(--accent-color);
-  border-bottom: 3px solid var(--accent-color);
-  background: rgba(0, 242, 254, 0.05);
+  color: var(--accent-color); border-bottom: 3px solid var(--accent-color);
 }
 
-/* TAB PAGES - IMPORTANT: Hides inactive pages */
-.tab-page {
-  display: none;
-}
+.tab-page { display: none; }
+.tab-page.active { display: block; }
 
-.tab-page.active {
-  display: block;
-}
-
-/* CARDS & CONTAINERS */
 .card {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 15px;
-  margin-bottom: 15px;
+  background: var(--card-bg); border: 1px solid var(--border-color);
+  border-radius: 8px; padding: 15px; margin-bottom: 15px;
 }
+.card h2, .card h3 { color: var(--accent-color); margin-bottom: 12px; font-size: 1.1rem; }
 
-.card h2, .card h3 {
-  color: var(--accent-color);
-  margin-bottom: 12px;
-  font-size: 1.1rem;
-}
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;}
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px;}
 
-/* GRID LAYOUTS FOR COMPACT ROWS */
-.grid-2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
+.field-group { display: flex; flex-direction: column; gap: 4px; }
+.field-group label { font-size: 0.7rem; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
 
-.grid-3 {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 10px;
+input, select, textarea {
+  background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-main);
+  padding: 8px; border-radius: 4px; width: 100%;
 }
+input:focus, select:focus { border-color: var(--accent-color); outline: none; }
 
-/* FORM FIELDS */
-.field-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
+/* STATS */
+.stats-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; margin-bottom: 15px; }
+.stat-box { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px; text-align: center; padding: 5px; }
+.stat-box label { color: var(--accent-color); font-size: 0.7rem; font-weight: bold; display: block; }
+.stat-box input { text-align: center; font-weight: bold; padding: 4px 0; margin-top: 4px; }
 
-.field-group label {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  font-weight: bold;
-}
+/* DEATH SAVES */
+.death-saves { display: flex; justify-content: space-between; background: var(--input-bg); padding: 10px; border-radius: 6px; margin-top: 10px;}
+.ds-group { display: flex; align-items: center; gap: 5px; }
+.ds-group input { width: 16px; height: 16px; accent-color: var(--accent-color); }
 
-input[type="text"],
-input[type="number"],
-select,
-textarea {
-  background: var(--input-bg);
-  border: 1px solid var(--border-color);
-  color: var(--text-main);
-  padding: 8px 10px;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  width: 100%;
-}
+/* SKILLS */
+.skill-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border-color); }
+.skill-checks { display: flex; gap: 10px; }
+.skill-checks label { font-size: 0.7rem; display: flex; align-items: center; gap: 4px; }
 
-input:focus, select:focus, textarea:focus {
-  outline: none;
-  border-color: var(--accent-color);
-}
-
-/* STATS GRID */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 6px;
-  margin-bottom: 15px;
-}
-
-.stat-box {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  padding: 6px 2px;
-  text-align: center;
-}
-
-.stat-box label {
-  font-size: 0.65rem;
-  color: var(--accent-color);
-  font-weight: bold;
-  display: block;
-}
-
-.stat-box input {
-  text-align: center;
-  padding: 4px 0;
-  font-size: 0.9rem;
-  font-weight: bold;
-}
-
-.mod-display {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  display: block;
-  margin-top: 2px;
-}
-
-/* DERIVED STATS BAR */
-.derived-stats {
-  display: flex;
-  justify-content: space-around;
-  font-size: 0.85rem;
-  padding: 10px;
-}
-
-/* WEAPONS & AMMO */
-.weapon-block {
-  background: rgba(0,0,0,0.2);
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
-}
-
-.ammo-controls {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 10px;
-  background: var(--input-bg);
-  padding: 8px;
-  border-radius: 6px;
-}
-
-/* BUTTONS */
-.btn {
-  padding: 8px 14px;
-  border-radius: 6px;
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.primary-btn {
-  background: var(--accent-color);
-  color: #000;
-  width: 100%;
-}
-
-.danger-btn {
-  background: var(--danger-color);
-  color: #fff;
-  font-size: 0.75rem;
-  padding: 4px 8px;
-}
-
-.ammo-btn {
-  background: var(--accent-secondary);
-  color: #000;
-  font-size: 0.75rem;
-}
-
-.reload-btn {
-  background: var(--success-color);
-  color: #fff;
-}
-
-/* CHAR LIST ROSTER */
-.char-list-container {
-  margin-top: 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.char-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--input-bg);
-  padding: 12px;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
-  cursor: pointer;
-}
-
-.char-card.active-char {
-  border-color: var(--accent-color);
-}
-
-.char-sub {
-  display: block;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  margin-top: 2px;
-}
-
-/* ABILITIES PAGE */
-.ability-entry {
-  background: var(--input-bg);
-  border-left: 3px solid var(--accent-color);
-  padding: 10px;
-  margin-top: 8px;
-  border-radius: 0 6px 6px 0;
-}
-
-.ability-entry-header {
-  display: flex;
-  justify-content: space-between;
-  font-weight: bold;
-  font-size: 0.85rem;
-  margin-bottom: 4px;
-}
-
-.ability-entry-level {
-  color: var(--accent-color);
-  font-size: 0.75rem;
-}
-
-.ability-entry-desc {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
-
-.ladder-desc {
-  font-size: 0.8rem;
-  color: var(--accent-secondary);
-  font-style: italic;
-  margin-bottom: 8px;
-}
+.btn { padding: 8px; border-radius: 4px; border: none; font-weight: bold; width: 100%; background: var(--accent-color); color: #000; margin-top: 10px;}
+.btn.danger { background: #da3633; color: white; width: auto; font-size: 0.8rem; }
