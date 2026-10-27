@@ -1,26 +1,29 @@
 const UM5_SKILLS = [
   { name: 'Acrobatics', stat: 'dex' },
+  { name: 'Animal Handling', stat: 'wis' },
+  { name: 'Arcana', stat: 'int' },
   { name: 'Athletics', stat: 'str' },
-  { name: 'Computers', stat: 'int' },
+  { name: 'Commune', stat: 'vig' },
+  { name: 'Computer Use', stat: 'int' },
   { name: 'Deception', stat: 'cha' },
   { name: 'Demolitions', stat: 'int' },
-  { name: 'Driving', stat: 'dex' },
-  { name: 'Electronics', stat: 'int' },
+  { name: 'Detection', stat: 'vig' },
+  { name: 'Engineering', stat: 'int' },
+  { name: 'History', stat: 'int' },
+  { name: 'Induce', stat: 'vig' },
   { name: 'Insight', stat: 'wis' },
   { name: 'Intimidation', stat: 'cha' },
   { name: 'Investigation', stat: 'int' },
   { name: 'Medicine', stat: 'wis' },
+  { name: 'Nature', stat: 'int' },
   { name: 'Perception', stat: 'wis' },
   { name: 'Performance', stat: 'cha' },
   { name: 'Persuasion', stat: 'cha' },
-  { name: 'Piloting', stat: 'dex' },
-  { name: 'Science', stat: 'int' },
+  { name: 'Religion', stat: 'int' },
+  { name: 'Sciences', stat: 'int' },
   { name: 'Sleight of Hand', stat: 'dex' },
   { name: 'Stealth', stat: 'dex' },
-  { name: 'Survival', stat: 'wis' },
-  { name: 'Technology', stat: 'int' },
-  { name: 'Vehicle (Air/Sea)', stat: 'dex' },
-  { name: 'Heavy Weapons', stat: 'str' }
+  { name: 'Survival', stat: 'dex' }
 ];
 
 const STORAGE_KEY = 'um5_chars_v5';
