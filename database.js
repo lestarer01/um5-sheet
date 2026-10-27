@@ -10,40 +10,15 @@ const LADDER_DATA = {
       { level: 19, name: 'Just Stop', desc: '+2 to one stat or +1 to two stats (max 20, primary 22). Action: You and up to 5 communicating allies instantly gain the benefit of a short rest (1/long rest).' }
     ]
   },
-  'Cyberborn': {
-    desc: 'Augmented body, digital mind.',
+    'Juggernaut': {
+    desc: 'Brutal power, extreme stamina, and physical perfection. (Key: CON, STR)',
     abilities: [
-      { level: 1, name: 'Neural Jack', desc: 'Advantage on Computers and Electronics checks.' },
-      { level: 2, name: 'Overclock', desc: 'Once per rest, take an extra action; suffer 1 level of exhaustion after.' },
-      { level: 5, name: 'System Shield', desc: 'Resistance to psychic and lightning damage.' },
-      { level: 10, name: 'Ghost Protocol', desc: 'You can become undetectable to electronic sensors for 1 minute / long rest.' }
-    ]
-  },
-  'Heavy Armor': {
-    desc: 'Walking tank. Armor is your second skin.',
-    abilities: [
-      { level: 1, name: 'Armored Hide', desc: 'While wearing heavy armor, +1 AC and ignore speed penalty.' },
-      { level: 2, name: 'Bulwark', desc: 'Impose disadvantage on attacks against adjacent allies.' },
-      { level: 5, name: 'Shock Absorber', desc: 'Resistance to bludgeoning from non-magical / ballistic sources while armored.' },
-      { level: 10, name: 'Juggernaut Charge', desc: 'Dash into a creature; STR save or knocked prone and take extra damage.' }
-    ]
-  },
-  'Infiltrator': {
-    desc: 'Ghost in the machine and the shadows.',
-    abilities: [
-      { level: 1, name: 'Ghost Step', desc: 'Advantage on Stealth; move full speed while hidden.' },
-      { level: 2, name: 'Weak Point', desc: 'Once per turn, add 1d6 damage when attacking from hiding.' },
-      { level: 5, name: 'False Identity', desc: 'Create airtight cover identities; advantage on Deception for them.' },
-      { level: 10, name: 'Vanishing Act', desc: 'Bonus action Hide even when lightly obscured.' }
-    ]
-  },
-  'Juggernaut': {
-    desc: 'Unstoppable physical force.',
-    abilities: [
-      { level: 1, name: 'Thick Skin', desc: '+1 max HP per level.' },
-      { level: 2, name: 'Power Through', desc: 'Ignore difficult terrain; advantage vs shove/prone.' },
-      { level: 5, name: 'Adrenal Surge', desc: 'When bloodied, gain +2 STR and temp HP equal to level.' },
-      { level: 10, name: 'Unbreakable', desc: 'Once per long rest, drop to 1 HP instead of 0.' }
+      { level: 1, name: 'Full Torque', desc: 'Use STR instead of DEX for ranged/thrown attack & damage rolls and save DCs; OR use CON instead of DEX for 2-handed small arms, heavy, or super heavy weapons. Set STR or CON as primary ladder ability.' },
+      { level: 4, name: 'Good Cardio', desc: '+1 to any stat (max 20, primary 22). Ignore speed reduction from difficult terrain. Gain bonus HP equal to twice primary mod (triple if CON).' },
+      { level: 8, name: 'Unstoppable', desc: '+1 to any stat (max 20, primary 22). Gain 1 extra Hit Die now; maximize HP gained from both this extra Hit Die and your normal Hit Die at this level.' },
+      { level: 12, name: 'Built Like a Truck', desc: '+2 to one stat or +1 to two (max 20, primary 22). Gain bonus HP equal to primary mod (double if CON). Add primary mod to melee damage vs incapacitated targets or objects. Advantage on saves vs poison and stun.' },
+      { level: 16, name: 'Hulking Smash', desc: '+1 to any stat (max 20, primary 22). Action to Hulk (1/long rest): gain (2x lvl + 2x primary mod) temp HP and add primary mod to melee damage while temp HP lasts; suffer disadvantage on INT/WIS/CHA checks & attacks for 1 hr.' },
+      { level: 19, name: 'In Your Prime', desc: '+2 to one stat or +1 to two (max 20, primary 22). Gain resistance to non-magical bludgeoning, piercing, and slashing damage.' }
     ]
   },
   'Martial Artist': {
