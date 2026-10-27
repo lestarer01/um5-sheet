@@ -90,16 +90,47 @@ const LADDER_DATA = {
 };
 
 const CLASS_DATA = {
-  'Face': {
+    'Face': {
     desc: 'The smooth talker, the negotiator, and the haggler.',
     hitDie: 'd8',
-    primaryStat: 'Any',
+    primaryStat: 'CHA',
     abilities: [
-      { level: 1, name: 'Bulletproof Ego', desc: 'wear light or no armor, you gain a bonus to AC equal to half your proficiency bonus (rounded up).' },
-      { level: 1, name: 'Double your efforts', desc: 'once per turn on your turn, can make a DC 15 Perception free check; pass, take an additional action (not for Attack or cast spells).' },
-      { level: 1, name: 'Life Insurance', desc: 'Spend a Hit Die on your turn, regain no hit points, and you gain all the following benefi ts (this requires no action.' },
-      { level: 5, name: 'Deadeye', desc: 'Ignore half cover; +1d8 damage on critical hits with firearms.' }
-    ]
+      { level: 1, name: 'Bulletproof Ego', desc: 'As long as you wear light or no armor, you gain a bonus to AC equal to half your proficiency bonus (rounded up).' },
+      { level: 1, name: 'Double Your Efforts', desc: 'Once per turn, make a free DC 15 WIS (Perception) check. If you pass, take an additional action (cannot be Attack or cast spell).' },
+      { level: 1, name: 'Life Insurance', desc: 'Spend a Hit Die on your turn (no action, heals no HP) to gain: Auto-pass Double Your Efforts check; Advantage on all attacks, checks, and saves until next turn; Any CHA save you force gains +3 DC until next turn.' },
+      { level: 2, name: 'Hustle Pool', desc: 'Gain a pool = 2 + (2x CHA mod). After rolling any non-attack d20, you can alter the result by pulling from this pool. Refills on long rest.' },
+      { level: 3, name: 'Archetype Feature', desc: 'You gain a feature from your chosen Archetype (or skip it to take an extra Protagonist Trait).' },
+      { level: 5, name: 'Life Insurance Upgrade', desc: 'When you use Life Insurance, your speed increases by +5 ft and you gain +2 AC until start of your next turn.' },
+      { level: 6, name: 'Automatic Improvisation', desc: 'Spend a Hit Die as a bonus action to gain proficiency with a tool for 1 minute.' },
+      { level: 7, name: 'Archetype Feature', desc: 'You gain a feature from your chosen Archetype.' },
+      { level: 9, name: 'Double Your Efforts Upgrade', desc: 'The DC to gain your extra action reduces to 10.' },
+      { level: 10, name: 'Life Insurance Upgrade', desc: 'The bonus to Save DCs when using Life Insurance increases to +5.' },
+      { level: 11, name: 'Archetype Feature', desc: 'You gain a feature from your chosen Archetype.' },
+      { level: 13, name: 'Make Them Flinch', desc: 'Force a creature that made a CHA saving throw you imposed to re-roll. (1/long rest per target).' },
+      { level: 14, name: 'Life Insurance Upgrade', desc: 'When you use Life Insurance, you regain 2 points to your Hustle Pool.' },
+      { level: 15, name: 'Archetype Feature', desc: 'You gain a feature from your chosen Archetype.' },
+      { level: 17, name: 'Life Insurance Upgrade', desc: 'When you use Life Insurance, roll the spent Hit Die and recover hit points equal to the result.' },
+      { level: 18, name: 'Archetype Feature', desc: 'You gain a feature from your chosen Archetype.' },
+      { level: 20, name: 'Automatic Improvisation Mastery', desc: 'You have proficiency with all tools all the time (no need to spend hit dice).' }
+    ],
+    choiceMenu: {
+      name: 'Protagonist Traits',
+      levels: [1, 1, 5, 10, 15, 20], // You get two at level 1, then one at 5, 10, 15, 20.
+      options: {
+        'Biting Taunt': 'Action: Target makes CHA save or has disadvantage on attack rolls and ability checks until the beginning of your next turn. (If pass, immune for 24 hrs).',
+        'Cognitive Empathy': 'Action: Target within 30ft (INT 4+) makes CHA save. Fail: you learn surface thoughts, likely actions, and emotional state until end of your next turn. (1/target/long rest).',
+        'Faceman': 'Select one INT, WIS, or CHA skill or one item you are proficient with. Action: Double your proficiency bonus with the next check made with that skill/item. Can be taken multiple times for different skills.',
+        'Fascination': 'Action: Target makes CHA save. Fail: Charmed by you and allies for 5 mins or until damaged/line of sight broken. (1/long rest, or 2/long rest if taken twice).',
+        'Iceman': 'If you suffer a critical hit, you regain 1 spent Hit Die.',
+        'Know the Signs': 'You have advantage against any Charisma and Wisdom saving throws.',
+        'Mind Twist': 'Action: Target makes CHA save. Fail: Stunned until the beginning of your next turn. (1/target/long rest, can take twice to gain a second use).',
+        'Poker Face': 'Immune to frightened and charmed conditions. Advantage against being frightened/charmed.',
+        'Polyglot': 'Learn 3 additional languages. Learn 1 more every 3 levels from now on.',
+        'Possible Sociopath': 'Resistance to psychic damage. Advantage on saving throws against effects that sense emotions or read thoughts.',
+        'Veneer': 'With a disguise kit, alter voice and mannerisms. If mimicking generically, disguise is near flawless. If mimicking someone specific, set visual disguise check roll to your CHA save DC.',
+        'Winning Smile': 'Before making a skill check for a proficient skill, you can set the roll to your ability score instead of rolling. (1/long rest, can take twice to gain a second use).'
+      }
+    }
   },
   'Heavy': {
     desc: 'Biggest guns. Biggest hits.',
