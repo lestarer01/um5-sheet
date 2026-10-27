@@ -1,5 +1,5 @@
 /* ==========================================
-   ULTRAMODERN 5 (UM5) ENGINE
+   ULTRAMODERN 5 (UM5) TACTICAL ENGINE
    ========================================== */
 
 const STORAGE_KEY = 'um5_chars_v5';
@@ -35,7 +35,6 @@ const UM5_SKILLS = [
 let chars = [];
 let activeId = null;
 
-// Safe DOM Helpers
 function safeVal(id, defaultVal = "") {
   const el = document.getElementById(id);
   return el ? el.value : defaultVal;
@@ -83,7 +82,7 @@ function calcMod(score) {
 }
 
 function emptyWeapon() {
-  return { preset: "", name: "", dmg: "", range: "", props: "", max: "", cur: "" };
+  return { preset: "", name: "", dmg: "", range: "", props: "", max: 0, cur: 0 };
 }
 
 function emptyChar(name = "New Operative") {
@@ -110,8 +109,7 @@ function emptyChar(name = "New Operative") {
     hpMax: 10,
     hpCurrent: 10,
     hpTemp: 0,
-    hitDiceMax: "1d8",
-    hitDiceCurrent: 1,
+    hitDiceMax: "1d10",
     ac: 10,
 
     dsS1: false, dsS2: false, dsS3: false,
@@ -119,7 +117,7 @@ function emptyChar(name = "New Operative") {
 
     armorType: "",
     armorPreset: "",
-    armorName: "",
+    armorName: "Plain Clothes",
     armorProps: "",
 
     weapons: [emptyWeapon()],
@@ -151,7 +149,7 @@ function loadData() {
     }
   }
   if (!chars || chars.length === 0) {
-    const defaultChar = emptyChar("Operative 1");
+    const defaultChar = emptyChar("New Operative");
     chars = [defaultChar];
     activeId = defaultChar.id;
     saveData();
@@ -164,7 +162,6 @@ function saveData() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(chars));
 }
 
-// Tab Switching
 function switchTab(targetId) {
   const allContents = document.querySelectorAll(".tab-content");
   const allBtns = document.querySelectorAll(".tab-btn");
@@ -213,6 +210,12 @@ function populateOperativesList() {
     if (c.id === activeId) opt.selected = true;
     select.appendChild(opt);
   });
+
+  const activeChar = getActiveChar();
+  if (activeChar) {
+    setTxt("op-display-name", activeChar.name || "New Operative");
+    setTxt("op-display-sub", `Lvl ${activeChar.level || 1} ${activeChar.class || 'Operative'}`);
+  }
 }
 
 function initOperativeEvents() {
@@ -247,7 +250,7 @@ function initOperativeEvents() {
         alert("You must keep at least one Operative!");
         return;
       }
-      if (confirm("Delete this Operative?")) {
+      if (confirm("Delete active Operative?")) {
         chars = chars.filter(c => c.id !== activeId);
         activeId = chars[0].id;
         saveData();
@@ -274,13 +277,7 @@ function filterArmorByType() {
     if (!a) continue;
 
     const itemType = (a.type || "").toLowerCase();
-    
-    let isMatch = false;
-    if (!selectedType) {
-      isMatch = true;
-    } else if (itemType.includes(selectedType) || selectedType.includes(itemType.replace(" armor", ""))) {
-      isMatch = true;
-    }
+    let isMatch = !selectedType || itemType.includes(selectedType) || selectedType.includes(itemType.replace(" armor", ""));
 
     if (isMatch) {
       const opt = document.createElement("option");
@@ -304,9 +301,7 @@ function applyArmor() {
     dexBonus = Math.min(dexMod, a.maxDex);
   }
 
-  const calculatedAc = a.baseAc + dexBonus;
-
-  setVal("ac", calculatedAc);
+  setVal("ac", a.baseAc + dexBonus);
   setVal("armor-name", presetKey);
 
   const propsStr = `${a.props?.cost ? a.props.cost : ''} | Wt: ${a.props?.wt ? a.props.wt : ''} | ${a.props?.stealth ? a.props.stealth : ''} | TL${a.props?.tl !== undefined ? a.props.tl : ''}`;
@@ -332,7 +327,7 @@ function renderWeapons() {
     const card = document.createElement("div");
     card.className = "card weapon-card mb-2";
 
-    let weaponOptions = '<option value="">-- Preset --</option>';
+    let weaponOptions = '<option value="">Custom / Manual</option>';
     if (typeof WEAPON_DATA !== "undefined" && WEAPON_DATA) {
       Object.keys(WEAPON_DATA).forEach(wName => {
         const sel = w.preset === wName ? "selected" : "";
@@ -342,45 +337,44 @@ function renderWeapons() {
 
     card.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-        <strong style="color:var(--accent);">Weapon #${index + 1}</strong>
-        <button class="btn btn-delete btn-sm" onclick="removeWeapon(${index})">Remove</button>
+        <strong style="color:var(--accent);">Weapon ${index + 1}</strong>
+        <button class="btn-delete" onclick="removeWeapon(${index})">Remove</button>
       </div>
 
       <div class="form-group mb-1">
-        <label>Preset Quick-Fill</label>
+        <label>WEAPON PRESET</label>
         <select class="form-control w-preset" data-index="${index}">${weaponOptions}</select>
       </div>
 
       <div class="row">
         <div class="col-6 form-group">
-          <label>Weapon Name</label>
-          <input type="text" class="form-control w-name" data-index="${index}" value="${w.name || ''}" placeholder="Custom Weapon">
+          <label>NAME</label>
+          <input type="text" class="form-control w-name" data-index="${index}" value="${w.name || ''}">
         </div>
         <div class="col-6 form-group">
-          <label>Damage</label>
-          <input type="text" class="form-control w-dmg" data-index="${index}" value="${w.dmg || ''}" placeholder="1d8 ballistic">
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-6 form-group">
-          <label>Range</label>
-          <input type="text" class="form-control w-range" data-index="${index}" value="${w.range || ''}" placeholder="50/150">
-        </div>
-        <div class="col-6 form-group">
-          <label>Properties</label>
-          <input type="text" class="form-control w-props" data-index="${index}" value="${w.props || ''}" placeholder="Recoil, Burst">
+          <label>DAMAGE</label>
+          <input type="text" class="form-control w-dmg" data-index="${index}" value="${w.dmg || ''}">
         </div>
       </div>
 
       <div class="row">
         <div class="col-6 form-group">
-          <label>Ammo Capacity</label>
-          <input type="number" class="form-control w-max" data-index="${index}" value="${w.max !== undefined ? w.max : ''}" placeholder="30">
+          <label>RANGE</label>
+          <input type="text" class="form-control w-range" data-index="${index}" value="${w.range || ''}">
         </div>
         <div class="col-6 form-group">
-          <label>Ammo Loaded</label>
-          <input type="number" class="form-control w-cur" data-index="${index}" value="${w.cur !== undefined ? w.cur : ''}" placeholder="30">
+          <label>PROPERTIES</label>
+          <input type="text" class="form-control w-props" data-index="${index}" value="${w.props || ''}">
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+        <div style="font-size:0.85rem; font-weight:700;">
+          Ammo: <span style="color:var(--accent);">${w.cur || 0} / ${w.max || 0}</span>
+        </div>
+        <div>
+          <button class="btn-action btn-shoot" onclick="shootWeapon(${index})">SHOOT</button>
+          <button class="btn-action btn-reload" onclick="reloadWeapon(${index})">RELOAD</button>
         </div>
       </div>
     `;
@@ -410,8 +404,8 @@ function bindWeaponEvents() {
           dmg: wData.dmg || "",
           range: wData.range || "",
           props: wData.props || "",
-          max: wData.max || "",
-          cur: wData.max || ""
+          max: parseInt(wData.max) || 0,
+          cur: parseInt(wData.max) || 0
         };
         saveData();
         renderWeapons();
@@ -419,7 +413,7 @@ function bindWeaponEvents() {
     });
   });
 
-  const fields = ['name', 'dmg', 'range', 'props', 'max', 'cur'];
+  const fields = ['name', 'dmg', 'range', 'props'];
   fields.forEach(field => {
     container.querySelectorAll(`.w-${field}`).forEach(elem => {
       elem.addEventListener("input", (e) => {
@@ -432,6 +426,24 @@ function bindWeaponEvents() {
     });
   });
 }
+
+window.shootWeapon = function(index) {
+  const c = getActiveChar();
+  if (!c || !c.weapons[index]) return;
+  if (c.weapons[index].cur > 0) {
+    c.weapons[index].cur--;
+    saveData();
+    renderWeapons();
+  }
+};
+
+window.reloadWeapon = function(index) {
+  const c = getActiveChar();
+  if (!c || !c.weapons[index]) return;
+  c.weapons[index].cur = c.weapons[index].max;
+  saveData();
+  renderWeapons();
+};
 
 window.addWeapon = function() {
   const c = getActiveChar();
@@ -459,23 +471,15 @@ function renderSkillsTable() {
 
   UM5_SKILLS.forEach(sk => {
     const tr = document.createElement("tr");
-
     tr.innerHTML = `
       <td>
         <strong>${sk.name}</strong>
-        <span style="font-size:0.75rem; color:var(--text-dim); display:block;">${sk.stat.toUpperCase()}</span>
+        <span style="font-size:0.7rem; color:var(--text-dim); display:block;">${sk.stat.toUpperCase()}</span>
       </td>
-      <td style="text-align:center;">
-        <input type="checkbox" id="sk-prof-${sk.name}" class="sk-prof-chk" data-skill="${sk.name}">
-      </td>
-      <td style="text-align:center;">
-        <input type="checkbox" id="sk-exp-${sk.name}" class="sk-exp-chk" data-skill="${sk.name}">
-      </td>
-      <td style="text-align:right;">
-        <strong id="sk-val-${sk.name}">+0</strong>
-      </td>
+      <td style="text-align:center;"><input type="checkbox" id="sk-prof-${sk.name}" class="sk-prof-chk"></td>
+      <td style="text-align:center;"><input type="checkbox" id="sk-exp-${sk.name}" class="sk-exp-chk"></td>
+      <td style="text-align:right;"><strong id="sk-val-${sk.name}">+0</strong></td>
     `;
-
     tbody.appendChild(tr);
   });
 
@@ -508,7 +512,7 @@ function renderAbilities() {
         }
       }
     } else {
-      ladderBox.innerHTML = '<span style="color:var(--text-dim);">Select a Ladder in Core tab to load features.</span>';
+      ladderBox.innerHTML = '<span style="color:var(--text-dim);">Select a Ladder in Core tab.</span>';
     }
   }
 
@@ -525,7 +529,7 @@ function renderAbilities() {
         }
       }
     } else {
-      classBox.innerHTML = '<span style="color:var(--text-dim);">Select a Class in Core tab to load features.</span>';
+      classBox.innerHTML = '<span style="color:var(--text-dim);">Select a Class in Core tab.</span>';
     }
   }
 }
@@ -599,7 +603,6 @@ function loadToForm() {
 
   setVal("char-name", c.name);
   setVal("char-species", c.species);
-  setVal("char-background", c.background);
   setVal("char-ladder", c.ladder);
   setVal("char-class", c.class);
   setVal("char-archetype", c.archetype);
@@ -616,8 +619,7 @@ function loadToForm() {
   setVal("hp-max", c.hpMax !== undefined ? c.hpMax : 10);
   setVal("hp-cur", c.hpCurrent !== undefined ? c.hpCurrent : 10);
   setVal("hp-temp", c.hpTemp !== undefined ? c.hpTemp : 0);
-  setVal("hd-max", c.hitDiceMax || "1d8");
-  setVal("hd-cur", c.hitDiceCurrent !== undefined ? c.hitDiceCurrent : 1);
+  setVal("hd-max", c.hitDiceMax || "1d10");
   setVal("ac", c.ac !== undefined ? c.ac : 10);
 
   setChk("ds-s1", c.dsS1);
@@ -630,7 +632,7 @@ function loadToForm() {
   setVal("armor-type", c.armorType || "");
   filterArmorByType();
   setVal("armor-preset", c.armorPreset || "");
-  setVal("armor-name", c.armorName || "");
+  setVal("armor-name", c.armorName || "Plain Clothes");
   setVal("armor-props", c.armorProps || "");
 
   setVal("credits", c.credits || "");
@@ -659,9 +661,8 @@ function saveCurrent() {
   const c = getActiveChar();
   if (!c) return;
 
-  c.name = safeVal("char-name", "Unnamed");
+  c.name = safeVal("char-name", "New Operative");
   c.species = safeVal("char-species");
-  c.background = safeVal("char-background");
   c.ladder = safeVal("char-ladder");
   c.class = safeVal("char-class");
   c.archetype = safeVal("char-archetype");
@@ -678,8 +679,7 @@ function saveCurrent() {
   c.hpMax = safeNum("hp-max", 10);
   c.hpCurrent = safeNum("hp-cur", 10);
   c.hpTemp = safeNum("hp-temp", 0);
-  c.hitDiceMax = safeVal("hd-max", "1d8");
-  c.hitDiceCurrent = safeNum("hd-cur", 1);
+  c.hitDiceMax = safeVal("hd-max", "1d10");
   c.ac = safeNum("ac", 10);
 
   c.dsS1 = safeChk("ds-s1");
@@ -720,8 +720,7 @@ function initAutoSave() {
   document.body.addEventListener("input", (e) => {
     if (!e.target.classList.contains("w-preset") && !e.target.classList.contains("w-name") &&
         !e.target.classList.contains("w-dmg") && !e.target.classList.contains("w-range") &&
-        !e.target.classList.contains("w-props") && !e.target.classList.contains("w-max") &&
-        !e.target.classList.contains("w-cur")) {
+        !e.target.classList.contains("w-props")) {
       saveCurrent();
       recalc();
     }
