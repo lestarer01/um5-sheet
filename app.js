@@ -73,8 +73,7 @@ function populateSelects() {
     $('c-class').innerHTML = Object.keys(CLASS_DATA).map(k => `<option value="${k}">${k}</option>`).join('');
   }
   if (typeof ARMOR_DATA !== 'undefined' && $('armor-preset')) {
-    $('armor-preset').innerHTML = '<option value="__custom__">Custom / Manual</option>' + 
-      Object.keys(ARMOR_DATA).map(k => `<option value="${k}">${k} (AC ${ARMOR_DATA[k].baseAc}) (${ARMOR_DATA[k].type})</option>`).join('');
+  populateArmorPresets('__all__');
   }
 }
 
