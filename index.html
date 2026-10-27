@@ -172,15 +172,35 @@
 
     <!-- TAB 3: COMBAT (Armor + Weapons) -->
     <section id="tab-combat" class="tab-page">
-      <div class="card">
+            <div class="card">
         <h3>Armor</h3>
-        <div class="field-group">
-          <label>Armor Preset (auto-calculates AC)</label>
-          <select id="armor-preset"></select>
+        <div class="grid-2">
+          <div class="field-group">
+            <label>Armor Type</label>
+            <select id="armor-type">
+              <option value="">-- Select Type --</option>
+              <option value="Light Armor">Light Armor</option>
+              <option value="Medium Armor">Medium Armor</option>
+              <option value="Heavy Armor">Heavy Armor</option>
+              <option value="__custom__">Custom / Manual</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label>Armor Preset</label>
+            <select id="armor-preset">
+              <option value="">-- Choose type first --</option>
+            </select>
+          </div>
         </div>
         <div class="grid-2">
-          <div class="field-group"><label>Armor Name</label><input type="text" id="armor-name" /></div>
-          <div class="field-group"><label>Properties</label><input type="text" id="armor-props" /></div>
+          <div class="field-group">
+            <label>Armor Name</label>
+            <input type="text" id="armor-name" />
+          </div>
+          <div class="field-group">
+            <label>Properties</label>
+            <input type="text" id="armor-props" />
+          </div>
         </div>
       </div>
 
