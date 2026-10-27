@@ -1,232 +1,125 @@
-/* ==========================================
-   ULTRAMODERN 5 (UM5) TACTICAL STYLING
-   ========================================== */
-
 :root {
   --bg: #090d16;
-  --card-bg: #121b2d;
-  --card-border: #1e2d4a;
+  --card: #161b22;
+  --input: #0d1117;
+  --border: #30363d;
   --accent: #00f2fe;
-  --accent-glow: rgba(0, 242, 254, 0.2);
-  --text: #e2e8f0;
-  --text-dim: #8a99ad;
-  --danger: #ff4757;
+  --accent2: #4facfe;
+  --text: #c9d1d9;
+  --muted: #8b949e;
+  --danger: #da3633;
+  --success: #238636;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  background-color: var(--bg);
-  color: var(--text);
-  padding: 12px;
-  max-width: 900px;
-  margin: 0 auto;
+  background: var(--bg); color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  padding: 10px; max-width: 640px; margin: 0 auto; line-height: 1.4;
 }
 
-/* Tab Navigation */
+header { text-align: center; padding: 12px 0 8px; }
+header h1 { color: var(--accent); font-size: 1.45rem; letter-spacing: 3px; font-weight: 800; }
+header p { color: var(--muted); font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; }
+
+/* TABS */
 .nav-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-bottom: 12px;
-  background: #0d1424;
-  padding: 4px;
-  border-radius: 8px;
-  border: 1px solid var(--card-border);
+  display: flex; overflow-x: auto; gap: 0;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; margin-bottom: 14px; -webkit-overflow-scrolling: touch;
 }
-
+.nav-tabs::-webkit-scrollbar { height: 0; }
 .tab-btn {
-  flex: 1 1 30%;
-  padding: 10px 4px;
-  background: transparent;
-  color: var(--text-dim);
-  border: none;
-  border-radius: 6px;
-  font-weight: 700;
-  font-size: 0.8rem;
-  cursor: pointer;
-  text-transform: uppercase;
+  flex: 0 0 auto; background: transparent; border: none; color: var(--muted);
+  font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+  padding: 12px 14px; cursor: pointer; border-bottom: 3px solid transparent;
 }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); background: rgba(0, 242, 254, 0.06); }
+.tab-page { display: none; }
+.tab-page.active { display: block; }
 
-.tab-btn.active {
-  background: var(--accent);
-  color: #000;
+/* CARDS & GRIDS */
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 12px; }
+.card h2, .card h3 { color: var(--accent); font-size: 0.95rem; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px;}
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 8px;}
+
+/* STANDARD INPUTS */
+.field-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
+.field-group label { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; font-weight: 700; }
+input[type="text"], input[type="number"], select, textarea {
+  width: 100%; background: var(--input); border: 1px solid var(--border);
+  color: var(--text); border-radius: 6px; padding: 9px 10px; font-size: 0.9rem;
 }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 1px rgba(0, 242, 254, 0.25); }
 
-/* Tab Switching Rules */
-.tab-content {
-  display: none;
+/* --- BIG NUMBERS & VITALS (NEW) --- */
+.vitals-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.vital-box {
+  background: var(--card); border: 2px solid var(--border); border-radius: 8px;
+  display: flex; flex-direction: column; align-items: center; padding: 8px 4px; text-align: center;
 }
-
-.tab-content.active {
-  display: block;
+.vital-box label { font-size: 0.65rem; color: var(--muted); font-weight: bold; text-transform: uppercase; margin-bottom: 4px; }
+.vital-box input.massive, .vital-box .massive {
+  font-size: 2rem; font-weight: 900; text-align: center; color: var(--accent);
+  background: transparent; border: none; width: 100%; padding: 0; outline: none;
 }
+.hp-sub { display: flex; gap: 4px; margin-top: 4px; width: 100%; padding: 0 4px; }
+.hp-sub input { font-size: 0.7rem; padding: 4px; text-align: center; }
 
-/* Card System */
-.card {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 10px;
-  padding: 12px;
-  margin-bottom: 12px;
+/* --- 2-COLUMN STATS GRID (NEW) --- */
+.stats-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 15px;
 }
-
-.card h3 {
-  font-size: 0.95rem;
-  color: var(--accent);
-  text-transform: uppercase;
-  margin-bottom: 8px;
-  border-bottom: 1px solid var(--card-border);
-  padding-bottom: 4px;
+.stat-card-new {
+  background: var(--card); border: 2px solid var(--border); border-radius: 8px; padding: 8px;
 }
-
-/* Grid Layout */
-.row {
-  display: flex;
-  flex-wrap: wrap;
-  margin: -4px;
-}
-
-.col-12 { flex: 0 0 100%; max-width: 100%; padding: 4px; }
-.col-6  { flex: 0 0 50%; max-width: 50%; padding: 4px; }
-.col-4  { flex: 0 0 33.333%; max-width: 33.333%; padding: 4px; }
-.col-3  { flex: 0 0 25%; max-width: 25%; padding: 4px; }
-
-/* Form Controls */
-.form-group {
-  margin-bottom: 8px;
-}
-
-.form-group label {
-  display: block;
-  font-size: 0.7rem;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  margin-bottom: 2px;
-  font-weight: 600;
-}
-
-.form-control {
-  width: 100%;
-  padding: 8px;
-  background: #090f1a;
-  border: 1px solid var(--card-border);
-  border-radius: 6px;
-  color: var(--text);
-  font-size: 0.9rem;
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--accent);
-}
-
-textarea.form-control {
-  resize: vertical;
-  min-height: 70px;
-}
-
-/* Buttons */
-.btn {
-  padding: 8px 12px;
-  border: none;
-  border-radius: 6px;
-  font-weight: 700;
-  cursor: pointer;
-  text-transform: uppercase;
-  font-size: 0.75rem;
-}
-
-.btn-primary {
-  background: var(--accent);
-  color: #000;
-}
-
-.btn-delete {
-  background: var(--danger);
-  color: #fff;
-}
-
-.btn-sm {
-  padding: 4px 8px;
-  font-size: 0.7rem;
-}
-
-/* Massive Stats & Vitals */
-.massive-input {
-  font-size: 1.3rem !important;
-  font-weight: 800;
-  text-align: center;
-  color: var(--accent);
-}
-
-.stat-box {
-  background: #090f1a;
-  border: 1px solid var(--card-border);
-  border-radius: 8px;
-  padding: 6px;
-  text-align: center;
-}
+/* Make the 7th stat (VIGOR) span both columns at the bottom */
+.stat-card-new.full-width { grid-column: 1 / -1; max-width: 250px; margin: 0 auto; width: 100%; }
 
 .stat-name {
-  font-size: 0.7rem;
-  font-weight: 800;
-  color: var(--accent);
-  text-transform: uppercase;
+  text-align: center; font-weight: 800; font-size: 0.9rem; color: var(--accent2);
+  border-bottom: 1px solid var(--border); padding-bottom: 4px; margin-bottom: 6px; text-transform: uppercase;
 }
+.stat-cols { display: flex; justify-content: space-between; align-items: center; padding: 0 5px; }
+.stat-col { display: flex; flex-direction: column; align-items: center; text-align: center; width: 33%; }
+.stat-col label { font-size: 0.55rem; color: var(--muted); text-transform: uppercase; font-weight: 700; margin-bottom: 2px; }
+.stat-col label input[type="checkbox"] { width: 12px; height: 12px; accent-color: var(--accent); vertical-align: middle; margin-right: 2px; }
+.stat-col input.stat-score { font-size: 1.6rem; font-weight: 900; color: var(--accent); background: transparent; border: none; text-align: center; width: 100%; padding: 0; outline: none; }
+.stat-col .stat-mod { font-size: 1.3rem; font-weight: 700; color: var(--text); line-height: 1.6rem; }
 
-.stat-mod {
-  font-size: 1.2rem;
-  font-weight: 800;
-  color: #fff;
-  margin: 2px 0;
-}
+/* DEATH SAVES */
+.death-box { display: flex; justify-content: space-around; padding: 10px; background: var(--input); border-radius: 8px; }
+.death-group { display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 0.8rem; }
+.death-group.success { color: var(--success); }
+.death-group.fail { color: var(--danger); }
+.death-group input { width: 18px; height: 18px; accent-color: var(--accent); }
 
-.stat-save {
-  font-size: 0.7rem;
-  color: var(--text-dim);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-}
+/* WEAPONS & SKILLS (Kept from before) */
+.weapon-block { background: rgba(0,0,0,0.25); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+.ammo-row { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; background: var(--input); padding: 8px 10px; border-radius: 6px; font-size: 0.85rem; }
+.skill-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 4px; border-bottom: 1px solid var(--border); }
+.skill-bonus { font-weight: 700; color: var(--accent); font-size: 0.85rem; width: 36px; text-align: center; }
+.skill-checks { display: flex; gap: 8px; font-size: 0.68rem; color: var(--muted); }
+.skill-checks input { width: 14px; height: 14px; accent-color: var(--accent); }
 
-/* Tables */
-.skills-table, .ds-table {
-  width: 100%;
-  border-collapse: collapse;
-}
+/* ABILITIES */
+.ability-entry { background: var(--input); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 10px 12px; margin-bottom: 8px; }
+.ability-entry-header { display: flex; justify-content: space-between; margin-bottom: 4px; font-weight: 700; }
+.ability-entry-level { color: var(--accent); font-size: 0.72rem; }
+.ability-entry-desc { font-size: 0.8rem; color: var(--muted); }
 
-.skills-table th, .skills-table td {
-  padding: 6px;
-  border-bottom: 1px solid var(--card-border);
-  font-size: 0.85rem;
-}
+/* BUTTONS */
+.btn { border: none; border-radius: 6px; font-weight: 700; cursor: pointer; padding: 10px 14px; font-size: 0.85rem; }
+.btn-primary { background: var(--accent); color: #000; width: 100%; }
+.btn-danger { background: var(--danger); color: #fff; padding: 6px 10px; font-size: 0.72rem; }
+.btn-shoot { background: var(--accent2); color: #000; padding: 8px 12px; }
+.btn-reload { background: var(--success); color: #fff; padding: 8px 12px; }
 
-.skills-table th {
-  color: var(--text-dim);
-  text-transform: uppercase;
-  font-size: 0.7rem;
-  text-align: left;
-}
-
-.ds-table td {
-  padding: 4px;
-  text-align: center;
-}
-
-/* Weapon Cards */
-.weapon-card {
-  background: #090f1a;
-  border: 1px dashed var(--card-border);
-}
-
-/* Utilities */
-.mb-1 { margin-bottom: 4px; }
-.mb-2 { margin-bottom: 8px; }
-.mb-3 { margin-bottom: 12px; }
+.char-card { display: flex; justify-content: space-between; align-items: center; background: var(--input); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-top: 10px; cursor: pointer; }
+.char-card.active-char { border-color: var(--accent); box-shadow: 0 0 0 1px rgba(0,242,254,0.2); }
