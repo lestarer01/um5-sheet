@@ -304,7 +304,7 @@ function applyArmor() {
 
 function blankChar() {
   return {
-    id: 'c_' + Date.now(), name: 'New Operative', species: 'Human', arch: '', ladder: 'Born Leader', className: 'Gunslinger', lvl: 1,
+    id: 'c_' + Date.now(), name: 'New Operative', species: 'Human', arch: '', background: '', ladder: 'Born Leader', className: 'Gunslinger', lvl: 1,
     str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10, vig: 10,
     saveProfs: {str:false, dex:false, con:false, int:false, wis:false, cha:false, vig:false},
     hpMax: 10, hpCur: 10, hpTemp: 0, hd: '1d10', ac: 10, spd: 30, init: 0,
@@ -330,7 +330,7 @@ function saveCurrent() {
   const c = chars.find(x => x.id === activeId);
   if (!c) return;
 
-  c.name = val('c-name'); c.species = val('c-species'); c.arch = val('c-arch');
+  c.name = val('c-name'); c.species = val('c-species'); c.arch = val('c-arch'); c.background = val('c-background');
   c.ladder = val('c-ladder'); c.className = val('c-class'); c.lvl = val('c-lvl');
   
   c.str = val('s-str'); c.dex = val('s-dex'); c.con = val('s-con'); c.int = val('s-int'); c.wis = val('s-wis'); c.cha = val('s-cha'); c.vig = val('s-vig');
@@ -357,7 +357,7 @@ function loadToForm(c) {
   if (!c) return;
   activeId = c.id;
 
-  val('c-name', c.name); val('c-species', c.species); val('c-arch', c.arch);
+  val('c-name', c.name); val('c-species', c.species); val('c-arch', c.arch); val('c-background', c.background);
   val('c-ladder', c.ladder); val('c-class', c.className); val('c-lvl', c.lvl);
   
   val('s-str', c.str); val('s-dex', c.dex); val('s-con', c.con); val('s-int', c.int); val('s-wis', c.wis); val('s-cha', c.cha); val('s-vig', c.vig);
