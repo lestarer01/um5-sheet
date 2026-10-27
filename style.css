@@ -1,5 +1,5 @@
 /* ==========================================
-   ULTRAMODERN 5 (UM5) TACTICAL STYLING
+   ULTRAMODERN 5 (UM5) SLEEK CYBERPUNK STYLING
    ========================================== */
 
 :root {
@@ -7,9 +7,11 @@
   --card-bg: #121b2d;
   --card-border: #1e2d4a;
   --accent: #00f2fe;
+  --accent-glow: rgba(0, 242, 254, 0.25);
   --text: #e2e8f0;
   --text-dim: #8a99ad;
   --danger: #ff4757;
+  --success: #2ed573;
 }
 
 * {
@@ -25,23 +27,27 @@ body {
   padding: 12px;
   max-width: 900px;
   margin: 0 auto;
+  line-height: 1.4;
 }
 
+/* Cyberpunk Header */
 .header-title {
   text-align: center;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   font-weight: 800;
+  letter-spacing: 2px;
   color: var(--accent);
+  text-transform: uppercase;
   margin-bottom: 12px;
-  letter-spacing: 1.5px;
+  text-shadow: 0 0 10px var(--accent-glow);
 }
 
-/* Nav Tabs */
+/* Tabs Navigation Bar */
 .nav-tabs {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   background: #0d1424;
   padding: 4px;
   border-radius: 8px;
@@ -56,17 +62,20 @@ body {
   border: none;
   border-radius: 6px;
   font-weight: 700;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   cursor: pointer;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.2s ease;
 }
 
 .tab-btn.active {
   background: var(--accent);
   color: #000;
+  box-shadow: 0 0 12px var(--accent-glow);
 }
 
-/* Hard Tab Hiding Rules */
+/* Tab Content Control */
 .tab-content {
   display: none;
 }
@@ -75,20 +84,22 @@ body {
   display: block;
 }
 
-/* Card System */
+/* Cyberpunk Cards */
 .card {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: 10px;
-  padding: 12px;
-  margin-bottom: 12px;
+  padding: 14px;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .card h3 {
-  font-size: 0.95rem;
+  font-size: 1rem;
   color: var(--accent);
   text-transform: uppercase;
-  margin-bottom: 8px;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
   border-bottom: 1px solid var(--card-border);
   padding-bottom: 4px;
 }
@@ -105,33 +116,38 @@ body {
 .col-4  { flex: 0 0 33.333%; max-width: 33.333%; padding: 4px; }
 .col-3  { flex: 0 0 25%; max-width: 25%; padding: 4px; }
 
-/* Form Controls */
+/* Dark Form Controls */
 .form-group {
   margin-bottom: 8px;
 }
 
 .form-group label {
   display: block;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   color: var(--text-dim);
   text-transform: uppercase;
-  margin-bottom: 2px;
+  margin-bottom: 3px;
   font-weight: 600;
 }
 
 .form-control {
   width: 100%;
-  padding: 8px;
+  padding: 8px 10px;
   background: #090f1a;
   border: 1px solid var(--card-border);
   border-radius: 6px;
   color: var(--text);
-  font-size: 0.9rem;
+  font-size: 0.95rem;
 }
 
 .form-control:focus {
   outline: none;
   border-color: var(--accent);
+  box-shadow: 0 0 6px var(--accent-glow);
+}
+
+select.form-control {
+  cursor: pointer;
 }
 
 textarea.form-control {
@@ -139,102 +155,11 @@ textarea.form-control {
   min-height: 70px;
 }
 
-/* Buttons */
+/* Action Buttons */
 .btn {
-  padding: 8px 12px;
+  padding: 8px 14px;
   border: none;
   border-radius: 6px;
   font-weight: 700;
   cursor: pointer;
-  text-transform: uppercase;
-  font-size: 0.75rem;
-}
-
-.btn-primary {
-  background: var(--accent);
-  color: #000;
-}
-
-.btn-delete {
-  background: var(--danger);
-  color: #fff;
-}
-
-.btn-sm {
-  padding: 4px 8px;
-  font-size: 0.7rem;
-}
-
-/* Massive Display Numbers */
-.massive-input {
-  font-size: 1.3rem !important;
-  font-weight: 800;
-  text-align: center;
-  color: var(--accent);
-}
-
-.stat-box {
-  background: #090f1a;
-  border: 1px solid var(--card-border);
-  border-radius: 8px;
-  padding: 6px;
-  text-align: center;
-}
-
-.stat-name {
-  font-size: 0.7rem;
-  font-weight: 800;
-  color: var(--accent);
-  text-transform: uppercase;
-}
-
-.stat-mod {
-  font-size: 1.2rem;
-  font-weight: 800;
-  color: #fff;
-  margin: 2px 0;
-}
-
-.stat-save {
-  font-size: 0.7rem;
-  color: var(--text-dim);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-}
-
-/* Tables */
-.skills-table, .ds-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.skills-table th, .skills-table td {
-  padding: 6px;
-  border-bottom: 1px solid var(--card-border);
-  font-size: 0.85rem;
-}
-
-.skills-table th {
-  color: var(--text-dim);
-  text-transform: uppercase;
-  font-size: 0.7rem;
-  text-align: left;
-}
-
-.ds-table td {
-  padding: 4px;
-  text-align: center;
-}
-
-/* Weapon Cards */
-.weapon-card {
-  background: #090f1a;
-  border: 1px dashed var(--card-border);
-}
-
-/* Utilities */
-.mb-1 { margin-bottom: 4px; }
-.mb-2 { margin-bottom: 8px; }
-.mb-3 { margin-bottom: 12px; }
+  
