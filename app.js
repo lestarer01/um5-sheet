@@ -77,6 +77,16 @@ function populateSelects() {
   }
 }
 
+function populateArmorPresets(filterType) {
+  if (typeof ARMOR_DATA === 'undefined' || !$('armor-preset')) return;
+  let keys = Object.keys(ARMOR_DATA);
+  if (filterType && filterType !== '__all__') {
+    keys = keys.filter(k => ARMOR_DATA[k].type === filterType);
+  }
+  $('armor-preset').innerHTML = '<option value="__custom__">Custom / Manual</option>' +
+    keys.map(k => `<option value="${k}">${k} (AC ${ARMOR_DATA[k].baseAc})</option>`).join('');
+}
+
 function buildSkillsUI() {
   const box = $('skills-box');
   if (!box) return;
@@ -442,6 +452,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if ($('armor-preset')) $('armor-preset').addEventListener('change', applyArmor);
+  if ($('armor-type')) $('armor-type').addEventListener('change', (e) => populateArmorPresets(e.target.value));
 
   document.querySelectorAll('input, select, textarea').forEach(el => {
     el.addEventListener('input', saveCurrent);
