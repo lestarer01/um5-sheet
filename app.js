@@ -311,7 +311,7 @@ function blankChar() {
     dsS: [false,false,false], dsF: [false,false,false],
     armorPreset: 'Plain Clothes', armorName: 'Plain Clothes', armorProps: '',
     weapons: [emptyWeapon()],
-    credits: 500, inventory: '', skills: {}, ladderTaken: null, featNotes: '',
+    credits: 500, inventory: '', skills: {}, ladderTaken: null, classChoices: {}, featNotes: '',
     mpMax: 0, mpCur: 0, spellDc: 10, spellAtk: 0, magicSource: '', spellList: ''
   };
 }
@@ -456,10 +456,52 @@ function renderAbilities() {
     });
   }
 
-  if (cls && $('class-box')) {
+    if (cls && $('class-box')) {
     const list = cls.abilities.filter(a => a.level <= lvl);
-    $('class-box').innerHTML = `<p style="font-size:0.8rem;color:var(--accent2);margin-bottom:10px;">${cls.desc} · Hit Die ${cls.hitDie}</p>` +
-      list.map(a => `<div class="ability-entry"><div class="ability-entry-header"><span>${a.name}</span><span class="ability-entry-level">Lvl ${a.level}</span></div><div class="ability-entry-desc">${a.desc}</div></div>`).join('');
+    let html = `<p style="font-size:0.8rem;color:var(--accent2);margin-bottom:10px;">${cls.desc} · Hit Die ${cls.hitDie}</p>`;
+    
+    // Render fixed abilities
+    html += list.map(a => `<div class="ability-entry"><div class="ability-entry-header"><span>${a.name}</span><span class="ability-entry-level">Lvl ${a.level}</span></div><div class="ability-entry-desc">${a.desc}</div></div>`).join('');
+
+    // Render Choice Menu (e.g., Protagonist Traits)
+    if (cls.choiceMenu) {
+      if (!c.classChoices) c.classChoices = {};
+      if (!c.classChoices[val('c-class')]) c.classChoices[val('c-class')] = [];
+      
+      const unlockedCount = cls.choiceMenu.levels.filter(l => l <= lvl).length;
+      if (unlockedCount > 0) {
+        html += `<div class="ability-entry" style="border-left-color: var(--accent2);">
+          <div class="ability-entry-header"><span style="color:var(--accent2);">${cls.choiceMenu.name}</span></div>
+          <div class="ability-entry-desc" style="margin-bottom:8px;">Select ${unlockedCount} option(s) based on your level.</div>`;
+
+        for (let i = 0; i < unlockedCount; i++) {
+          const selected = c.classChoices[val('c-class')][i] || '';
+          const opts = ['<option value="">-- Select --</option>']
+            .concat(Object.keys(cls.choiceMenu.options).map(k => `<option value="${k}" ${k === selected ? 'selected' : ''}>${k}</option>`)).join('');
+
+          html += `<div class="field-group" style="margin-bottom:8px;">
+            <select class="class-choice-select" data-idx="${i}" style="background:var(--bg);">${opts}</select>
+            ${selected && cls.choiceMenu.options[selected] ? `<div style="font-size:0.75rem; color:var(--text); margin-top:4px; padding:6px; background:rgba(0,0,0,0.3); border-radius:4px;">${cls.choiceMenu.options[selected]}</div>` : ''}
+          </div>`;
+        }
+        html += `</div>`;
+      }
+    }
+    
+    $('class-box').innerHTML = html;
+
+    // Bind event listeners for the new dropdowns
+    $('class-box').querySelectorAll('.class-choice-select').forEach(sel => {
+      sel.addEventListener('change', (e) => {
+        const idx = parseInt(e.target.dataset.idx, 10);
+        const char = chars.find(x => x.id === activeId);
+        if (char && char.classChoices && char.classChoices[val('c-class')]) {
+          char.classChoices[val('c-class')][idx] = e.target.value;
+          saveStorage();
+          renderAbilities();
+        }
+      });
+    });
   }
 }
 
