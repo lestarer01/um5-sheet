@@ -219,13 +219,20 @@ function filterArmorByType() {
   const presetSelect = document.getElementById("armor-preset");
   if (!typeSelect || !presetSelect) return;
 
-  const selectedType = typeSelect.value;
+  const selectedType = typeSelect.value.trim().toLowerCase();
   presetSelect.innerHTML = '<option value="">-- Select Preset --</option>';
 
-  if (!selectedType || typeof ARMOR_DATA === "undefined") return;
+  if (typeof ARMOR_DATA === "undefined") return;
 
   for (const [key, a] of Object.entries(ARMOR_DATA)) {
-    if (a.type === selectedType) {
+    const itemType = (a.type || "").toLowerCase();
+    
+    // Show all if no filter selected, or match if filter is Light / Medium / Heavy
+    const isMatch = !selectedType || 
+                    itemType.includes(selectedType) || 
+                    selectedType.includes(itemType.replace(" armor", ""));
+
+    if (isMatch) {
       const opt = document.createElement("option");
       opt.value = key;
       opt.textContent = `${key} (AC ${a.baseAc})`;
@@ -428,7 +435,6 @@ function renderSkillsTable() {
     tbody.appendChild(tr);
   });
 
-  // Attach Listeners
   tbody.querySelectorAll(".sk-prof-chk, .sk-exp-chk").forEach(chk => {
     chk.addEventListener("change", () => {
       saveCurrent();
@@ -588,6 +594,7 @@ function loadToForm() {
 
   const armorTypeElem = document.getElementById("armor-type");
   if (armorTypeElem) armorTypeElem.value = c.armorType || "";
+  
   filterArmorByType();
 
   const armorPresetElem = document.getElementById("armor-preset");
@@ -599,7 +606,6 @@ function loadToForm() {
   document.getElementById("credits").value = c.credits || "";
   document.getElementById("inventory").value = c.inventory || "";
 
-  // Populate Skills
   if (c.skills) {
     UM5_SKILLS.forEach(sk => {
       const skData = c.skills[sk.name] || { prof: false, exp: false };
@@ -698,6 +704,7 @@ function initAutoSave() {
   document.body.addEventListener("change", (e) => {
     if (e.target.id === "armor-type") {
       filterArmorByType();
+      saveCurrent();
     } else if (e.target.id === "armor-preset") {
       applyArmor();
     } else {
