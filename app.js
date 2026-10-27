@@ -36,7 +36,35 @@ const UM5_SKILLS = [
 let chars = [];
 let activeId = null;
 
-// Helper: Calculate Proficiency Bonus by Level
+// Safe DOM Helper Functions (Prevents Any JS Crashes)
+function safeVal(id, defaultVal = "") {
+  const el = document.getElementById(id);
+  return el ? el.value : defaultVal;
+}
+function safeNum(id, defaultVal = 0) {
+  const el = document.getElementById(id);
+  if (!el) return defaultVal;
+  const parsed = parseInt(el.value);
+  return isNaN(parsed) ? defaultVal : parsed;
+}
+function safeChk(id) {
+  const el = document.getElementById(id);
+  return el ? el.checked : false;
+}
+function setVal(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.value = (val !== undefined && val !== null) ? val : "";
+}
+function setChk(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.checked = !!val;
+}
+function setTxt(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = (val !== undefined && val !== null) ? val : "";
+}
+
+// Math Helpers
 function getProfBonus(lvl) {
   const level = parseInt(lvl) || 1;
   if (level >= 17) return 6;
@@ -46,13 +74,12 @@ function getProfBonus(lvl) {
   return 2;
 }
 
-// Helper: Calculate Ability Modifier
 function calcMod(score) {
   const s = parseInt(score) || 10;
   return Math.floor((s - 10) / 2);
 }
 
-// Blank Character Generator Template
+// Blank Character Structure
 function emptyWeapon() {
   return { preset: "", name: "", dmg: "", range: "", props: "", max: "", cur: "" };
 }
@@ -108,12 +135,11 @@ function emptyChar(name = "New Operative") {
   };
 }
 
-// Active Character Helper
 function getActiveChar() {
   return chars.find(c => c.id === activeId);
 }
 
-// Data Persistence
+// LocalStorage Management
 function loadData() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw) {
@@ -137,25 +163,28 @@ function saveData() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(chars));
 }
 
-// Tab Switching System
+// Tabs Switching
 function initTabs() {
   const tabBtns = document.querySelectorAll(".tab-btn");
   const tabContents = document.querySelectorAll(".tab-content");
 
   tabBtns.forEach(btn => {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const targetId = btn.getAttribute("data-tab");
+      if (!targetId) return;
+
       tabBtns.forEach(b => b.classList.remove("active"));
       tabContents.forEach(c => c.classList.remove("active"));
 
       btn.classList.add("active");
-      const targetId = btn.getAttribute("data-tab");
       const targetContent = document.getElementById(targetId);
       if (targetContent) targetContent.classList.add("active");
     });
   });
 }
 
-// Operatives Management
+// Operatives Dropdown & Actions
 function populateOperativesList() {
   const select = document.getElementById("op-select");
   if (!select) return;
@@ -202,7 +231,7 @@ function initOperativeEvents() {
         alert("You must keep at least one Operative!");
         return;
       }
-      if (confirm("Delete this Operative? This action cannot be undone.")) {
+      if (confirm("Delete this Operative?")) {
         chars = chars.filter(c => c.id !== activeId);
         activeId = chars[0].id;
         saveData();
@@ -213,40 +242,46 @@ function initOperativeEvents() {
   }
 }
 
-// Armor Categorization and Calculation
+// Armor Categorization & Preset Loading
 function filterArmorByType() {
   const typeSelect = document.getElementById("armor-type");
   const presetSelect = document.getElementById("armor-preset");
   if (!typeSelect || !presetSelect) return;
 
-  const selectedType = typeSelect.value.trim().toLowerCase();
+  const selectedType = (typeSelect.value || "").trim().toLowerCase();
   presetSelect.innerHTML = '<option value="">-- Select Preset --</option>';
 
-  if (typeof ARMOR_DATA === "undefined") return;
+  if (typeof ARMOR_DATA === "undefined" || !ARMOR_DATA) return;
 
-  for (const [key, a] of Object.entries(ARMOR_DATA)) {
+  for (const key in ARMOR_DATA) {
+    if (!ARMOR_DATA.hasOwnProperty(key)) continue;
+    const a = ARMOR_DATA[key];
+    if (!a) continue;
+
     const itemType = (a.type || "").toLowerCase();
     
-    // Show all if no filter selected, or match if filter is Light / Medium / Heavy
-    const isMatch = !selectedType || 
-                    itemType.includes(selectedType) || 
-                    selectedType.includes(itemType.replace(" armor", ""));
+    let isMatch = false;
+    if (!selectedType) {
+      isMatch = true;
+    } else if (itemType.includes(selectedType) || selectedType.includes(itemType.replace(" armor", ""))) {
+      isMatch = true;
+    }
 
     if (isMatch) {
       const opt = document.createElement("option");
       opt.value = key;
-      opt.textContent = `${key} (AC ${a.baseAc})`;
+      opt.textContent = `${key} (AC ${a.baseAc !== undefined ? a.baseAc : ''})`;
       presetSelect.appendChild(opt);
     }
   }
 }
 
 function applyArmor() {
-  const presetKey = document.getElementById("armor-preset")?.value;
-  if (!presetKey || typeof ARMOR_DATA === "undefined" || !ARMOR_DATA[presetKey]) return;
+  const presetKey = safeVal("armor-preset");
+  if (!presetKey || typeof ARMOR_DATA === "undefined" || !ARMOR_DATA || !ARMOR_DATA[presetKey]) return;
 
   const a = ARMOR_DATA[presetKey];
-  const dexScore = parseInt(document.getElementById("dex-score")?.value) || 10;
+  const dexScore = safeNum("dex-score", 10);
   const dexMod = calcMod(dexScore);
 
   let dexBonus = 0;
@@ -256,15 +291,11 @@ function applyArmor() {
 
   const calculatedAc = a.baseAc + dexBonus;
 
-  const acInput = document.getElementById("ac");
-  const nameInput = document.getElementById("armor-name");
-  const propsInput = document.getElementById("armor-props");
-
-  if (acInput) acInput.value = calculatedAc;
-  if (nameInput) nameInput.value = presetKey;
+  setVal("ac", calculatedAc);
+  setVal("armor-name", presetKey);
 
   const propsStr = `${a.props?.cost ? a.props.cost : ''} | Wt: ${a.props?.wt ? a.props.wt : ''} | ${a.props?.stealth ? a.props.stealth : ''} | TL${a.props?.tl !== undefined ? a.props.tl : ''}`;
-  if (propsInput) propsInput.value = propsStr.replace(/^ \| | \| $/g, '');
+  setVal("armor-props", propsStr.replace(/^ \| | \| $/g, ''));
 
   saveCurrent();
 }
@@ -288,7 +319,7 @@ function renderWeapons() {
     card.className = "card weapon-card mb-2";
 
     let weaponOptions = '<option value="">-- Preset --</option>';
-    if (typeof WEAPON_DATA !== "undefined") {
+    if (typeof WEAPON_DATA !== "undefined" && WEAPON_DATA) {
       Object.keys(WEAPON_DATA).forEach(wName => {
         const sel = w.preset === wName ? "selected" : "";
         weaponOptions += `<option value="${wName}" ${sel}>${wName}</option>`;
@@ -443,7 +474,7 @@ function renderSkillsTable() {
   });
 }
 
-// Abilities Tab Renderer
+// Abilities Tab Features
 function renderAbilities() {
   const ladderBox = document.getElementById("ladder-features");
   const classBox = document.getElementById("class-features");
@@ -487,7 +518,7 @@ function renderAbilities() {
   }
 }
 
-// Dropdown Pre-Populators
+// Populate Ladder & Class Dropdowns
 function populateDropdowns() {
   const ladderSel = document.getElementById("char-ladder");
   const classSel = document.getElementById("char-class");
@@ -513,183 +544,171 @@ function populateDropdowns() {
   }
 }
 
-// Recalculate Stats, Saves, & Skills UI
+// Recalculate Ability Mods, Saves & Skills
 function recalc() {
   const c = getActiveChar();
   if (!c) return;
 
-  const level = parseInt(document.getElementById("char-level")?.value) || 1;
+  const level = safeNum("char-level", 1);
   const prof = getProfBonus(level);
-  const profElem = document.getElementById("prof-bonus");
-  if (profElem) profElem.value = `+${prof}`;
+  setVal("prof-bonus", `+${prof}`);
 
   const stats = ["str", "dex", "con", "int", "wis", "cha", "vig"];
   const mods = {};
 
   stats.forEach(st => {
-    const scoreVal = parseInt(document.getElementById(`${st}-score`)?.value) || 10;
+    const scoreVal = safeNum(`${st}-score`, 10);
     const mod = calcMod(scoreVal);
     mods[st] = mod;
 
-    const modElem = document.getElementById(`${st}-mod`);
-    if (modElem) modElem.textContent = mod >= 0 ? `+${mod}` : `${mod}`;
+    setTxt(`${st}-mod`, mod >= 0 ? `+${mod}` : `${mod}`);
 
-    const saveProf = document.getElementById(`${st}-save-prof`)?.checked;
+    const saveProf = safeChk(`${st}-save-prof`);
     const saveVal = mod + (saveProf ? prof : 0);
-    const saveElem = document.getElementById(`${st}-save-val`);
-    if (saveElem) saveElem.textContent = saveVal >= 0 ? `+${saveVal}` : `${saveVal}`;
+    setTxt(`${st}-save-val`, saveVal >= 0 ? `+${saveVal}` : `${saveVal}`);
   });
 
-  // Calculate Skills
   UM5_SKILLS.forEach(sk => {
     const statMod = mods[sk.stat] || 0;
-    const isProf = document.getElementById(`sk-prof-${sk.name}`)?.checked;
-    const isExp = document.getElementById(`sk-exp-${sk.name}`)?.checked;
+    const isProf = safeChk(`sk-prof-${sk.name}`);
+    const isExp = safeChk(`sk-exp-${sk.name}`);
 
     let total = statMod;
     if (isExp) total += (prof * 2);
     else if (isProf) total += prof;
 
-    const skElem = document.getElementById(`sk-val-${sk.name}`);
-    if (skElem) skElem.textContent = total >= 0 ? `+${total}` : `${total}`;
+    setTxt(`sk-val-${sk.name}`, total >= 0 ? `+${total}` : `${total}`);
   });
 
   renderAbilities();
 }
 
-// Load Active Character to HTML Form
+// Load Active Character Data into UI
 function loadToForm() {
   const c = getActiveChar();
   if (!c) return;
 
-  document.getElementById("char-name").value = c.name || "";
-  document.getElementById("char-species").value = c.species || "";
-  document.getElementById("char-background").value = c.background || "";
-  document.getElementById("char-ladder").value = c.ladder || "";
-  document.getElementById("char-class").value = c.class || "";
-  document.getElementById("char-archetype").value = c.archetype || "";
-  document.getElementById("char-level").value = c.level || 1;
+  setVal("char-name", c.name);
+  setVal("char-species", c.species);
+  setVal("char-background", c.background);
+  setVal("char-ladder", c.ladder);
+  setVal("char-class", c.class);
+  setVal("char-archetype", c.archetype);
+  setVal("char-level", c.level || 1);
 
   const stats = ["str", "dex", "con", "int", "wis", "cha", "vig"];
   stats.forEach(st => {
-    document.getElementById(`${st}-score`).value = c[st] !== undefined ? c[st] : 10;
-    document.getElementById(`${st}-save-prof`).checked = !!c[`${st}Save`];
+    setVal(`${st}-score`, c[st] !== undefined ? c[st] : 10);
+    setChk(`${st}-save-prof`, c[`${st}Save`]);
   });
 
-  document.getElementById("init-bonus").value = c.initiativeBonus !== undefined ? c.initiativeBonus : 0;
-  document.getElementById("speed").value = c.speed !== undefined ? c.speed : 30;
-  document.getElementById("hp-max").value = c.hpMax !== undefined ? c.hpMax : 10;
-  document.getElementById("hp-cur").value = c.hpCurrent !== undefined ? c.hpCurrent : 10;
-  document.getElementById("hp-temp").value = c.hpTemp !== undefined ? c.hpTemp : 0;
-  document.getElementById("hd-max").value = c.hitDiceMax || "1d8";
-  document.getElementById("hd-cur").value = c.hitDiceCurrent !== undefined ? c.hitDiceCurrent : 1;
-  document.getElementById("ac").value = c.ac !== undefined ? c.ac : 10;
+  setVal("init-bonus", c.initiativeBonus !== undefined ? c.initiativeBonus : 0);
+  setVal("speed", c.speed !== undefined ? c.speed : 30);
+  setVal("hp-max", c.hpMax !== undefined ? c.hpMax : 10);
+  setVal("hp-cur", c.hpCurrent !== undefined ? c.hpCurrent : 10);
+  setVal("hp-temp", c.hpTemp !== undefined ? c.hpTemp : 0);
+  setVal("hd-max", c.hitDiceMax || "1d8");
+  setVal("hd-cur", c.hitDiceCurrent !== undefined ? c.hitDiceCurrent : 1);
+  setVal("ac", c.ac !== undefined ? c.ac : 10);
 
-  document.getElementById("ds-s1").checked = !!c.dsS1;
-  document.getElementById("ds-s2").checked = !!c.dsS2;
-  document.getElementById("ds-s3").checked = !!c.dsS3;
-  document.getElementById("ds-f1").checked = !!c.dsF1;
-  document.getElementById("ds-f2").checked = !!c.dsF2;
-  document.getElementById("ds-f3").checked = !!c.dsF3;
+  setChk("ds-s1", c.dsS1);
+  setChk("ds-s2", c.dsS2);
+  setChk("ds-s3", c.dsS3);
+  setChk("ds-f1", c.dsF1);
+  setChk("ds-f2", c.dsF2);
+  setChk("ds-f3", c.dsF3);
 
-  const armorTypeElem = document.getElementById("armor-type");
-  if (armorTypeElem) armorTypeElem.value = c.armorType || "";
-  
+  setVal("armor-type", c.armorType || "");
   filterArmorByType();
+  setVal("armor-preset", c.armorPreset || "");
+  setVal("armor-name", c.armorName || "");
+  setVal("armor-props", c.armorProps || "");
 
-  const armorPresetElem = document.getElementById("armor-preset");
-  if (armorPresetElem) armorPresetElem.value = c.armorPreset || "";
-
-  document.getElementById("armor-name").value = c.armorName || "";
-  document.getElementById("armor-props").value = c.armorProps || "";
-
-  document.getElementById("credits").value = c.credits || "";
-  document.getElementById("inventory").value = c.inventory || "";
+  setVal("credits", c.credits || "");
+  setVal("inventory", c.inventory || "");
 
   if (c.skills) {
     UM5_SKILLS.forEach(sk => {
       const skData = c.skills[sk.name] || { prof: false, exp: false };
-      const profChk = document.getElementById(`sk-prof-${sk.name}`);
-      const expChk = document.getElementById(`sk-exp-${sk.name}`);
-      if (profChk) profChk.checked = !!skData.prof;
-      if (expChk) expChk.checked = !!skData.exp;
+      setChk(`sk-prof-${sk.name}`, skData.prof);
+      setChk(`sk-exp-${sk.name}`, skData.exp);
     });
   }
 
-  document.getElementById("ladder-notes").value = c.ladderNotes || "";
-  document.getElementById("class-notes").value = c.classNotes || "";
+  setVal("ladder-notes", c.ladderNotes || "");
+  setVal("class-notes", c.classNotes || "");
 
-  document.getElementById("dark-mana-max").value = c.darkManaMax !== undefined ? c.darkManaMax : 0;
-  document.getElementById("dark-mana-cur").value = c.darkManaCur !== undefined ? c.darkManaCur : 0;
-  document.getElementById("dark-spells").value = c.darkSpells || "";
+  setVal("dark-mana-max", c.darkManaMax !== undefined ? c.darkManaMax : 0);
+  setVal("dark-mana-cur", c.darkManaCur !== undefined ? c.darkManaCur : 0);
+  setVal("dark-spells", c.darkSpells || "");
 
   renderWeapons();
   recalc();
 }
 
-// Save Current Form Inputs into Active Character
+// Save UI State back to Active Character
 function saveCurrent() {
   const c = getActiveChar();
   if (!c) return;
 
-  c.name = document.getElementById("char-name")?.value || "Unnamed";
-  c.species = document.getElementById("char-species")?.value || "";
-  c.background = document.getElementById("char-background")?.value || "";
-  c.ladder = document.getElementById("char-ladder")?.value || "";
-  c.class = document.getElementById("char-class")?.value || "";
-  c.archetype = document.getElementById("char-archetype")?.value || "";
-  c.level = parseInt(document.getElementById("char-level")?.value) || 1;
+  c.name = safeVal("char-name", "Unnamed");
+  c.species = safeVal("char-species");
+  c.background = safeVal("char-background");
+  c.ladder = safeVal("char-ladder");
+  c.class = safeVal("char-class");
+  c.archetype = safeVal("char-archetype");
+  c.level = safeNum("char-level", 1);
 
   const stats = ["str", "dex", "con", "int", "wis", "cha", "vig"];
   stats.forEach(st => {
-    c[st] = parseInt(document.getElementById(`${st}-score`)?.value) || 10;
-    c[`${st}Save`] = document.getElementById(`${st}-save-prof`)?.checked || false;
+    c[st] = safeNum(`${st}-score`, 10);
+    c[`${st}Save`] = safeChk(`${st}-save-prof`);
   });
 
-  c.initiativeBonus = parseInt(document.getElementById("init-bonus")?.value) || 0;
-  c.speed = parseInt(document.getElementById("speed")?.value) || 30;
-  c.hpMax = parseInt(document.getElementById("hp-max")?.value) || 10;
-  c.hpCurrent = parseInt(document.getElementById("hp-cur")?.value) || 0;
-  c.hpTemp = parseInt(document.getElementById("hp-temp")?.value) || 0;
-  c.hitDiceMax = document.getElementById("hd-max")?.value || "1d8";
-  c.hitDiceCurrent = parseInt(document.getElementById("hd-cur")?.value) || 0;
-  c.ac = parseInt(document.getElementById("ac")?.value) || 10;
+  c.initiativeBonus = safeNum("init-bonus", 0);
+  c.speed = safeNum("speed", 30);
+  c.hpMax = safeNum("hp-max", 10);
+  c.hpCurrent = safeNum("hp-cur", 10);
+  c.hpTemp = safeNum("hp-temp", 0);
+  c.hitDiceMax = safeVal("hd-max", "1d8");
+  c.hitDiceCurrent = safeNum("hd-cur", 1);
+  c.ac = safeNum("ac", 10);
 
-  c.dsS1 = document.getElementById("ds-s1")?.checked || false;
-  c.dsS2 = document.getElementById("ds-s2")?.checked || false;
-  c.dsS3 = document.getElementById("ds-s3")?.checked || false;
-  c.dsF1 = document.getElementById("ds-f1")?.checked || false;
-  c.dsF2 = document.getElementById("ds-f2")?.checked || false;
-  c.dsF3 = document.getElementById("ds-f3")?.checked || false;
+  c.dsS1 = safeChk("ds-s1");
+  c.dsS2 = safeChk("ds-s2");
+  c.dsS3 = safeChk("ds-s3");
+  c.dsF1 = safeChk("ds-f1");
+  c.dsF2 = safeChk("ds-f2");
+  c.dsF3 = safeChk("ds-f3");
 
-  c.armorType = document.getElementById("armor-type")?.value || "";
-  c.armorPreset = document.getElementById("armor-preset")?.value || "";
-  c.armorName = document.getElementById("armor-name")?.value || "";
-  c.armorProps = document.getElementById("armor-props")?.value || "";
+  c.armorType = safeVal("armor-type");
+  c.armorPreset = safeVal("armor-preset");
+  c.armorName = safeVal("armor-name");
+  c.armorProps = safeVal("armor-props");
 
-  c.credits = document.getElementById("credits")?.value || "";
-  c.inventory = document.getElementById("inventory")?.value || "";
+  c.credits = safeVal("credits");
+  c.inventory = safeVal("inventory");
 
   if (!c.skills) c.skills = {};
   UM5_SKILLS.forEach(sk => {
     c.skills[sk.name] = {
-      prof: document.getElementById(`sk-prof-${sk.name}`)?.checked || false,
-      exp: document.getElementById(`sk-exp-${sk.name}`)?.checked || false
+      prof: safeChk(`sk-prof-${sk.name}`),
+      exp: safeChk(`sk-exp-${sk.name}`)
     };
   });
 
-  c.ladderNotes = document.getElementById("ladder-notes")?.value || "";
-  c.classNotes = document.getElementById("class-notes")?.value || "";
+  c.ladderNotes = safeVal("ladder-notes");
+  c.classNotes = safeVal("class-notes");
 
-  c.darkManaMax = parseInt(document.getElementById("dark-mana-max")?.value) || 0;
-  c.darkManaCur = parseInt(document.getElementById("dark-mana-cur")?.value) || 0;
-  c.darkSpells = document.getElementById("dark-spells")?.value || "";
+  c.darkManaMax = safeNum("dark-mana-max", 0);
+  c.darkManaCur = safeNum("dark-mana-cur", 0);
+  c.darkSpells = safeVal("dark-spells");
 
   saveData();
   populateOperativesList();
 }
 
-// Global Event Listeners Setup
+// Global Event Handlers
 function initAutoSave() {
   document.body.addEventListener("input", (e) => {
     if (!e.target.classList.contains("w-preset") && !e.target.classList.contains("w-name") &&
@@ -719,7 +738,7 @@ function initAutoSave() {
   }
 }
 
-// Initialization Entry Point
+// Startup Entrypoint
 document.addEventListener("DOMContentLoaded", () => {
   loadData();
   initTabs();
