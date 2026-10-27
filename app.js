@@ -36,29 +36,34 @@ const UM5_SKILLS = [
 let chars = [];
 let activeId = null;
 
-// Safe DOM Helper Functions (Prevents Any JS Crashes)
+// Safe DOM Helpers (Prevents Any Crash)
 function safeVal(id, defaultVal = "") {
   const el = document.getElementById(id);
   return el ? el.value : defaultVal;
 }
+
 function safeNum(id, defaultVal = 0) {
   const el = document.getElementById(id);
   if (!el) return defaultVal;
   const parsed = parseInt(el.value);
   return isNaN(parsed) ? defaultVal : parsed;
 }
+
 function safeChk(id) {
   const el = document.getElementById(id);
   return el ? el.checked : false;
 }
+
 function setVal(id, val) {
   const el = document.getElementById(id);
   if (el) el.value = (val !== undefined && val !== null) ? val : "";
 }
+
 function setChk(id, val) {
   const el = document.getElementById(id);
   if (el) el.checked = !!val;
 }
+
 function setTxt(id, val) {
   const el = document.getElementById(id);
   if (el) el.textContent = (val !== undefined && val !== null) ? val : "";
@@ -79,7 +84,7 @@ function calcMod(score) {
   return Math.floor((s - 10) / 2);
 }
 
-// Blank Character Structure
+// Blank Templates
 function emptyWeapon() {
   return { preset: "", name: "", dmg: "", range: "", props: "", max: "", cur: "" };
 }
@@ -163,28 +168,49 @@ function saveData() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(chars));
 }
 
-// Tabs Switching
+// HARD-ENFORCED TAB SWITCHING ENGINE
+function switchTab(targetId) {
+  const allContents = document.querySelectorAll(".tab-content");
+  const allBtns = document.querySelectorAll(".tab-btn");
+
+  allContents.forEach(c => {
+    if (c.id === targetId) {
+      c.style.display = "block";
+      c.classList.add("active");
+    } else {
+      c.style.display = "none";
+      c.classList.remove("active");
+    }
+  });
+
+  allBtns.forEach(b => {
+    if (b.getAttribute("data-tab") === targetId) {
+      b.classList.add("active");
+    } else {
+      b.classList.remove("active");
+    }
+  });
+}
+
 function initTabs() {
   const tabBtns = document.querySelectorAll(".tab-btn");
-  const tabContents = document.querySelectorAll(".tab-content");
-
   tabBtns.forEach(btn => {
     btn.addEventListener("click", (e) => {
       e.preventDefault();
       const targetId = btn.getAttribute("data-tab");
-      if (!targetId) return;
-
-      tabBtns.forEach(b => b.classList.remove("active"));
-      tabContents.forEach(c => c.classList.remove("active"));
-
-      btn.classList.add("active");
-      const targetContent = document.getElementById(targetId);
-      if (targetContent) targetContent.classList.add("active");
+      if (targetId) switchTab(targetId);
     });
   });
+
+  // Activate first tab by default
+  const activeBtn = document.querySelector(".tab-btn.active") || tabBtns[0];
+  if (activeBtn) {
+    const initialTabId = activeBtn.getAttribute("data-tab");
+    if (initialTabId) switchTab(initialTabId);
+  }
 }
 
-// Operatives Dropdown & Actions
+// Operatives Dropdown & Controls
 function populateOperativesList() {
   const select = document.getElementById("op-select");
   if (!select) return;
@@ -242,7 +268,7 @@ function initOperativeEvents() {
   }
 }
 
-// Armor Categorization & Preset Loading
+// Armor Categorization
 function filterArmorByType() {
   const typeSelect = document.getElementById("armor-type");
   const presetSelect = document.getElementById("armor-preset");
@@ -419,23 +445,23 @@ function bindWeaponEvents() {
   });
 }
 
-function addWeapon() {
+window.addWeapon = function() {
   const c = getActiveChar();
   if (!c) return;
   if (!c.weapons) c.weapons = [];
   c.weapons.push(emptyWeapon());
   saveData();
   renderWeapons();
-}
+};
 
-function removeWeapon(index) {
+window.removeWeapon = function(index) {
   const c = getActiveChar();
   if (!c) return;
   c.weapons.splice(index, 1);
   if (c.weapons.length === 0) c.weapons.push(emptyWeapon());
   saveData();
   renderWeapons();
-}
+};
 
 // Skills Renderer
 function renderSkillsTable() {
@@ -474,7 +500,7 @@ function renderSkillsTable() {
   });
 }
 
-// Abilities Tab Features
+// Abilities Features Renderer
 function renderAbilities() {
   const ladderBox = document.getElementById("ladder-features");
   const classBox = document.getElementById("class-features");
@@ -518,7 +544,7 @@ function renderAbilities() {
   }
 }
 
-// Populate Ladder & Class Dropdowns
+// Dropdowns Setup
 function populateDropdowns() {
   const ladderSel = document.getElementById("char-ladder");
   const classSel = document.getElementById("char-class");
@@ -583,7 +609,7 @@ function recalc() {
   renderAbilities();
 }
 
-// Load Active Character Data into UI
+// Load Active Character into Form
 function loadToForm() {
   const c = getActiveChar();
   if (!c) return;
@@ -646,7 +672,7 @@ function loadToForm() {
   recalc();
 }
 
-// Save UI State back to Active Character
+// Save Current Form Inputs into Active Character
 function saveCurrent() {
   const c = getActiveChar();
   if (!c) return;
@@ -708,7 +734,7 @@ function saveCurrent() {
   populateOperativesList();
 }
 
-// Global Event Handlers
+// Global Event Listeners Setup
 function initAutoSave() {
   document.body.addEventListener("input", (e) => {
     if (!e.target.classList.contains("w-preset") && !e.target.classList.contains("w-name") &&
@@ -734,18 +760,22 @@ function initAutoSave() {
 
   const btnAddWep = document.getElementById("btn-add-weapon");
   if (btnAddWep) {
-    btnAddWep.addEventListener("click", addWeapon);
+    btnAddWep.addEventListener("click", () => window.addWeapon());
   }
 }
 
-// Startup Entrypoint
+// Startup Entry Point
 document.addEventListener("DOMContentLoaded", () => {
-  loadData();
-  initTabs();
-  populateDropdowns();
-  renderSkillsTable();
-  populateOperativesList();
-  initOperativeEvents();
-  loadToForm();
-  initAutoSave();
+  try {
+    loadData();
+    initTabs();
+    populateDropdowns();
+    renderSkillsTable();
+    populateOperativesList();
+    initOperativeEvents();
+    loadToForm();
+    initAutoSave();
+  } catch (err) {
+    console.error("UM5 Startup Error: ", err);
+  }
 });
