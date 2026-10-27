@@ -1,10 +1,9 @@
 /* ==========================================
-   ULTRAMODERN 5 (UM5) CHARACTER SHEET ENGINE
+   ULTRAMODERN 5 (UM5) ENGINE
    ========================================== */
 
 const STORAGE_KEY = 'um5_chars_v5';
 
-// Master UM5 Skills List
 const UM5_SKILLS = [
   { name: "Acrobatics", stat: "dex" },
   { name: "Animal Handling", stat: "wis" },
@@ -36,7 +35,7 @@ const UM5_SKILLS = [
 let chars = [];
 let activeId = null;
 
-// Safe DOM Helpers (Prevents Any Crash)
+// Safe DOM Helpers
 function safeVal(id, defaultVal = "") {
   const el = document.getElementById(id);
   return el ? el.value : defaultVal;
@@ -69,7 +68,6 @@ function setTxt(id, val) {
   if (el) el.textContent = (val !== undefined && val !== null) ? val : "";
 }
 
-// Math Helpers
 function getProfBonus(lvl) {
   const level = parseInt(lvl) || 1;
   if (level >= 17) return 6;
@@ -84,7 +82,6 @@ function calcMod(score) {
   return Math.floor((s - 10) / 2);
 }
 
-// Blank Templates
 function emptyWeapon() {
   return { preset: "", name: "", dmg: "", range: "", props: "", max: "", cur: "" };
 }
@@ -144,7 +141,6 @@ function getActiveChar() {
   return chars.find(c => c.id === activeId);
 }
 
-// LocalStorage Management
 function loadData() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw) {
@@ -168,7 +164,7 @@ function saveData() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(chars));
 }
 
-// HARD-ENFORCED TAB SWITCHING ENGINE
+// Tab Switching
 function switchTab(targetId) {
   const allContents = document.querySelectorAll(".tab-content");
   const allBtns = document.querySelectorAll(".tab-btn");
@@ -202,15 +198,9 @@ function initTabs() {
     });
   });
 
-  // Activate first tab by default
-  const activeBtn = document.querySelector(".tab-btn.active") || tabBtns[0];
-  if (activeBtn) {
-    const initialTabId = activeBtn.getAttribute("data-tab");
-    if (initialTabId) switchTab(initialTabId);
-  }
+  switchTab("tab-operatives");
 }
 
-// Operatives Dropdown & Controls
 function populateOperativesList() {
   const select = document.getElementById("op-select");
   if (!select) return;
@@ -268,7 +258,6 @@ function initOperativeEvents() {
   }
 }
 
-// Armor Categorization
 function filterArmorByType() {
   const typeSelect = document.getElementById("armor-type");
   const presetSelect = document.getElementById("armor-preset");
@@ -326,7 +315,6 @@ function applyArmor() {
   saveCurrent();
 }
 
-// Dynamic Weapon System
 function renderWeapons() {
   const container = document.getElementById("weapons-container");
   if (!container) return;
@@ -463,7 +451,6 @@ window.removeWeapon = function(index) {
   renderWeapons();
 };
 
-// Skills Renderer
 function renderSkillsTable() {
   const tbody = document.getElementById("skills-tbody");
   if (!tbody) return;
@@ -500,7 +487,6 @@ function renderSkillsTable() {
   });
 }
 
-// Abilities Features Renderer
 function renderAbilities() {
   const ladderBox = document.getElementById("ladder-features");
   const classBox = document.getElementById("class-features");
@@ -544,7 +530,6 @@ function renderAbilities() {
   }
 }
 
-// Dropdowns Setup
 function populateDropdowns() {
   const ladderSel = document.getElementById("char-ladder");
   const classSel = document.getElementById("char-class");
@@ -570,7 +555,6 @@ function populateDropdowns() {
   }
 }
 
-// Recalculate Ability Mods, Saves & Skills
 function recalc() {
   const c = getActiveChar();
   if (!c) return;
@@ -609,7 +593,6 @@ function recalc() {
   renderAbilities();
 }
 
-// Load Active Character into Form
 function loadToForm() {
   const c = getActiveChar();
   if (!c) return;
@@ -672,7 +655,6 @@ function loadToForm() {
   recalc();
 }
 
-// Save Current Form Inputs into Active Character
 function saveCurrent() {
   const c = getActiveChar();
   if (!c) return;
@@ -734,7 +716,6 @@ function saveCurrent() {
   populateOperativesList();
 }
 
-// Global Event Listeners Setup
 function initAutoSave() {
   document.body.addEventListener("input", (e) => {
     if (!e.target.classList.contains("w-preset") && !e.target.classList.contains("w-name") &&
@@ -764,18 +745,13 @@ function initAutoSave() {
   }
 }
 
-// Startup Entry Point
 document.addEventListener("DOMContentLoaded", () => {
-  try {
-    loadData();
-    initTabs();
-    populateDropdowns();
-    renderSkillsTable();
-    populateOperativesList();
-    initOperativeEvents();
-    loadToForm();
-    initAutoSave();
-  } catch (err) {
-    console.error("UM5 Startup Error: ", err);
-  }
+  loadData();
+  initTabs();
+  populateDropdowns();
+  renderSkillsTable();
+  populateOperativesList();
+  initOperativeEvents();
+  loadToForm();
+  initAutoSave();
 });
