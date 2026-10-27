@@ -1,11 +1,13 @@
 const LADDER_DATA = {
-  'Born Leader': {
-    desc: 'You inspire allies and dominate the social battlefield.',
+    'Born Leader': {
+    desc: 'Confidence, presence, and tactical command. (Key: CHA, INT)',
     abilities: [
-      { level: 1, name: 'Brains and good looks', desc: 'Can choose to use Int for Insight and Perception checks.; After finishing a long rest, you gain a +2 bonus to Cha or Int (select one) until you make an attack roll or cast a spell.' },
-      { level: 4, name: 'Compelling directive', desc: 'after finish long rest, roll a d20. Can swap any roll you or an ally that can communicate with you. doesnt require action. Twice per short or long rest.' },
-      { level: 8, name: 'Social sciences', desc: 'Once per rest, grant temporary HP equal to your level + CHA mod to allies in 30 ft.' },
-      { level: 10, name: 'Battlefield Authority', desc: 'Your Commanding Presence bonus becomes +2.' }
+      { level: 1, name: 'Brains and Good Looks', desc: 'Use INT instead of WIS for Insight/Perception. After long rest: gain +2 to CHA or INT until you attack or cast a spell (set CHA or INT as primary ladder ability, max 22).' },
+      { level: 4, name: 'Compelling Directive', desc: '+1 to any stat (max 20, primary 22). After long rest, roll a d20 and store it; swap it with any roll you or a communicating ally makes (no action, 2 swaps/long rest).' },
+      { level: 8, name: 'Social Sciences', desc: '+1 to any stat (max 20, primary 22). Compelling Directive improves: swap up to 4 die rolls per long rest.' },
+      { level: 12, name: 'Presence of Leadership', desc: '+2 to one stat or +1 to two stats (max 20, primary 22). After long rest: gain advantage on CHA or INT skill checks until you attack or cast a spell.' },
+      { level: 16, name: 'Earned Loyalty', desc: '+1 to any stat (max 20, primary 22). Convert a short rest into a long rest with no extra time for you and visible allies (1 use per 4 long rests).' },
+      { level: 19, name: 'Just Stop', desc: '+2 to one stat or +1 to two stats (max 20, primary 22). Action: You and up to 5 communicating allies instantly gain the benefit of a short rest (1/long rest).' }
     ]
   },
   'Cyberborn': {
