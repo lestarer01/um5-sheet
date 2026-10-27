@@ -21,78 +21,72 @@ const LADDER_DATA = {
       { level: 19, name: 'In Your Prime', desc: '+2 to one stat or +1 to two (max 20, primary 22). Gain resistance to non-magical bludgeoning, piercing, and slashing damage.' }
     ]
   },
-  'Martial Artist': {
-    desc: 'Body is the weapon.',
+    'Performer': {
+    desc: 'Creativity, agility, and absolute focus under pressure. (Key: DEX, CHA)',
     abilities: [
-      { level: 1, name: 'Unarmed Arsenal', desc: 'Unarmed strikes deal 1d6 and count as finesse.' },
-      { level: 2, name: 'Flow State', desc: 'After hitting with unarmed, make a second unarmed as bonus action.' },
-      { level: 5, name: 'Pressure Point', desc: 'Unarmed hit can force CON save or target speed becomes 0 until your next turn.' },
-      { level: 10, name: 'Perfect Form', desc: 'Unarmed damage becomes 1d10; add WIS mod to AC when unarmored.' }
+      { level: 1, name: 'Constant Practice', desc: 'Use DEX for Performance or CHA for Acrobatics. Gain proficiency in Deception and Performance skills. Set DEX or CHA as primary ladder ability.' },
+      { level: 4, name: 'Over Baseline', desc: '+1 to any stat (max 20, primary 22). You are immune to the frightened condition.' },
+      { level: 8, name: 'Practice Makes Perfect', desc: '+1 to any stat (max 20, primary 22). Re-roll any die results of 5 or less on ability checks using your primary performer ability.' },
+      { level: 12, name: 'Confidence', desc: '+1 to any stat (max 20, primary 22). Guess your d20 roll before rolling to gain a bonus up to +4 based on guess accuracy (recharges short/long rest if +4 used).' },
+      { level: 16, name: 'Effortless', desc: '+1 to any stat (max 20, primary 22). Re-roll any die results of 10 or less on ability checks using your primary performer ability.' },
+      { level: 19, name: 'Personal Control', desc: '+2 to one stat or +1 to two (max 20, primary 22). 1/long rest: set the die roll of a proficient DEX or CHA skill check to a natural 20.' }
     ]
   },
-  'Outlaw': {
-    desc: 'Rules are for other people.',
+    'Runner': {
+    desc: 'Unmatched speed, agility, and tactical mobility. (Key: DEX, INT)',
     abilities: [
-      { level: 1, name: 'Dirty Fighting', desc: 'Once per turn deal +1d6 when you have advantage or an ally is adjacent.' },
-      { level: 2, name: 'Street Smarts', desc: 'Advantage on Insight and Intimidation in urban environments.' },
-      { level: 5, name: 'Escape Artist', desc: 'Disengage or Hide as a bonus action.' },
-      { level: 10, name: 'One Last Job', desc: 'When you reduce a creature to 0 HP, regain 1 use of Dirty Fighting die.' }
+      { level: 1, name: 'Power to Weight Ratio', desc: 'Use DEX for Athletics, INT for Perception, and DEX for non-heavy weapon attacks/damage/DCs. Gain Acrobatics proficiency. Set DEX or INT as primary runner ability.' },
+      { level: 4, name: 'Cat Balance', desc: '+1 to any stat (max 20, primary 22). +5 ft speed. Moving 10+ ft toward a wall grants climb speed on vertical surfaces for remaining movement.' },
+      { level: 8, name: 'Saute de Precision', desc: '+1 to any stat (max 20, primary 22). Dashing increases movement by 1.5x speed. Add both DEX and INT mods to Acrobatics checks.' },
+      { level: 12, name: 'Natural Athlete', desc: '+1 to any stat (max 20, primary 22). Action (INT mod/long rest): set next DEX check or save to your DEX score without rolling. Take 0 damage on successful DEX save that normally deals half.' },
+      { level: 16, name: 'All About the Flipping', desc: '+1 to any stat (max 20, primary 22). Max DEX for medium armor increases to 3; light armor gives +1 AC. Action to analyze path before moving: gain +INT mod AC until start of next turn.' },
+      { level: 19, name: 'Parkour Master', desc: '+2 to one stat or +1 to two (max 20, primary 22). Gain a pool of extra actions equal to primary mod per long rest (max 1/turn) to Dash, Disengage, or Use an Object.' }
     ]
   },
-  'Psion': {
-    desc: 'Mind over matter.',
+    'Savant': {
+    desc: 'Genius intellect, master analysis, and pure knowledge. (Key: INT, WIS)',
     abilities: [
-      { level: 1, name: 'Telepathic Whisper', desc: 'Speak telepathically to any creature you can see within 60 ft.' },
-      { level: 2, name: 'Mind Spike', desc: 'Ranged psychic attack 1d8 + INT; target has disadvantage on next attack.' },
-      { level: 5, name: 'Kinetic Barrier', desc: 'Reaction: reduce damage by 1d10 + INT mod (prof/day).' },
-      { level: 10, name: 'Domination', desc: 'Once per long rest, charm a humanoid for 1 minute (WIS save).' }
+      { level: 1, name: 'Training Beats Experience', desc: 'Use INT instead of DEX for attack/damage/DCs with small arms. Use INT or WIS instead of DEX for AC and spellcasting. Set INT or WIS as primary savant ability.' },
+      { level: 4, name: 'Not Stupid', desc: '+1 to any stat (max 20, primary 22). Ask GM if an action is "plain dumb" (uses equal to primary mod per long rest).' },
+      { level: 8, name: 'Experience Beats Training', desc: '+1 to any stat (max 20, primary 22). Gain proficiency in all skills of your primary savant ability. Use primary mod instead of DEX for initiative.' },
+      { level: 12, name: 'Too Smart', desc: '+2 to one stat or +1 to two (max 20, primary 22). Maintain wealthy lifestyle free; reduce research/training cost/time to 1/4. After long rest: gain +3 to INT or WIS until you attack or cast a spell.' },
+      { level: 16, name: 'Eidetic Memory', desc: '+1 to any stat (max 20, primary 22). When both rolls on advantage succeed, store one die result for up to 5 mins to replace any future d20 roll without rolling.' },
+      { level: 19, name: 'Opus', desc: '+1 to any stat (max 20, primary 22). Whenever you roll a check or save using your primary savant ability, set the die roll equal to your primary ability score.' }
     ]
   },
-  'Runner': {
-    desc: 'Speed is life.',
+    'Survivor': {
+    desc: 'Indomitable instinct, extreme endurance, and absolute survival. (Key: CON, WIS)',
     abilities: [
-      { level: 1, name: 'Sprint Protocol', desc: '+10 ft speed; Dash as bonus action once per rest.' },
-      { level: 2, name: 'Parkour', desc: 'Climb and long jump use full speed; no Athletics check for basic vaults.' },
-      { level: 5, name: 'Afterimage', desc: 'When you Dash, opportunity attacks against you have disadvantage.' },
-      { level: 10, name: 'Blitz', desc: 'Move through enemy spaces; each enemy you pass must save or be off-balance.' }
-    ]
-  },
-  'Savant': {
-    desc: 'Hyper-focused genius.',
-    abilities: [
-      { level: 1, name: 'Hyperfocus', desc: 'Choose one skill; double proficiency for it.' },
-      { level: 2, name: 'Rapid Analysis', desc: 'Bonus action: learn one resistance, vulnerability, or weak point of a target.' },
-      { level: 5, name: 'Calculated Strike', desc: 'Once per turn add INT mod to damage of an attack you hit.' },
-      { level: 10, name: 'Master Plan', desc: 'Grant allies advantage on the first round of combat once per long rest.' }
-    ]
-  },
-  'Survivor': {
-    desc: 'Hard to kill. Harder to stop.',
-    abilities: [
-      { level: 1, name: 'Grit', desc: 'Advantage on death saves; stabilize on a 18–20.' },
-      { level: 2, name: 'Scavenger', desc: 'Find useful scrap/ammo during short rests in urban/ruins.' },
-      { level: 5, name: 'Second Wind', desc: 'Bonus action heal 1d10 + level once per rest.' },
-      { level: 10, name: 'Die Hard', desc: 'When you fail a death save, you can choose to succeed instead (1/long rest).' }
-    ]
-  },
-  'Techie': {
-    desc: 'If it has a circuit, you own it.',
-    abilities: [
-      { level: 1, name: 'Jury Rig', desc: 'Repair or temporarily boost a device in 1 minute.' },
-      { level: 2, name: 'Drone Link', desc: 'You have a small scout drone (AC 12, 5 HP, fly 30).' },
-      { level: 5, name: 'EMP Pulse', desc: 'Once per rest, 15 ft sphere disables unshielded electronics for 1 round.' },
-      { level: 10, name: 'Override', desc: 'Attempt to seize control of a machine or turret (INT contest).' }
+      { level: 1, name: 'Hunter', desc: 'Use WIS instead of DEX for ranged attack/damage/DCs. Use CON instead of DEX for AC. Set CON or WIS as primary survivor ability.' },
+      { level: 4, name: 'Natural Equilibrium', desc: '+1 to any stat (max 20, primary 22). Gain proficiency in Survival or Animal Handling. Action: DC 15 CON check to reduce exhaustion by 1 (+5 DC per attempt until long rest + food/water).' },
+      { level: 8, name: 'Tough It Out', desc: '+1 to any stat (max 20, primary 22). Action (gain 1 exhaustion level): pick temp HP (primary mod + lvl), force a critical hit (+2x lvl dmg), +1 AC for 1 min, or +1 attack for 1 min (1 use each per long rest).' },
+      { level: 12, name: 'Dead Man Walking', desc: '+1 to any stat (max 20, primary 22). Can drop below 0 HP down to -50 HP while remaining conscious, gaining 1-5 levels of exhaustion based on depth.' },
+      { level: 16, name: 'Elite', desc: '+2 to one stat or +1 to two (max 20, primary 22). Auto-pass WIS (Survival) checks with DC 20 or less unless you have disadvantage.' },
+      { level: 19, name: 'Unnatural Survival', desc: '+2 to one stat or +1 to two (max 20, primary 22). Long rest with food & drink reduces exhaustion level by 2.' }
     ]
   },
   'Veteran': {
-    desc: 'Seen every war. Still standing.',
+    desc: 'Battle-hardened wisdom, sharp reflexes, and combat intuition. (Key: CHA, WIS)',
     abilities: [
-      { level: 1, name: 'Combat Experience', desc: '+1 to initiative; cannot be surprised while conscious.' },
-      { level: 2, name: 'Suppressing Fire', desc: 'When you miss with a firearm, the target still has disadvantage on next attack.' },
-      { level: 5, name: 'No Man Left Behind', desc: 'Drag or carry an ally at full speed without extra checks.' },
-      { level: 10, name: 'Old Soldier', desc: 'Once per long rest ignore all conditions until end of your next turn.' }
+      { level: 1, name: 'Calm Reflexes', desc: 'Use WIS for ranged, unarmed, or non-heavy melee attack/damage/DCs. Gain 1 CHA skill proficiency. Use WIS or CHA for spells. Set WIS or CHA as primary veteran ability.' },
+      { level: 4, name: 'Good Guess', desc: '+1 to any stat (max 20, primary 22). Gain a pool of rerolls equal to primary mod per long rest (reroll any roll after seeing the final result).' },
+      { level: 8, name: 'Expecting Trouble', desc: '+1 to any stat (max 20, primary 22). Good Guess pool +2 (regain 1 charge on a 1 or 2 roll). WIS (History) works as gut instinct truth check, CHA (History) as convincing lies.' },
+      { level: 12, name: 'Stone Faced', desc: '+2 to one stat or +1 to two (max 20, primary 22). Immune to frightened and charmed conditions.' },
+      { level: 16, name: 'Instinct with Time', desc: '+1 to any stat (max 20, primary 22). Reaction before making a save: move 5 ft. If movement takes you out of the AoE, no save required.' },
+      { level: 19, name: 'At Any Cost', desc: '+1 to any stat (max 20, primary 22). Good Guess pool +2. Gain advantage on attacks & auto-crit on first hit against previously defeated enemy types.' }
     ]
-  }
+  },
+  'Warrior': {
+    desc: 'Relentless combat training, stance mastery, and escalating power. (Key: DEX, STR)',
+    abilities: [
+      { level: 1, name: 'Strength Over Agility', desc: 'Use STR instead of DEX for 2-handed small arms, heavy, super heavy weapon attacks/damage/DCs. Medium armor max DEX is 3; heavy armor max DEX is 1. Set STR or DEX as primary warrior ability.' },
+      { level: 4, name: 'Power Up', desc: '+1 to any stat (max 20, primary 22). Action: increase Power Rank (1-5). Rank 1: Adv on next attack (+2 dmg); Rank 2: Auto-hit + step up dmg die; Rank 3: Auto-crit; Rank 4: Reroll 1s/2s & exploding max dmg; Rank 5: Double all dmg dice.' },
+      { level: 8, name: 'Ultra Super', desc: '+2 to one stat or +1 to two (max 20, primary 22). Bonus action: gain +1 Power Rank (1/short or long rest).' },
+      { level: 12, name: 'Covert Energy', desc: '+2 to one stat or +1 to two (max 20, primary 22). If you don\'t move on your turn, gain +1 Power Rank at start of next turn (1/short or long rest).' },
+      { level: 16, name: 'Vigorous Surge', desc: '+2 to one stat or +1 to two (max 20, primary 22). Start every combat at Power Rank 1 after rolling initiative.' },
+      { level: 19, name: 'Loses Patience, Finds Anger', desc: '+1 to any stat (max 20, primary 22). When hit by a crit or reduced below half HP, roll 1d4 and add to Power Rank (1/combat).' }
+    ]
+  },
 };
 
 const CLASS_DATA = {
