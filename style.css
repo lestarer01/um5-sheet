@@ -123,3 +123,17 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--a
 
 .char-card { display: flex; justify-content: space-between; align-items: center; background: var(--input); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-top: 10px; cursor: pointer; }
 .char-card.active-char { border-color: var(--accent); box-shadow: 0 0 0 1px rgba(0,242,254,0.2); }
+
+/* Ladder feature checkboxes */
+.ladder-check-label {
+  display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 700;
+}
+.ladder-check-label input[type="checkbox"] {
+  width: 16px; height: 16px; accent-color: var(--accent); flex-shrink: 0;
+}
+.ability-entry.ability-taken {
+  border-left-color: var(--success);
+}
+.ability-entry.ability-taken .ability-entry-header span {
+  color: var(--text);
+}
