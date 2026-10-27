@@ -1,255 +1,351 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>UM5 Tactical Sheet</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <h1>ULTRAMODERN5</h1>
-    <p>Tactical Operative System</p>
-  </header>
 
+  <div class="header-title">UM5 TACTICAL SHEET</div>
+
+  <!-- Navigation Tabs -->
   <nav class="nav-tabs">
-    <button class="tab-btn active" data-tab="tab-list">Operatives</button>
+    <button class="tab-btn active" data-tab="tab-operatives">Operatives</button>
     <button class="tab-btn" data-tab="tab-core">Core</button>
     <button class="tab-btn" data-tab="tab-combat">Combat</button>
     <button class="tab-btn" data-tab="tab-skills">Skills</button>
     <button class="tab-btn" data-tab="tab-abilities">Abilities</button>
-    <button class="tab-btn" data-tab="tab-magic">Magic</button>
+    <button class="tab-btn" data-tab="tab-magic">Dark System</button>
   </nav>
 
-  <main>
-    <!-- TAB 1: OPERATIVES -->
-    <section id="tab-list" class="tab-page active">
-      <div class="card">
-        <h2>Operative Roster</h2>
-        <button id="btn-new" class="btn btn-primary">+ New Operative</button>
-        <div id="roster"></div>
+  <!-- TAB 1: OPERATIVES -->
+  <div id="tab-operatives" class="tab-content active">
+    <div class="card mb-3">
+      <h3>Operative Selection</h3>
+      <div class="form-group mb-2">
+        <label>Active Operative</label>
+        <select id="op-select" class="form-control"></select>
       </div>
-    </section>
-
-    <!-- TAB 2: CORE (REDESIGNED VITAL & STAT BLOCKS) -->
-    <section id="tab-core" class="tab-page">
-      
-      <!-- Collapsed Profile Card to save space -->
-      <div class="card" style="padding-bottom: 5px;">
-        <div class="grid-2">
-          <div class="field-group"><label>Name</label><input type="text" id="c-name" /></div>
-          <div class="field-group"><label>Species</label><input type="text" id="c-species" /></div>
-          <div class="field-group"><label>Class</label><select id="c-class"></select></div>
-          <div class="field-group"><label>Level</label><input type="number" id="c-lvl" value="1" /></div>
-          <div class="field-group"><label>Ladder</label><select id="c-ladder"></select></div>
-          <div class="field-group"><label>Archetype</label><input type="text" id="c-arch" /></div>
+      <div class="row">
+        <div class="col-6 form-group">
+          <input type="text" id="new-op-name" class="form-control" placeholder="New Operative Name">
+        </div>
+        <div class="col-6 form-group">
+          <button id="btn-new-op" class="btn btn-primary" style="width:100%;">+ Create Operative</button>
         </div>
       </div>
+      <div class="mb-1" style="margin-top:10px;">
+        <button id="btn-delete-op" class="btn btn-delete btn-sm" style="width:100%;">Delete Active Operative</button>
+      </div>
+    </div>
+  </div>
 
-      <!-- BIG VITALS ROW 1 -->
-      <div class="vitals-row">
-        <div class="vital-box">
-          <label>Initiative</label>
-          <input type="number" id="init-val" class="massive" value="0" />
+  <!-- TAB 2: CORE -->
+  <div id="tab-core" class="tab-content">
+    <div class="card mb-3">
+      <h3>Profile</h3>
+      <div class="row">
+        <div class="col-6 form-group">
+          <label>Codename / Name</label>
+          <input type="text" id="char-name" class="form-control">
         </div>
-        <div class="vital-box" style="border-color: var(--accent);">
-          <label style="color: var(--accent);">HP (Current)</label>
-          <input type="number" id="hp-cur" class="massive" value="10" />
-          <div class="hp-sub">
-            <input type="number" id="hp-max" placeholder="Max" />
-            <input type="number" id="hp-temp" placeholder="Temp" />
-          </div>
+        <div class="col-6 form-group">
+          <label>Species</label>
+          <input type="text" id="char-species" class="form-control">
         </div>
-        <div class="vital-box">
-          <label>Speed</label>
-          <input type="number" id="spd-val" class="massive" value="30" />
+        <div class="col-6 form-group">
+          <label>Background</label>
+          <input type="text" id="char-background" class="form-control">
+        </div>
+        <div class="col-6 form-group">
+          <label>Level</label>
+          <input type="number" id="char-level" class="form-control" value="1" min="1" max="20">
+        </div>
+        <div class="col-4 form-group">
+          <label>Ladder</label>
+          <select id="char-ladder" class="form-control"></select>
+        </div>
+        <div class="col-4 form-group">
+          <label>Class</label>
+          <select id="char-class" class="form-control"></select>
+        </div>
+        <div class="col-4 form-group">
+          <label>Archetype</label>
+          <input type="text" id="char-archetype" class="form-control">
         </div>
       </div>
+    </div>
 
-      <!-- BIG VITALS ROW 2 -->
-      <div class="vitals-row">
-        <div class="vital-box">
-          <label>Hit Dice</label>
-          <input type="text" id="hd-val" class="massive" value="1d10" />
-        </div>
-        <div class="vital-box">
-          <label>Armor Class</label>
-          <input type="number" id="ac-val" class="massive" value="10" />
-        </div>
-        <div class="vital-box">
-          <label>Proficiency</label>
-          <div id="prof-display" class="massive">+2</div>
-        </div>
-      </div>
-
-      <!-- 2-COLUMN STATS GRID -->
-      <div class="stats-grid-2col">
+    <!-- Ability Scores -->
+    <div class="card mb-3">
+      <h3>Ability Scores & Saves</h3>
+      <div class="row">
         <!-- STR -->
-        <div class="stat-card-new">
-          <div class="stat-name">Strength</div>
-          <div class="stat-cols">
-            <div class="stat-col"><label>Score</label><input type="number" id="s-str" class="stat-score" value="10"></div>
-            <div class="stat-col"><label>Mod</label><span id="m-str" class="stat-mod">+0</span></div>
-            <div class="stat-col"><label><input type="checkbox" id="svS-str"> Save</label><span id="sv-str" class="stat-mod">+0</span></div>
-          </div>
-        </div>
-        <!-- INT -->
-        <div class="stat-card-new">
-          <div class="stat-name">Intelligence</div>
-          <div class="stat-cols">
-            <div class="stat-col"><label>Score</label><input type="number" id="s-int" class="stat-score" value="10"></div>
-            <div class="stat-col"><label>Mod</label><span id="m-int" class="stat-mod">+0</span></div>
-            <div class="stat-col"><label><input type="checkbox" id="svS-int"> Save</label><span id="sv-int" class="stat-mod">+0</span></div>
+        <div class="col-4 form-group">
+          <div class="stat-box">
+            <div class="stat-name">STR</div>
+            <input type="number" id="str-score" class="form-control massive-input mb-1" value="10">
+            <div class="stat-mod" id="str-mod">+0</div>
+            <div class="stat-save">
+              <input type="checkbox" id="str-save-prof">
+              <span>Save <strong id="str-save-val">+0</strong></span>
+            </div>
           </div>
         </div>
         <!-- DEX -->
-        <div class="stat-card-new">
-          <div class="stat-name">Dexterity</div>
-          <div class="stat-cols">
-            <div class="stat-col"><label>Score</label><input type="number" id="s-dex" class="stat-score" value="10"></div>
-            <div class="stat-col"><label>Mod</label><span id="m-dex" class="stat-mod">+0</span></div>
-            <div class="stat-col"><label><input type="checkbox" id="svS-dex"> Save</label><span id="sv-dex" class="stat-mod">+0</span></div>
-          </div>
-        </div>
-        <!-- WIS -->
-        <div class="stat-card-new">
-          <div class="stat-name">Wisdom</div>
-          <div class="stat-cols">
-            <div class="stat-col"><label>Score</label><input type="number" id="s-wis" class="stat-score" value="10"></div>
-            <div class="stat-col"><label>Mod</label><span id="m-wis" class="stat-mod">+0</span></div>
-            <div class="stat-col"><label><input type="checkbox" id="svS-wis"> Save</label><span id="sv-wis" class="stat-mod">+0</span></div>
+        <div class="col-4 form-group">
+          <div class="stat-box">
+            <div class="stat-name">DEX</div>
+            <input type="number" id="dex-score" class="form-control massive-input mb-1" value="10">
+            <div class="stat-mod" id="dex-mod">+0</div>
+            <div class="stat-save">
+              <input type="checkbox" id="dex-save-prof">
+              <span>Save <strong id="dex-save-val">+0</strong></span>
+            </div>
           </div>
         </div>
         <!-- CON -->
-        <div class="stat-card-new">
-          <div class="stat-name">Constitution</div>
-          <div class="stat-cols">
-            <div class="stat-col"><label>Score</label><input type="number" id="s-con" class="stat-score" value="10"></div>
-            <div class="stat-col"><label>Mod</label><span id="m-con" class="stat-mod">+0</span></div>
-            <div class="stat-col"><label><input type="checkbox" id="svS-con"> Save</label><span id="sv-con" class="stat-mod">+0</span></div>
+        <div class="col-4 form-group">
+          <div class="stat-box">
+            <div class="stat-name">CON</div>
+            <input type="number" id="con-score" class="form-control massive-input mb-1" value="10">
+            <div class="stat-mod" id="con-mod">+0</div>
+            <div class="stat-save">
+              <input type="checkbox" id="con-save-prof">
+              <span>Save <strong id="con-save-val">+0</strong></span>
+            </div>
+          </div>
+        </div>
+        <!-- INT -->
+        <div class="col-4 form-group">
+          <div class="stat-box">
+            <div class="stat-name">INT</div>
+            <input type="number" id="int-score" class="form-control massive-input mb-1" value="10">
+            <div class="stat-mod" id="int-mod">+0</div>
+            <div class="stat-save">
+              <input type="checkbox" id="int-save-prof">
+              <span>Save <strong id="int-save-val">+0</strong></span>
+            </div>
+          </div>
+        </div>
+        <!-- WIS -->
+        <div class="col-4 form-group">
+          <div class="stat-box">
+            <div class="stat-name">WIS</div>
+            <input type="number" id="wis-score" class="form-control massive-input mb-1" value="10">
+            <div class="stat-mod" id="wis-mod">+0</div>
+            <div class="stat-save">
+              <input type="checkbox" id="wis-save-prof">
+              <span>Save <strong id="wis-save-val">+0</strong></span>
+            </div>
           </div>
         </div>
         <!-- CHA -->
-        <div class="stat-card-new">
-          <div class="stat-name">Charisma</div>
-          <div class="stat-cols">
-            <div class="stat-col"><label>Score</label><input type="number" id="s-cha" class="stat-score" value="10"></div>
-            <div class="stat-col"><label>Mod</label><span id="m-cha" class="stat-mod">+0</span></div>
-            <div class="stat-col"><label><input type="checkbox" id="svS-cha"> Save</label><span id="sv-cha" class="stat-mod">+0</span></div>
+        <div class="col-4 form-group">
+          <div class="stat-box">
+            <div class="stat-name">CHA</div>
+            <input type="number" id="cha-score" class="form-control massive-input mb-1" value="10">
+            <div class="stat-mod" id="cha-mod">+0</div>
+            <div class="stat-save">
+              <input type="checkbox" id="cha-save-prof">
+              <span>Save <strong id="cha-save-val">+0</strong></span>
+            </div>
           </div>
         </div>
-        <!-- VIGOR (Spans Full Width at Bottom) -->
-        <div class="stat-card-new full-width">
-          <div class="stat-name">Vigor</div>
-          <div class="stat-cols">
-            <div class="stat-col"><label>Score</label><input type="number" id="s-vig" class="stat-score" value="10"></div>
-            <div class="stat-col"><label>Mod</label><span id="m-vig" class="stat-mod">+0</span></div>
-            <div class="stat-col"><label><input type="checkbox" id="svS-vig"> Save</label><span id="sv-vig" class="stat-mod">+0</span></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SEPARATE DEATH SAVES CARD -->
-      <div class="card">
-        <h3>Death Saves</h3>
-        <div class="death-box">
-          <div class="death-group success">
-            SUCCESS
-            <input type="checkbox" id="ds-s1" />
-            <input type="checkbox" id="ds-s2" />
-            <input type="checkbox" id="ds-s3" />
-          </div>
-          <div class="death-group fail">
-            FAIL
-            <input type="checkbox" id="ds-f1" />
-            <input type="checkbox" id="ds-f2" />
-            <input type="checkbox" id="ds-f3" />
+        <!-- VIG -->
+        <div class="col-4 form-group">
+          <div class="stat-box">
+            <div class="stat-name">VIG</div>
+            <input type="number" id="vig-score" class="form-control massive-input mb-1" value="10">
+            <div class="stat-mod" id="vig-mod">+0</div>
+            <div class="stat-save">
+              <input type="checkbox" id="vig-save-prof">
+              <span>Save <strong id="vig-save-val">+0</strong></span>
+            </div>
           </div>
         </div>
       </div>
+    </div>
 
-    </section>
-
-    <!-- TAB 3: COMBAT (Armor + Weapons) -->
-    <section id="tab-combat" class="tab-page">
-            <div class="card">
-        <h3>Armor</h3>
-        <div class="grid-2">
-          <div class="field-group">
-            <label>Armor Type</label>
-            <select id="armor-type">
-              <option value="">-- Select Type --</option>
-              <option value="Light Armor">Light Armor</option>
-              <option value="Medium Armor">Medium Armor</option>
-              <option value="Heavy Armor">Heavy Armor</option>
-              <option value="__custom__">Custom / Manual</option>
-            </select>
-          </div>
-          <div class="field-group">
-            <label>Armor Preset</label>
-            <select id="armor-preset">
-              <option value="">-- Choose type first --</option>
-            </select>
-          </div>
+    <!-- Vitals -->
+    <div class="card mb-3">
+      <h3>Vitals & Combat Stats</h3>
+      <div class="row">
+        <div class="col-4 form-group">
+          <label>Initiative Mod</label>
+          <input type="number" id="init-bonus" class="form-control massive-input" value="0">
         </div>
-        <div class="grid-2">
-          <div class="field-group">
-            <label>Armor Name</label>
-            <input type="text" id="armor-name" />
-          </div>
-          <div class="field-group">
-            <label>Properties</label>
-            <input type="text" id="armor-props" />
-          </div>
+        <div class="col-4 form-group">
+          <label>Speed (ft)</label>
+          <input type="number" id="speed" class="form-control massive-input" value="30">
+        </div>
+        <div class="col-4 form-group">
+          <label>Proficiency</label>
+          <input type="text" id="prof-bonus" class="form-control massive-input" value="+2" readonly>
+        </div>
+        <div class="col-4 form-group">
+          <label>Armor Class</label>
+          <input type="number" id="ac" class="form-control massive-input" value="10">
+        </div>
+        <div class="col-4 form-group">
+          <label>Max HP</label>
+          <input type="number" id="hp-max" class="form-control massive-input" value="10">
+        </div>
+        <div class="col-4 form-group">
+          <label>Current HP</label>
+          <input type="number" id="hp-cur" class="form-control massive-input" value="10">
+        </div>
+        <div class="col-4 form-group">
+          <label>Temp HP</label>
+          <input type="number" id="hp-temp" class="form-control massive-input" value="0">
+        </div>
+        <div class="col-4 form-group">
+          <label>Hit Dice Max</label>
+          <input type="text" id="hd-max" class="form-control massive-input" value="1d8">
+        </div>
+        <div class="col-4 form-group">
+          <label>Hit Dice Left</label>
+          <input type="number" id="hd-cur" class="form-control massive-input" value="1">
         </div>
       </div>
+    </div>
 
-      <div class="card">
-        <h3>Weapons</h3>
-        <div id="weapons-container"></div>
-        <button type="button" id="btn-add-weapon" class="btn btn-primary" style="margin-top:10px;">+ Add Weapon</button>
-      </div>
+    <!-- Death Saves Card -->
+    <div class="card mb-3">
+      <h3>Death Saves</h3>
+      <table class="ds-table">
+        <tr>
+          <td><strong>Successes:</strong></td>
+          <td><input type="checkbox" id="ds-s1"> 1</td>
+          <td><input type="checkbox" id="ds-s2"> 2</td>
+          <td><input type="checkbox" id="ds-s3"> 3</td>
+        </tr>
+        <tr>
+          <td><strong>Failures:</strong></td>
+          <td><input type="checkbox" id="ds-f1"> 1</td>
+          <td><input type="checkbox" id="ds-f2"> 2</td>
+          <td><input type="checkbox" id="ds-f3"> 3</td>
+        </tr>
+      </table>
+    </div>
+  </div>
 
-      <div class="card">
-        <h3>Credits & Gear</h3>
-        <div class="field-group"><label>Credits (₡)</label><input type="number" id="credits" /></div>
-        <div class="field-group"><label>Inventory</label><textarea id="inventory" rows="4"></textarea></div>
-      </div>
-    </section>
-
-    <!-- TAB 4: SKILLS -->
-    <section id="tab-skills" class="tab-page">
-      <div class="card">
-        <h2>Skill Proficiencies</h2>
-        <p style="font-size:0.75rem;color:var(--muted);margin-bottom:10px;">Check Prof for proficiency. Check Exp for expertise (double bonus).</p>
-        <div id="skills-box"></div>
-      </div>
-    </section>
-
-    <!-- TAB 5: ABILITIES -->
-    <section id="tab-abilities" class="tab-page">
-      <div class="card"><h2>Ladder Features</h2><div id="ladder-box"></div></div>
-      <div class="card"><h2>Class Features</h2><div id="class-box"></div></div>
-      <div class="card"><h2>Custom Notes</h2><textarea id="feat-notes" rows="5"></textarea></div>
-    </section>
-
-    <!-- TAB 6: MAGIC -->
-    <section id="tab-magic" class="tab-page">
-      <div class="card">
-        <h2>Dark System Magic</h2>
-        <div class="grid-2">
-          <div class="field-group"><label>Max Mana / MP</label><input type="number" id="mp-max" /></div>
-          <div class="field-group"><label>Current Mana</label><input type="number" id="mp-cur" /></div>
+  <!-- TAB 3: COMBAT -->
+  <div id="tab-combat" class="tab-content">
+    <!-- Armor Card -->
+    <div class="card mb-3">
+      <h3>Armor</h3>
+      <div class="row">
+        <div class="col-6 form-group">
+          <label>Armor Type Filter</label>
+          <select id="armor-type" class="form-control">
+            <option value="">-- All Types --</option>
+            <option value="Light">Light Armor</option>
+            <option value="Medium">Medium Armor</option>
+            <option value="Heavy">Heavy Armor</option>
+          </select>
         </div>
-        <div class="grid-2">
-          <div class="field-group"><label>Spell Save DC</label><input type="number" id="spell-dc" /></div>
-          <div class="field-group"><label>Spell Attack</label><input type="number" id="spell-atk" /></div>
+        <div class="col-6 form-group">
+          <label>Armor Preset</label>
+          <select id="armor-preset" class="form-control">
+            <option value="">-- Select Preset --</option>
+          </select>
         </div>
-        <div class="field-group"><label>Magic Tradition / Source</label><input type="text" id="magic-source" /></div>
-        <div class="field-group"><label>Spells & Dark Powers</label><textarea id="spell-list" rows="10"></textarea></div>
+        <div class="col-6 form-group">
+          <label>Armor Equipped</label>
+          <input type="text" id="armor-name" class="form-control" placeholder="Custom / Equipped Armor">
+        </div>
+        <div class="col-6 form-group">
+          <label>Armor Properties</label>
+          <input type="text" id="armor-props" class="form-control" placeholder="Cost, Wt, Stealth, TL">
+        </div>
       </div>
-    </section>
-  </main>
+    </div>
+
+    <!-- Weapons Card -->
+    <div class="card mb-3">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <h3 style="margin:0; border:none;">Weapons</h3>
+        <button id="btn-add-weapon" class="btn btn-primary btn-sm">+ Add Weapon</button>
+      </div>
+      <div id="weapons-container"></div>
+    </div>
+
+    <!-- Inventory & Credits -->
+    <div class="card mb-3">
+      <h3>Credits & Gear</h3>
+      <div class="form-group mb-2">
+        <label>Credits</label>
+        <input type="text" id="credits" class="form-control" placeholder="e.g. 1,500 cr">
+      </div>
+      <div class="form-group">
+        <label>Inventory & Equipment</label>
+        <textarea id="inventory" class="form-control" placeholder="Gear, items, ammo, cyberware..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: SKILLS -->
+  <div id="tab-skills" class="tab-content">
+    <div class="card mb-3">
+      <h3>Skills</h3>
+      <table class="skills-table">
+        <thead>
+          <tr>
+            <th>Skill (Stat)</th>
+            <th style="text-align:center;">Prof</th>
+            <th style="text-align:center;">Exp</th>
+            <th style="text-align:right;">Bonus</th>
+          </tr>
+        </thead>
+        <tbody id="skills-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB 5: ABILITIES -->
+  <div id="tab-abilities" class="tab-content">
+    <div class="card mb-3">
+      <h3>Ladder Features</h3>
+      <div id="ladder-features" class="mb-2"></div>
+      <div class="form-group">
+        <label>Ladder Notes</label>
+        <textarea id="ladder-notes" class="form-control" placeholder="Personal ladder notes..."></textarea>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <h3>Class Features</h3>
+      <div id="class-features" class="mb-2"></div>
+      <div class="form-group">
+        <label>Class Notes & Archetype Features</label>
+        <textarea id="class-notes" class="form-control" placeholder="Personal class/archetype notes..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 6: DARK SYSTEM -->
+  <div id="tab-magic" class="tab-content">
+    <div class="card mb-3">
+      <h3>Dark System Magic / Powers</h3>
+      <div class="row mb-2">
+        <div class="col-6 form-group">
+          <label>Max Mana / Power Points</label>
+          <input type="number" id="dark-mana-max" class="form-control massive-input" value="0">
+        </div>
+        <div class="col-6 form-group">
+          <label>Current Mana</label>
+          <input type="number" id="dark-mana-cur" class="form-control massive-input" value="0">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Spells / Powers Known & Prepared</label>
+        <textarea id="dark-spells" class="form-control" style="min-height:150px;" placeholder="List spells, spell slots, powers, save DC..."></textarea>
+      </div>
+    </div>
+  </div>
 
   <script src="database.js"></script>
   <script src="app.js"></script>
