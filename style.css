@@ -1,24 +1,24 @@
 /* ==========================================
-   ULTRAMODERN 5 (UM5) SLEEK CYBERPUNK STYLING
+   ULTRAMODERN 5 (UM5) TACTICAL OPERATIVE UI
    ========================================== */
 
 :root {
-  --bg: #090d16;
-  --card-bg: #121b2d;
-  --card-border: #1e2d4a;
+  --bg: #070b12;
+  --card-bg: #0d1320;
+  --card-border: #182338;
   --accent: #00f2fe;
   --accent-glow: rgba(0, 242, 254, 0.25);
   --text: #e2e8f0;
-  --text-dim: #8a99ad;
-  --danger: #ff4757;
-  --success: #2ed573;
+  --text-dim: #64748b;
+  --danger: #ef4444;
+  --success: #10b981;
 }
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 body {
@@ -27,55 +27,56 @@ body {
   padding: 12px;
   max-width: 900px;
   margin: 0 auto;
-  line-height: 1.4;
 }
 
-/* Cyberpunk Header */
-.header-title {
+/* Header */
+.header-container {
   text-align: center;
-  font-size: 1.4rem;
-  font-weight: 800;
-  letter-spacing: 2px;
-  color: var(--accent);
-  text-transform: uppercase;
   margin-bottom: 12px;
-  text-shadow: 0 0 10px var(--accent-glow);
 }
 
-/* Tabs Navigation Bar */
+.main-title {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--accent);
+  letter-spacing: 2px;
+}
+
+.sub-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+}
+
+/* Tabs */
 .nav-tabs {
   display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-bottom: 14px;
-  background: #0d1424;
-  padding: 4px;
-  border-radius: 8px;
+  background: #090f1a;
   border: 1px solid var(--card-border);
+  border-radius: 6px;
+  padding: 2px;
+  margin-bottom: 14px;
 }
 
 .tab-btn {
-  flex: 1 1 30%;
-  padding: 10px 4px;
+  flex: 1;
   background: transparent;
-  color: var(--text-dim);
   border: none;
-  border-radius: 6px;
+  color: #8a99ad;
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
+  padding: 10px 2px;
   cursor: pointer;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  transition: all 0.2s ease;
 }
 
 .tab-btn.active {
-  background: var(--accent);
-  color: #000;
-  box-shadow: 0 0 12px var(--accent-glow);
+  color: var(--accent);
+  border-bottom: 3px solid var(--accent);
+  background: #111a2e;
 }
 
-/* Tab Content Control */
 .tab-content {
   display: none;
 }
@@ -84,27 +85,24 @@ body {
   display: block;
 }
 
-/* Cyberpunk Cards */
+/* Cards */
 .card {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
-  border-radius: 10px;
-  padding: 14px;
-  margin-bottom: 14px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
 }
 
 .card h3 {
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: var(--accent);
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 10px;
-  border-bottom: 1px solid var(--card-border);
-  padding-bottom: 4px;
 }
 
-/* Grid Layout */
+/* Layout Grid */
 .row {
   display: flex;
   flex-wrap: wrap;
@@ -114,40 +112,34 @@ body {
 .col-12 { flex: 0 0 100%; max-width: 100%; padding: 4px; }
 .col-6  { flex: 0 0 50%; max-width: 50%; padding: 4px; }
 .col-4  { flex: 0 0 33.333%; max-width: 33.333%; padding: 4px; }
-.col-3  { flex: 0 0 25%; max-width: 25%; padding: 4px; }
 
-/* Dark Form Controls */
+/* Forms & Inputs */
 .form-group {
   margin-bottom: 8px;
 }
 
 .form-group label {
   display: block;
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   color: var(--text-dim);
   text-transform: uppercase;
+  font-weight: 800;
   margin-bottom: 3px;
-  font-weight: 600;
 }
 
 .form-control {
   width: 100%;
-  padding: 8px 10px;
-  background: #090f1a;
+  padding: 8px;
+  background: #070c16;
   border: 1px solid var(--card-border);
   border-radius: 6px;
-  color: var(--text);
-  font-size: 0.95rem;
+  color: #fff;
+  font-size: 0.9rem;
 }
 
 .form-control:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 6px var(--accent-glow);
-}
-
-select.form-control {
-  cursor: pointer;
 }
 
 textarea.form-control {
@@ -155,11 +147,213 @@ textarea.form-control {
   min-height: 70px;
 }
 
-/* Action Buttons */
-.btn {
+/* Big Cyan Action Button */
+.btn-cyan-lg {
+  width: 100%;
+  background: var(--accent);
+  color: #000;
+  font-weight: 800;
+  padding: 12px;
+  border-radius: 6px;
+  border: none;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.btn-delete {
+  background: var(--danger);
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.btn-action {
   padding: 8px 14px;
   border: none;
   border-radius: 6px;
-  font-weight: 700;
+  font-weight: 800;
   cursor: pointer;
-  
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+.btn-shoot { background: #00a8ff; color: #fff; }
+.btn-reload { background: #10b981; color: #fff; }
+
+/* Operative Card Item */
+.op-card-item {
+  background: #070c16;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+/* Vitals Grid (3 Columns) */
+.vitals-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.vital-card {
+  background: #070c16;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 10px 4px;
+  text-align: center;
+}
+
+.vital-card.hp-card {
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.vital-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.hp-label {
+  color: var(--accent);
+}
+
+.vital-value {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--accent);
+  font-size: 1.8rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.vital-value.text-val {
+  font-size: 1.3rem;
+}
+
+.hp-sub-row {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.hp-sub-input {
+  width: 42px;
+  background: #0d1320;
+  border: 1px solid var(--card-border);
+  color: #fff;
+  text-align: center;
+  border-radius: 4px;
+  padding: 2px;
+  font-size: 0.75rem;
+}
+
+/* Ability Score Cards (2 Columns) */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.stat-card {
+  background: #070c16;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.stat-header {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--accent);
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.stat-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-sublabel {
+  font-size: 0.6rem;
+  color: var(--text-dim);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.stat-score-input {
+  width: 38px;
+  background: transparent;
+  border: none;
+  color: var(--accent);
+  font-size: 1.3rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.stat-mod-val, .stat-save-val {
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.stat-save-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* Tables */
+.skills-table, .ds-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.skills-table th, .skills-table td {
+  padding: 6px;
+  border-bottom: 1px solid var(--card-border);
+  font-size: 0.85rem;
+}
+
+.skills-table th {
+  color: var(--text-dim);
+  text-transform: uppercase;
+  font-size: 0.65rem;
+  text-align: left;
+}
+
+.ds-table td {
+  padding: 4px;
+  text-align: center;
+}
+
+/* Weapon Cards */
+.weapon-card {
+  background: #070c16;
+  border: 1px dashed var(--card-border);
+}
+
+.mb-1 { margin-bottom: 4px; }
+.mb-2 { margin-bottom: 8px; }
+.mb-3 { margin-bottom: 12px; }
