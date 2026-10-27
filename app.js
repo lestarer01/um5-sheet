@@ -311,7 +311,7 @@ function blankChar() {
     dsS: [false,false,false], dsF: [false,false,false],
     armorPreset: 'Plain Clothes', armorName: 'Plain Clothes', armorProps: '',
     weapons: [emptyWeapon()],
-    credits: 500, inventory: '', skills: {}, featNotes: '',
+    credits: 500, inventory: '', skills: {}, ladderTaken: null, featNotes: '',
     mpMax: 0, mpCur: 0, spellDc: 10, spellAtk: 0, magicSource: '', spellList: ''
   };
 }
@@ -400,15 +400,65 @@ function renderAbilities() {
   const lvl = parseInt(val('c-lvl'), 10) || 1;
   const lad = typeof LADDER_DATA !== 'undefined' ? LADDER_DATA[val('c-ladder')] : null;
   const cls = typeof CLASS_DATA !== 'undefined' ? CLASS_DATA[val('c-class')] : null;
+  const c = chars.find(x => x.id === activeId);
 
   if (lad && $('ladder-box')) {
-    const list = lad.abilities.filter(a => a.level <= lvl);
-    $('ladder-box').innerHTML = `<p style="font-size:0.8rem;color:var(--accent2);margin-bottom:10px;">${lad.desc}</p>` + 
-      list.map(a => `<div class="ability-entry"><div class="ability-entry-header"><span>${a.name}</span><span class="ability-entry-level">Lvl ${a.level}</span></div><div class="ability-entry-desc">${a.desc}</div></div>`).join('');
+    if (!c.ladderTaken || !Array.isArray(c.ladderTaken) || c.ladderTaken.length !== lad.abilities.length) {
+      c.ladderTaken = lad.abilities.map((_, i) => i === 0);
+    }
+    c.ladderTaken[0] = true;
+
+    $('ladder-box').innerHTML =
+      `<p style="font-size:0.8rem;color:var(--accent2);margin-bottom:6px;">${lad.desc}</p>` +
+      `<p style="font-size:0.72rem;color:var(--muted);margin-bottom:10px;">1st-level feature is automatic. Later features are optional (taken instead of ASI/feat) and must be taken in order.</p>` +
+      lad.abilities.map((a, i) => {
+        const taken = !!c.ladderTaken[i];
+        const prevTaken = i === 0 || !!c.ladderTaken[i - 1];
+        const levelOk = lvl >= a.level;
+        const locked = i === 0;
+        const canCheck = !locked && prevTaken && levelOk;
+        const disabled = locked || (!taken && !canCheck);
+        const statusNote = !levelOk ? ' (need L' + a.level + ')' : (!prevTaken && i > 0 ? ' (take prior first)' : '');
+        return `<div class="ability-entry${taken ? ' ability-taken' : ''}">
+          <div class="ability-entry-header">
+            <label class="ladder-check-label">
+              <input type="checkbox" class="ladder-feat-check" data-idx="${i}" ${taken ? 'checked' : ''} ${disabled ? 'disabled' : ''} />
+              <span>${a.name}</span>
+            </label>
+            <span class="ability-entry-level">Lvl ${a.level}${statusNote}</span>
+          </div>
+          <div class="ability-entry-desc">${a.desc}</div>
+        </div>`;
+      }).join('');
+
+    $('ladder-box').querySelectorAll('.ladder-feat-check').forEach(cb => {
+      cb.addEventListener('change', (e) => {
+        const idx = parseInt(e.target.dataset.idx, 10);
+        const char = chars.find(x => x.id === activeId);
+        const ladder = typeof LADDER_DATA !== 'undefined' ? LADDER_DATA[val('c-ladder')] : null;
+        if (!char || !ladder || idx === 0) {
+          e.target.checked = true;
+          return;
+        }
+        const charLvl = parseInt(val('c-lvl'), 10) || 1;
+        if (e.target.checked) {
+          if (!char.ladderTaken[idx - 1] || charLvl < ladder.abilities[idx].level) {
+            e.target.checked = false;
+            return;
+          }
+          char.ladderTaken[idx] = true;
+        } else {
+          for (let j = idx; j < char.ladderTaken.length; j++) char.ladderTaken[j] = false;
+        }
+        saveStorage();
+        renderAbilities();
+      });
+    });
   }
+
   if (cls && $('class-box')) {
     const list = cls.abilities.filter(a => a.level <= lvl);
-    $('class-box').innerHTML = `<p style="font-size:0.8rem;color:var(--accent2);margin-bottom:10px;">${cls.desc} · Hit Die ${cls.hitDie}</p>` + 
+    $('class-box').innerHTML = `<p style="font-size:0.8rem;color:var(--accent2);margin-bottom:10px;">${cls.desc} · Hit Die ${cls.hitDie}</p>` +
       list.map(a => `<div class="ability-entry"><div class="ability-entry-header"><span>${a.name}</span><span class="ability-entry-level">Lvl ${a.level}</span></div><div class="ability-entry-desc">${a.desc}</div></div>`).join('');
   }
 }
@@ -459,7 +509,11 @@ document.addEventListener('DOMContentLoaded', () => {
     el.addEventListener('change', saveCurrent);
   });
   
-  if ($('c-ladder')) $('c-ladder').addEventListener('change', renderAbilities);
+  if ($('c-ladder')) $('c-ladder').addEventListener('change', () => {
+  const ch = chars.find(x => x.id === activeId);
+  if (ch) ch.ladderTaken = null;
+  renderAbilities();
+});
   if ($('c-class')) $('c-class').addEventListener('change', renderAbilities);
   if ($('c-lvl')) $('c-lvl').addEventListener('change', renderAbilities);
 
