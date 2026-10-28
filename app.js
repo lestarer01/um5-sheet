@@ -464,39 +464,66 @@ function renderAbilities() {
     html += list.map(a => `<div class="ability-entry"><div class="ability-entry-header"><span>${a.name}</span><span class="ability-entry-level">Lvl ${a.level}</span></div><div class="ability-entry-desc">${a.desc}</div></div>`).join('');
 
     // Render Choice Menu (e.g., Protagonist Traits)
-    if (cls.choiceMenu) {
-      if (!c.classChoices) c.classChoices = {};
-      if (!c.classChoices[val('c-class')]) c.classChoices[val('c-class')] = [];
-      
-      const unlockedCount = cls.choiceMenu.levels.filter(l => l <= lvl).length;
-      if (unlockedCount > 0) {
-        html += `<div class="ability-entry" style="border-left-color: var(--accent2);">
-          <div class="ability-entry-header"><span style="color:var(--accent2);">${cls.choiceMenu.name}</span></div>
-          <div class="ability-entry-desc" style="margin-bottom:8px;">Select ${unlockedCount} option(s) based on your level.</div>`;
+        // Normalize to an array of choice menus (supports Face single + Grounder multi)
+    const menus = cls.choiceMenus ? cls.choiceMenus
+      : (cls.choiceMenu ? [cls.choiceMenu] : []);
 
-        for (let i = 0; i < unlockedCount; i++) {
-          const selected = c.classChoices[val('c-class')][i] || '';
-          const opts = ['<option value="">-- Select --</option>']
-            .concat(Object.keys(cls.choiceMenu.options).map(k => `<option value="${k}" ${k === selected ? 'selected' : ''}>${k}</option>`)).join('');
+    if (!c.classChoices) c.classChoices = {};
+    if (!c.classChoices[val('c-class')]) c.classChoices[val('c-class')] = {};
 
-          html += `<div class="field-group" style="margin-bottom:8px;">
-            <select class="class-choice-select" data-idx="${i}" style="background:var(--bg);">${opts}</select>
-            ${selected && cls.choiceMenu.options[selected] ? `<div style="font-size:0.75rem; color:var(--text); margin-top:4px; padding:6px; background:rgba(0,0,0,0.3); border-radius:4px;">${cls.choiceMenu.options[selected]}</div>` : ''}
-          </div>`;
-        }
-        html += `</div>`;
+    menus.forEach((menu, menuIdx) => {
+      const key = menu.name;
+      if (!Array.isArray(c.classChoices[val('c-class')][key])) {
+        c.classChoices[val('c-class')][key] = [];
       }
-    }
-    
+      const unlockedCount = menu.levels.filter(l => l <= lvl).length;
+      if (unlockedCount <= 0) return;
+
+      // Tier summary for paths that allow duplicates (e.g. Fire Support)
+      let tierSummary = '';
+      if (menu.trackTiers) {
+        const counts = {};
+        c.classChoices[val('c-class')][key].forEach(v => { if (v) counts[v] = (counts[v] || 0) + 1; });
+        const parts = Object.keys(counts).map(k => `${k} Tier ${counts[k]}`);
+        if (parts.length) tierSummary = `<div style="font-size:0.75rem;color:var(--accent);margin-bottom:6px;">Current: ${parts.join(' · ')}</div>`;
+      }
+
+      html += `<div class="ability-entry" style="border-left-color: var(--accent2);">
+        <div class="ability-entry-header"><span style="color:var(--accent2);">${menu.name}</span></div>
+        <div class="ability-entry-desc" style="margin-bottom:6px;">${menu.hint || `Select ${unlockedCount} option(s) based on your level.`}</div>
+        ${tierSummary}`;
+
+      for (let i = 0; i < unlockedCount; i++) {
+        const selected = c.classChoices[val('c-class')][key][i] || '';
+        const opts = ['<option value="">-- Select --</option>']
+          .concat(Object.keys(menu.options).map(k =>
+            `<option value="${k}" ${k === selected ? 'selected' : ''}>${k}</option>`
+          )).join('');
+
+        html += `<div class="field-group" style="margin-bottom:8px;">
+          <label style="font-size:0.65rem;color:var(--muted);">Pick at level ${menu.levels[i] || '?'}</label>
+          <select class="class-choice-select" data-menu="${key}" data-idx="${i}" style="background:var(--bg);">${opts}</select>
+          ${selected && menu.options[selected]
+            ? `<div style="font-size:0.75rem;color:var(--text);margin-top:4px;padding:6px;background:rgba(0,0,0,0.3);border-radius:4px;">${menu.options[selected]}</div>`
+            : ''}
+        </div>`;
+      }
+      html += `</div>`;
+    });
+
     $('class-box').innerHTML = html;
 
-    // Bind event listeners for the new dropdowns
     $('class-box').querySelectorAll('.class-choice-select').forEach(sel => {
       sel.addEventListener('change', (e) => {
+        const menuKey = e.target.dataset.menu;
         const idx = parseInt(e.target.dataset.idx, 10);
         const char = chars.find(x => x.id === activeId);
-        if (char && char.classChoices && char.classChoices[val('c-class')]) {
-          char.classChoices[val('c-class')][idx] = e.target.value;
+        const className = val('c-class');
+        if (char && char.classChoices && char.classChoices[className]) {
+          if (!Array.isArray(char.classChoices[className][menuKey])) {
+            char.classChoices[className][menuKey] = [];
+          }
+          char.classChoices[className][menuKey][idx] = e.target.value;
           saveStorage();
           renderAbilities();
         }
