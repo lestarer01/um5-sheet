@@ -269,67 +269,280 @@ const CLASS_DATA = {
       }
     ]
   },
-  'Medic': {
-    desc: 'Keeps the squad breathing.',
+    'Infiltrator': {
+    desc: 'Stealth operative, assassin, and master of procedural memory and tactical precision.',
     hitDie: 'd8',
-    primaryStat: 'WIS',
+    primaryStat: 'DEX / WIS',
     abilities: [
-      { level: 1, name: 'Field Medicine', desc: 'Stabilize as bonus action; Medicine checks restore 1 HP on success.' },
-      { level: 2, name: 'Stim Pack', desc: 'Heal 2d8 + WIS as an action (uses equal to prof bonus / long rest).' },
-      { level: 5, name: 'Trauma Surgeon', desc: 'Remove one condition or end ongoing poison/bleed on a touch.' }
+      { level: 1, name: 'Procedural Memory', desc: 'Gain rerolls equal to Proficiency Bonus + 4 per long rest. Reroll any bad d20 roll until you accept a result or run out of uses. Works on disadvantage (removes disadvantage state).' },
+      { level: 1, name: 'Leet', desc: 'Whenever you have advantage on an attack roll, that target has disadvantage on attacks against you until start of your next turn.' },
+      { level: 1, name: 'Intended Target', desc: '1/turn: Hitting a target within 20 ft when you have advantage doubles your weapon\'s base damage dice.' },
+      { level: 2, name: 'Pacification', desc: 'When you hit with an attack, spend a Hit Die (restores no HP) to convert the hit into a critical hit.' },
+      { level: 3, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype (or forgo it for an extra Procedural Memory use).' },
+      { level: 5, name: 'Ghost', desc: 'Advantage on initiative. If you act first in combat, gain 1 extra action on turn 1 and advantage on all attack rolls until end of turn.' },
+      { level: 6, name: 'Efficient Killer', desc: 'Hitting a target within 20 ft with a melee or ranged weapon lets you repeat the attack on the same target as part of the same action if previous hit.' },
+      { level: 7, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' },
+      { level: 9, name: 'Most Dangerous Prey', desc: 'When attacking with a 1-handed small arm or melee weapon with advantage, from cover, or vs surprised target: step up weapon damage die by 1 rank (d4->d6->d8->d10->d12).' },
+      { level: 10, name: 'Crippling Effect', desc: 'Score critical hits on a natural 19 or 20 with 1-handed small arms and 1-handed melee weapons.' },
+      { level: 11, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' },
+      { level: 13, name: 'Efficient Killer Upgrade', desc: 'Efficient Killer allows up to 5 additional attacks against the same target in a single action as long as each previous attack hits.' },
+      { level: 14, name: 'Tactical Passage', desc: 'Dash as a bonus action. Moving through non-hostile creatures\' spaces costs no extra movement.' },
+      { level: 15, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' },
+      { level: 17, name: 'Enhanced Camouflage', desc: 'Half cover counts as 3/4 cover; 3/4 cover counts as total cover.' },
+      { level: 18, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' },
+      { level: 20, name: 'System Shock', desc: 'Scoring a critical hit on a creature stuns it until the end of your next turn (1/long rest).' }
+    ],
+    choiceMenus: [
+      {
+        name: 'Solid Skills',
+        hint: 'Select specialized tactical abilities at levels 1, 4, 7, 10, 13, 16, and 19.',
+        levels: [1, 4, 7, 10, 13, 16, 19],
+        options: {
+          'Around Corners': 'Aware of the location of hidden/invisible creatures within 10 ft as long as you are not deaf.',
+          'Automatic': '+2 additional uses of Procedural Memory (can only be selected once).',
+          'Focus': 'Range of Intended Target increases to 40 ft.',
+          'Following Patterns': 'Reduce the Passive Perception of all encountered enemies by 2.',
+          'Increased Fatality': 'Intended Target triples base weapon damage dice instead of double.',
+          'Multi-Talented': 'Gain proficiency in 1 skill or tool (or +2 bonus if already proficient).',
+          'Quickness': '+5 ft speed if unseen enemies are within 50 ft.',
+          'Readiness': 'Readying an Attack action grants advantage when triggered within 20 ft or when target reveals itself.',
+          'Reflex Dash': '+10 ft speed until end of next turn when hit by an attack.',
+          'Response': 'Advantage on next attack vs an enemy within 40 ft that missed an attack against you.',
+          'Scanner': 'You can perform the Search action as a bonus action.',
+          'Sprung': 'Stand from prone using only 5 ft movement; high jump distance increased by +5 ft.'
+        }
+      }
     ]
   },
-  'Officer': {
-    desc: 'Tactical command presence.',
-    hitDie: 'd10',
-    primaryStat: 'CHA',
-    abilities: [
-      { level: 1, name: 'Issue Order', desc: 'Bonus action: ally within 30 ft can move or make one attack.' },
-      { level: 2, name: 'Coordinated Fire', desc: 'When you hit, next ally attack against that target has advantage.' },
-      { level: 5, name: 'Command Aura', desc: 'Allies in 10 ft add your CHA mod to saving throws vs fear and charm.' }
-    ]
-  },
-  'Sniper': {
-    desc: 'One shot. One story.',
-    hitDie: 'd10',
-    primaryStat: 'DEX',
-    abilities: [
-      { level: 1, name: 'Steady Aim', desc: 'Bonus action: advantage on your next ranged attack this turn (speed 0).' },
-      { level: 2, name: 'Long Range Expert', desc: 'No disadvantage at long range with rifles; +20 ft range.' },
-      { level: 5, name: 'Kill Confirmed', desc: 'Critical hits with rifles deal one extra damage die and ignore cover.' }
-    ]
-  },
-  'Techie': {
-    desc: 'Wires, drones, and chaos.',
+    'Marshal': {
+    desc: 'Tactical commander, battlefield coordinator, and inspiring squad leader.',
     hitDie: 'd8',
-    primaryStat: 'INT',
+    primaryStat: 'CHA / WIS / INT',
     abilities: [
-      { level: 1, name: 'Tech Expertise', desc: 'Double proficiency on Computers, Electronics, and Technology.' },
-      { level: 2, name: 'Deployable', desc: 'Deploy a turret or scanner (stats scale with level).' },
-      { level: 5, name: 'System Crack', desc: 'Action: shut down or hijack a device within 30 ft (INT contest).' }
+      { level: 1, name: 'Command Presence', desc: 'Select 1 Command Presence aura. At levels 2, 6, 10, 14, and 18, choose another presence or upgrade an existing one to Tier 2.' },
+      { level: 1, name: 'For the Good of the Team', desc: 'Action: grant an ally in LOS an extra action on their next turn. Reaction to rolling initiative: swap initiative result with any willing ally.' },
+      { level: 1, name: 'Team Power', desc: 'Gain Team Powers at level 1 and at levels 2, 5, 6, 9, 10, 13, 14, 17, and 20.' },
+      { level: 3, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype (or forgo it for an extra Team Power).' },
+      { level: 7, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' },
+      { level: 11, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' },
+      { level: 15, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' },
+      { level: 18, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' },
+      { level: 20, name: 'Manifestation of Greatness', desc: 'Roll 1d4 natural 20s per long rest. Reaction: replace any ally\'s d20 roll in LOS with one of these stored natural 20s.' }
+    ],
+    choiceMenus: [
+      {
+        name: 'Command Presence',
+        hint: 'Aura abilities that motivate allies. Repeat a pick to unlock Tier 2.',
+        trackTiers: true,
+        levels: [1, 2, 6, 10, 14, 18],
+        options: {
+          'By Example': 'Allies in LOS have adv on INT/WIS/CHA saves. [Boost Action 1/rest: allies in 20ft gain +1 AC for 1 min]. Tier 2: Adds adv on STR/CON saves; Boost gives +2 AC.',
+          'Field Advice': 'Double effects that remove exhaustion; long rest reduces exhaustion by 2 if eaten. [Boost Action 1/rest: reduce ally exhaustion by 1]. Tier 2: Distribute half-level HD on long rest; Boost heals allies 1/4 HP.',
+          'Intimidating Mug': 'Enemies within 10 ft treat area as difficult terrain. [Boost Action 1/rest: double range to 20 ft for 1 min]. Tier 2: Base range 20 ft; Boost range 40 ft.',
+          'Mask of Authority': 'Allies in LOS reroll 1s on damage dice. [Boost Action 1/rest: allies gain +1 dmg for 1 min]. Tier 2: Allies reroll 1s twice; Boost gives +2 dmg.',
+          'Stand As One': 'Allies in LOS reduce damage taken by 1 (2 at L10). [Boost Action 1/rest: grant resistance to 1 energy type for 1 min]. Tier 2: Damage reduction becomes 2 (3 at L10).',
+          'Strategic Precision': '1/turn on hit: ally in LOS gains +2 to next attack roll. [Boost Action 1/rest: +1 attack vs last target hit]. Tier 2: Selected ally gains advantage instead of +2.'
+        }
+      },
+      {
+        name: 'Team Power',
+        hint: 'Tactical squad powers unlocked as you level up.',
+        levels: [1, 2, 5, 6, 9, 10, 13, 14, 17, 20],
+        options: {
+          'Allies Rebound (L5+)': 'Action: attack a target up to number of allies that attacked it since your last turn (max 2; multi-pick up to 4 attacks).',
+          'Autocratic': 'Reaction when ally suffers a crit: make a single attack vs the attacker.',
+          'Big Picture': 'Action: pick ally; if they hit before your next turn, add +(WIS mod + level) bonus damage.',
+          'Boar\'s Head': 'Spend 10 ft movement: ally gains +5 ft speed until start of next turn.',
+          'Control the Battle Theater': 'You and all allies gain +2 bonus to initiative rolls.',
+          'Face Slap (L5+)': 'Action: wake adjacent unconscious ally; if at <0 HP, heal to 1 HP (1/long rest).',
+          'Focus Target (L5+)': 'Bonus action: ally within 5 ft makes 1 ranged attack vs same target you hit with ranged attack this turn.',
+          'Improvisation is the Best Plan': 'Bonus action: gain 1 additional reaction before start of next turn.',
+          'Mark of the Puppeteer': 'Reaction when ally hits: shove target 5 ft (cannot shove into hazards).',
+          'No One Hits the Chief (L5+)': 'Reaction when hit by a crit: allies gain adv on attacks vs attacker until start of your next turn.',
+          'Pat on the Back': 'During short rest: give any of your Hit Dice to allies.',
+          'Plan of Attack': 'Spend 10 ft movement: move an ally 5 ft (no opportunity attacks, no reaction needed).',
+          'Pure Leader': 'Hit with ranged attack: deal 0 dmg, ally disengages and moves up to half speed.',
+          'Quick Patch': 'Action: heal ally 1d6 per your level HP (1/long rest; multi-pick up to 3 uses & +1d6).',
+          'Reading Body Language': 'Gain advantage on Insight, Survival, Deception, Intimidation, Performance, or Persuasion (multi-pick for different skills).',
+          'Shared Vigilance': 'You and allies gain +2 bonus to passive Perception while you are conscious.',
+          'Snap Out Of It': 'Reaction: deal 1d4 damage to ally within 5 ft to remove charmed, frightened, or stunned.',
+          'Unnecessary Abuse (L5+)': 'Reaction when ally within 5 ft misses: deal 1d4 dmg to ally to let them reroll with advantage.',
+          'Warrior\'s Respite (L5+)': 'Action: up to 4 allies spend 1 HD + CON mod to heal (1/rest).'
+        }
+      }
     ]
   },
-  'Commando': {
-    desc: 'Elite all-range combatant.',
+    'Martial Artist': {
+    desc: 'Unarmed and melee specialist utilizing lethal combo chains and devastating finishing moves.',
     hitDie: 'd10',
-    primaryStat: 'STR / DEX',
+    primaryStat: 'DEX / STR',
     abilities: [
-      { level: 1, name: 'Assault Doctrine', desc: 'Proficiency in Athletics and Stealth; +5 ft speed.' },
-      { level: 2, name: 'Breach and Clear', desc: 'After moving 15+ ft, first attack deals +1d6 and may shove.' },
-      { level: 5, name: 'Special Ops', desc: 'Ignore reload once per turn; advantage on initiative in planned assaults.' }
+      { level: 1, name: 'Combo Chain', desc: 'Hits build your combo chain tier (T1: 1d6 -> T2: 1d8 -> T3: 1d10 -> T4: 1d12 [L9] -> T5: 2d6 [L13]). Hitting at T2+ lets you unleash a Finishing Move, which resets chain to T1.' },
+      { level: 2, name: 'Block Attack', desc: 'Bonus action: gain +2 AC until next turn OR make 1 single melee attack. At level 5: spend a Hit Die to increase to +3 AC or 3 attacks instead of 1.' },
+      { level: 3, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype (or forgo it for an extra Martial Exploit).' },
+      { level: 6, name: 'Extra Attack', desc: 'Attack twice when taking the Attack action.' },
+      { level: 7, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' },
+      { level: 9, name: 'Combo Chain (Tier 4)', desc: 'Max combo chain increases to Tier 4 (1d12 unarmed).' },
+      { level: 10, name: 'Extra Attack (3)', desc: 'Extra Attack improves to three attacks.' },
+      { level: 11, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' },
+      { level: 13, name: 'Combo Chain (Tier 5)', desc: 'Max combo chain increases to Tier 5 (2d6 unarmed).' },
+      { level: 15, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' },
+      { level: 18, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' },
+      { level: 20, name: 'Extra Attack (4)', desc: 'Extra Attack improves to four attacks.' }
+    ],
+    choiceMenus: [
+      {
+        name: 'Fighting Form',
+        hint: 'Choose your combat core focus at 1st level.',
+        levels: [1],
+        options: {
+          'Dexterity Form': '+1 melee attack roll at Tier 2 (+2 at L14, +3 at L17); add +0.5x DEX mod to AC in light armor; use DEX (Acrobatics) for grapples.',
+          'Strength Form': '+1 to all melee damage rolls (+3 at L14, +5 at L17); gain medium/heavy armor prof; adv on shove checks (+10 ft shove distance).'
+        }
+      },
+      {
+        name: 'Martial Exploits',
+        hint: 'Select combat maneuvers to augment your martial abilities.',
+        levels: [1, 2, 5, 8, 11, 14, 17, 20],
+        options: {
+          'C-C-C-Combo Breaker': 'Reaction when same enemy hits you twice in a round: make melee attack vs target; on hit, inflict dmg and end its turn (size <= yours).',
+          'Calisthenics': 'Gain +1 damage bonus to all melee damage rolls.',
+          'Gun Something-Something': 'Treat 1-handed small arms as melee weapons vs targets within 5 ft (all ranged attacks at <=5 ft count as melee).',
+          'Chain Boost': 'Bonus action: spend 1d4 HD (restore no HP) to increase combo chain tier by that same amount (1/rest, max tier applies).',
+          'Marker': 'On hit, target in reach has disadv on attacks not including you until end of next turn (ends if 0 HP or out of reach).',
+          'Newaza': 'Reaction grapple if target breaks grapple; +2 AC vs grappled target; no disadv on melee while prone; miss grappled target by <=5 hits them instead; move grappled target without speed penalty.',
+          'Pound for Pound': 'Reaction: move up to your speed towards an enemy that moves away from you (even with Disengage).',
+          'Redirection of Energy': 'Gain temp HP = melee crit dmg taken (1/long rest); gain adv on attacks vs attacker until end of next turn.',
+          'Rhythm String': 'After finisher, gain bonus to next T1 attack = finisher tier (+5 bonus for T5 finisher).',
+          'Tag Team': 'Reaction when ally hits enemy in 5 ft with melee attack: deal bonus dmg = STR or DEX mod (doesn\'t count toward combo).',
+          'Ultra': 'Hit target: increase combo tier by +1 and immediately perform a finisher (1/long rest).',
+          'Unarmed Expanded Profile': 'Spend 30 ft movement: unarmed attacks gain reach until end of next turn.',
+          'Vicious Hook (Req L10)': 'Melee attacks score a critical hit on natural 19 or 20.',
+          'Wrestler': 'Half cover while grappling a target; missed attacks against you by <=5 hit grappled target instead.'
+        }
+      }
     ]
   },
-  'Driver/Pilot': {
-    desc: 'If it moves, you can weaponize it.',
-    hitDie: 'd8',
-    primaryStat: 'DEX',
+    'Medic': {
+    desc: 'Battlefield doctor, combat chemist, and support specialist using spell-like Medical Exploits.',
+    hitDie: 'd6',
+    primaryStat: 'WIS / INT',
     abilities: [
-      { level: 1, name: 'Wheelman', desc: 'Vehicles you drive gain +2 AC and you have advantage on Driving/Piloting.' },
-      { level: 2, name: 'Ram', desc: 'Vehicle melee attack dealing collision damage; DEX save or prone.' },
-      { level: 5, name: 'Evasive Pattern', desc: 'While driving, impose disadvantage on attacks against your vehicle.' }
+      { level: 1, name: 'Target Avoidance', desc: 'Bonus action: take the Dash action (at level 2: can also Disengage as a bonus action).' },
+      { level: 1, name: 'Primary Target', desc: 'If you don\'t take an Attack action on your turn, gain +2 AC until start of next turn (+3 at L5, +4 at L9).' },
+      { level: 1, name: 'Medical Exploits & Applications', desc: 'Access to at-will Medical Applications and 1st-4th level Medical Exploits (fueled by exploit slots). Use INT or WIS for save DCs and attack rolls.' },
+      { level: 3, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype (or forgo it for an extra Medical Application).' },
+      { level: 6, name: 'Medical Emergency', desc: '1/turn on your turn: activate one Medical Application requiring an action or bonus action for free.' },
+      { level: 7, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' },
+      { level: 10, name: 'Intelligent Resistance', desc: 'Double your proficiency bonus on all Intelligence and Wisdom saving throws.' },
+      { level: 11, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' },
+      { level: 13, name: 'Risk An Aneurysm', desc: 'On your turn: spend Hit Dice (no HP restored) to instantly recover 1 Medical Exploit slot per Hit Die spent (max 1 slot/turn).' },
+      { level: 14, name: 'Mindfulness', desc: 'Gain 2 additional Hit Dice permanently.' },
+      { level: 15, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' },
+      { level: 17, name: 'Expanded Knowledge', desc: 'Gain proficiency in 2 additional skills from the Medic class list.' },
+      { level: 18, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' },
+      { level: 20, name: 'Good Thing You Have Friends', desc: 'Allies within 5 ft grant cover (1 ally = half cover, 2 = 3/4 cover, 3 = full cover). Transfer hit damage to an adjacent ally.' }
+    ],
+    choiceMenus: [
+      {
+        name: 'Medical Applications',
+        hint: 'At-will tactical medical abilities unlocked as you level up.',
+        levels: [1, 1, 5, 9, 13, 17],
+        options: {
+          'Basic Treatment': 'Action (Touch, Medkit): Target gains bonus to next CON/WIS/INT save = your Proficiency Bonus (1/check).',
+          'Defilade': 'Reaction: When hit by a crit, allies in LOS gain advantage on attacks vs the attacker until start of its next turn.',
+          'Do Science To It': 'Bonus action: Double proficiency bonus on your next Medicine or Sciences check made this turn.',
+          'Evasive Overdrive': 'Bonus action: Gain +1 AC against 1 visible target and provoke no opportunity attacks from it until next turn.',
+          'Field Shot': 'Bonus action: After using a medical exploit as an action, make 1 ranged attack using INT/WIS instead of DEX.',
+          'Imperative Escape': 'Reaction: Halve damage from a hit suffered while already below half HP.',
+          'Live, Damn You': 'Action (Touch, Medkit + 1 HD): Target at 0 HP stabilizes to 1 HP; target above 0 HP heals 1d6 + Prof bonus (2d6 at L10).',
+          'Medical Expertise': 'Reaction on ally hit: Add INT or WIS modifier as extra damage to the ally\'s hit.',
+          'Medical Knowledge': 'Bonus action after firearm hit: Make exploit attack; on hit, target has disadv on next attack roll.',
+          'Modern Master': 'Bonus action after exploit that recovers HP: Target recovers +1d4 extra HP (+2d4 at L10).',
+          'Outthink and Outwit': 'Action (30 ft): Make a ranged attack roll using INT or WIS instead of DEX.',
+          'Weak Spot': 'Bonus action on hit: Halve target\'s speed until start of your next turn (1/turn).'
+        }
+      }
     ]
-  }
-};
+  },
+    'Sniper': {
+    desc: 'Long-range assassin, patient marksman, and cover-based stealth specialist.',
+    hitDie: 'd8',
+    primaryStat: 'DEX / WIS',
+    abilities: [
+      { level: 1, name: 'Marksman Talent', desc: 'Pool of Marksman Points (5 at L1, up to 15 at L20; +2 temp pts on sniper kill). Spend points per attack (max 2 at L1, 3 at L5, 4 at L10, 5 at L17, 6 at L20) to trigger talents (e.g. Academic Hill, Boom Headshot, Magic Bullet, Pinpoint Accuracy). Points refill on rest.' },
+      { level: 2, name: 'Ghostly Positioning', desc: 'If you move <= half speed and end movement in cover, gain +2 Stealth. Take the Hide action as a bonus action.' },
+      { level: 3, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype (or forgo it for an extra Battle Condition).' },
+      { level: 6, name: 'Hidden Relocation', desc: 'On a successful Hide action, move up to half speed without revealing position if ending in a location not clearly visible.' },
+      { level: 7, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' },
+      { level: 9, name: 'Mad Minute', desc: 'Attack twice with Attack action. If you hit with 1st attack, sacrifice 2nd attack to gain 1 Marksman Point immediately.' },
+      { level: 11, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' },
+      { level: 13, name: 'Mad Minute Upgrade', desc: 'Attack three times with Attack action. Sacrifice up to 2 additional attacks on hit to gain up to 2 Marksman Points immediately.' },
+      { level: 14, name: 'Shadow\'s Veil', desc: 'Hitting a target with a sniper weapon while hidden lets you immediately attempt to Hide again with advantage as part of the same action.' },
+      { level: 15, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' },
+      { level: 18, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' }
+    ],
+    choiceMenus: [
+      {
+        name: 'Battle Condition',
+        hint: 'Select specialized tactical sniping disciplines as you level up.',
+        levels: [1, 2, 6, 10, 14, 17, 20],
+        options: {
+          'Army Crawl': 'While prone, no disadvantage on ranged attacks made with sniper weapons.',
+          'Ballistics Expertise': 'Spend 10 ft movement to instantly swap between a 1-handed small arm and a sniper weapon.',
+          'Covert Operation': 'Spend 20 ft movement to gain advantage on Dexterity (Stealth) checks until end of turn.',
+          'Dead Eye': 'Reaction when hit by a crit within 25 ft: automatically switch to pistol and make a ranged attack against the attacker.',
+          'Low Profile': 'While prone, half cover becomes 3/4 cover, and 3/4 cover becomes total cover.',
+          'Failure Is Not An Option': 'Reroll a natural 1 on an attack roll with a sniper weapon (unless at disadvantage).',
+          'Snap Shot': 'Bonus action ranged attack with any firearm (disadvantage with sniper weapons; cannot use Marksman Talents).',
+          'Lead The Target': 'Bonus action focus target in LOS (1/rest): +1 attack with sniper weapon; 3/4 cover treated as total cover.',
+          'Penetration Shot': '3/4 cover treated as half cover; ignore half cover when making ranged sniper attacks.',
+          'Perfect Tracker': 'Move up to half speed while maintaining your sniper bonus.',
+          'Sharpshooter': 'Action: gain advantage on your next ranged attack with a sniper weapon.',
+          'Shock & Awe': 'Missing with a sniper weapon causes target to suffer disadvantage on its next attack vs you.',
+          'Smooth As Glass': 'Permanently add +2 additional Marksman Points to your maximum total (can select up to 3 times).',
+          'Zero Your Weapon': 'Bonus action: double both normal and long ranges of any sniper weapon you wield.'
+        }
+      }
+    ]
+  },
+    'Techie': {
+    desc: 'Master field engineer, gadget hacker, firearm modifier, and machine technician.',
+    hitDie: 'd8',
+    primaryStat: 'INT / WIS',
+    abilities: [
+      { level: 1, name: 'Tech Points & Shiny Red Button', desc: 'Gain Tech Points (6 at L1, +1/level). Program custom button configurations onto firearms. Pressing the button (no action) spends TP to activate all programmed Button Functions for 5 mins.' },
+      { level: 1, name: 'Widget Bag', desc: 'Carry $200 worth of spare parts and salvage. Scavenge $10 worth during short rests and $20 worth during long rests.' },
+      { level: 1, name: 'Tech Savant Exploits', desc: 'Gain unique technical traits at levels 1, 2, 5, 9, 13, 17, and 20.' },
+      { level: 3, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype (or forgo it for an extra Tech Savant exploit).' },
+      { level: 6, name: 'Pioneer', desc: 'Attack twice when taking the Attack action (improves to three attacks at level 14).' },
+      { level: 7, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' },
+      { level: 10, name: 'McGuy Something', desc: '1/long rest: Spend $20 of widget bag parts and make an INT (Engineering) check to improvise useful tools or crisis solutions on the fly.' },
+      { level: 11, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' },
+      { level: 14, name: 'Pioneer Upgrade', desc: 'Extra Attack improves to three attacks.' },
+      { level: 15, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' },
+      { level: 18, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' }
+    ],
+    choiceMenus: [
+      {
+        name: 'Tech Savant Exploits',
+        hint: 'Select engineering perks and technological enhancements.',
+        levels: [1, 2, 5, 9, 13, 17, 20],
+        options: {
+          'Candy-Like Button': 'Each button implanted on a weapon can hold up to three different configurations.',
+          'Economical Plating': 'Gain +1 AC. Action (1 TP): increase armor AC by an additional +1 for 5 minutes.',
+          'Failsafe': 'Unintended user explodes weapon on trigger (crit dmg, stunned if <=Medium). Weapon breaks.',
+          'Friggin\' Love Science': 'Spend 1 TP: gain advantage on INT (Science) or INT (Engineering) checks. Multi-pick: spend 1 TP to set next d20 roll to natural 20.',
+          'Immediacy': 'Bonus action (1 TP): gain an extra action on this turn (cannot be used for an Attack action).',
+          'Like Machines': 'Permanently increase your maximum Tech Points by +2 (can be selected up to 4 times).',
+          'Midas Touch': 'Firearm damage bonus increases by +2. Stacks with other damage-increasing effects.',
+          'Priorities': 'Spend Hit Dice on your turn (restore no HP) to recover 2 Tech Points per Hit Die spent.',
+          'Scientist, Not A Soldier': 'When taking the Disengage action, make a single ranged attack as part of the same action (half damage on hit).',
+          'Shrapnel Modification': 'Spend 1 TP after a hit: target becomes vulnerable to all ally attacks until start of your next turn.'
+        }
+      }
+    ]
+  };
 
 const WEAPON_DATA = {
   'M4 Carbine': { type: 'Assault Rifle', damage: '2d6', magSize: 30, range: '80/300', properties: 'Burst, Two-Handed' },
