@@ -186,24 +186,87 @@ const CLASS_DATA = {
       }
     ]
   },
-  'Infiltrator': {
-    desc: 'Silent entry, silent exit.',
-    hitDie: 'd8',
-    primaryStat: 'DEX',
-    abilities: [
-      { level: 1, name: 'Sneak Attack', desc: '1d6 extra damage once per turn when you have advantage or an ally is adjacent.' },
-      { level: 2, name: 'Infiltration Tools', desc: 'Proficiency with thieves’ tools, hacking kits, and disguise kits.' },
-      { level: 5, name: 'Assassinate', desc: 'Advantage on attack vs creatures that have not acted; crit on surprise hit.' }
-    ]
-  },
-  'Martial Artist': {
-    desc: 'Strikes faster than a trigger pull.',
+    'Gunslinger': {
+    desc: 'Agile, cinematic firearm specialist, bullet-ballet artist, and master of Kata exploits.',
     hitDie: 'd8',
     primaryStat: 'DEX / WIS',
     abilities: [
-      { level: 1, name: 'Flurry', desc: 'After Attack action with unarmed/melee, two unarmed strikes as bonus action.' },
-      { level: 2, name: 'Evasion Style', desc: 'Add WIS mod to AC while unarmored and not using a shield.' },
-      { level: 5, name: 'Stunning Palm', desc: 'Once per rest force CON save or stun until end of your next turn.' }
+      { level: 1, name: 'Converging Fire', desc: 'When attacking a creature within 5 ft with 1 or 2 small arms, gain +1 to attack rolls and +2 AC against that target.' },
+      { level: 1, name: 'Kata System', desc: 'Gain Kata Points (4 at L1, scaling to 10 at L18) to trigger Kata Exploits. Regain all spent Kata on short or long rest. Max 1 exploit/turn (2/turn at L10+).' },
+      { level: 5, name: 'Gun-Fu', desc: 'Attack twice with Attack action. If all attacks target the same creature, make 1 additional ranged attack against it.' },
+      { level: 6, name: 'Cinematic Style Upgrade', desc: 'One Weapon: damage bonus increases to +6. Two Weapons: add ability modifier to the damage of your bonus off-hand attack.' },
+      { level: 9, name: 'Reflex Shot', desc: 'When wielding a one-handed small arm, you can make a ranged attack as an opportunity attack.' },
+      { level: 10, name: 'Kata Improvement', desc: 'You can now use up to 2 Kata Exploits per turn. Selecting an exploit a second time unlocks its ENHANCED version.' },
+      { level: 13, name: 'Gun-Fu Upgrade', desc: 'Extra Attack improves to 3 attacks.' },
+      { level: 14, name: 'Heroic Bloodshed', desc: '1/rest (1-hand small arm): All hits are auto-crits until next turn. (2 small arms): Double total attacks with Attack action, Bonus, and Reactions until next turn.' },
+      { level: 17, name: 'Gun-Fu Upgrade', desc: 'The bonus attacks for focusing all attacks on a single target increases to +2 additional ranged attacks.' },
+      { level: 20, name: 'Endorphin Response', desc: 'Bonus action: spend Hit Dice (no HP restored) to gain 4 Kata Points instantly.' }
+    ],
+    choiceMenus: [
+      {
+        name: 'Cinematic Style',
+        hint: 'Choose your weapon combat style at 1st level.',
+        levels: [1],
+        options: {
+          'One Weapon': 'Wielding a single 1-handed small arm grants +3 to damage rolls (+6 at L6).',
+          'Two Weapons': 'Wielding two 1-handed small arms lets you make a bonus action off-hand attack (add ability mod to damage at L6).'
+        }
+      },
+      {
+        name: 'Kata Exploits',
+        hint: 'Select exploits fueled by Kata points. Pick a second time at L10+ to unlock the Enhanced version.',
+        levels: [1, 1, 2, 4, 8, 12, 16, 19],
+        options: {
+          'Abnormally Fast (1 Kata)': 'Double speed until next turn; if hit before next turn, regain 1 Kata. [Enhanced: +10 ft speed].',
+          'Between The Knees (1 Kata)': 'Advantage on ranged attack; double ability mod on hit. If both miss, regain 1 Kata. [Enhanced: Triple ability mod dmg].',
+          'Blood In The Eyes (1 Kata)': 'Reaction when enemy crits you: make ranged attack. Auto-crit if hit; regain 1 Kata if miss by 5+. [Enhanced: Regain 1 Kata on any miss].',
+          'Boundary Threshold (1 Kata)': 'Within 5 ft of ≥2 enemies: spend 30 ft movement for 1 ranged attack. [Enhanced: 15 ft cost, attack between movement].',
+          'Classic Tumble (1 Kata)': 'Reaction on hit or failed DEX save: take 1/4 damage. [Enhanced: Take 0 damage].',
+          'Equilibrium (1 Kata)': 'Reaction when enemy misses ranged attack vs you: make ranged attack; regain 1 Kata on crit. [Enhanced: Gain advantage].',
+          'Hydrostatic Shot (1 Kata)': 'After hit: +2d6 dmg. If target moves/attacks, knock prone as reaction. [Enhanced: +3d6 dmg].',
+          'Just One Bullet (1 Kata)': 'Spend before attack action: +2 dmg to all attacks this turn; regain 1 Kata on crit. [Enhanced: +4 dmg].',
+          'Kinesics (1 Kata)': 'Bonus action: ignore diff terrain, no opportunity attacks, disadvantage on attacks vs you. Regain 1 Kata if hit >1 time. [Enhanced: +5 ft speed].',
+          'Limber Up (1 Kata)': 'Bonus action: advantage on DEX/STR checks & saves until end of turn. [Enhanced: Reroll results ≤8].',
+          'Rapid Kill (2 Kata)': 'After hit: turn hit into a critical hit. [Enhanced: Triple dmg dice instead of double].',
+          'Way Of The Gun (1 Kata)': 'Hit target ≥20 ft away: make extra attack vs enemy within 5 ft of target. [Enhanced: Trigger target up to 50 ft, bonus target within 15 ft].',
+          'Weak Spot (4 Kata)': 'After hit: +3 dmg to every hit vs that target until dead or 5 mins. [Enhanced: +5 dmg].'
+        }
+      }
+    ]
+  },
+    'Heavy': {
+    desc: 'Devastating heavy-gunner, field control master, and walking firepower.',
+    hitDie: 'd10',
+    primaryStat: 'STR / CON',
+    abilities: [
+      { level: 1, name: 'Artillery Talents', desc: 'Gain 4 Artillery Talents at 1st level, and 1 more at 2nd, 5th, 9th, 13th, 17th, and 20th level. Repeating a talent increases its Tier (max Tier 2 at 1st level).' },
+      { level: 3, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype (or forgo it for an extra Artillery Talent).' },
+      { level: 6, name: 'Too Close', desc: 'If hit by an opportunity attack, make a single melee attack using your weapon as a club (as an action or part of your action).' },
+      { level: 7, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' },
+      { level: 10, name: 'Strongpoint', desc: '1/rest: Gain an additional action on your turn if both this and your normal action are used for Artillery Talents.' },
+      { level: 11, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' },
+      { level: 14, name: 'Strongpoint Upgrade', desc: 'Strongpoint can be used twice per rest. Spend a Hit Die as a bonus action (no healing) to gain an extra use (max 1 extra action/turn).' },
+      { level: 15, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' },
+      { level: 18, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' }
+    ],
+    choiceMenus: [
+      {
+        name: 'Artillery Talents',
+        hint: 'Select talents to customize your heavy weapons. Repeating a talent unlocks higher Tiers.',
+        trackTiers: true,
+        levels: [1, 1, 1, 1, 2, 5, 9, 13, 17, 20],
+        options: {
+          'Attack of Necessity': 'Action (auto/auto-heavy): DEX save vs 10-ft cone (15-ft auto-heavy) for weapon dmg. T2: +5 ft cone. T3: Knock target prone on fail. T4: +5 ft cone.',
+          'Rapid Fire': 'Action (auto/auto-heavy): DEX save vs 10-ft cube (20-ft auto-heavy) in range for weapon dmg (-5 DC at max range). T2: +10 ft cube. T3: Halve target speed. T4: +10 ft cube.',
+          'Easy Target': 'Auto/auto-heavy attacks vs Large+ creatures deal bonus dmg (+2 to +5 auto; +3 to +6 auto-heavy). T2: Bonus +1. T3: Bonus +2. T4: Bonus +3.',
+          'Gaming Avatar': 'Action single autofire attack: beat AC by X to trigger effects (push, disadv, zero speed, lose action). T2: +2 to attack roll for talent. T3: +4 to attack. T4: +6 to attack.',
+          'Imposing Frame': 'Spend 30 ft movement: +1 AC, half-cover to allies within 5 ft, adv vs forced move. T2: 3/4 cover for allies. T3: +2 AC. T4: Costs 20 ft movement.',
+          'Overwatch': 'Spend 30 ft movement (auto/auto-heavy): set 10-ft cube (20-ft auto-heavy) as diff terrain; reaction DEX save for dmg if enemy enters. T2: +10 ft cube. T3: 20 ft cost. T4: +10 ft cube. T5: Double area with action. T6: Sustain for 10 ft move.',
+          'Precision Fire': 'Non-autofire attack: reroll 1s on dmg; max dmg die result gives +1 dmg. T2: Crits roll all dmg dice twice & keep higher. T3: +2 dmg on max die. T4: Roll 1d6 on max die. T5: Reroll 1s & 2s.',
+          'Shrapnel': 'Hit with auto/auto-heavy: 1 target within 5 ft (10 ft auto-heavy) takes DEX/STR mod dmg. T2: +10 ft range. T3: Double damage to second target.',
+          'Sure-Footed': 'Treat heavy weapons as two-handed small arms for movement penalty purposes (does not apply to super heavy weapons).'
+        }
+      }
     ]
   },
   'Medic': {
