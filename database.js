@@ -542,7 +542,8 @@ const CLASS_DATA = {
         }
       }
     ]
-  };
+  },  
+};
 
 const WEAPON_DATA = {
   'M4 Carbine': { type: 'Assault Rifle', damage: '2d6', magSize: 30, range: '80/300', properties: 'Burst, Two-Handed' },
