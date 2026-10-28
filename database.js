@@ -132,14 +132,58 @@ const CLASS_DATA = {
       }
     }
   },
-  'Heavy': {
-    desc: 'Biggest guns. Biggest hits.',
-    hitDie: 'd12',
-    primaryStat: 'STR',
+    'Grounder': {
+    desc: 'Front-line multi-purpose soldier. Firearms master and team backbone.',
+    hitDie: 'd10',
+    primaryStat: 'STR / DEX',
     abilities: [
-      { level: 1, name: 'Heavy Weapon Specialist', desc: 'No disadvantage for firing heavy weapons at close range.' },
-      { level: 2, name: 'Suppressive Barrage', desc: 'Area fire: creatures in a line make DEX save or become pinned.' },
-      { level: 5, name: 'Overkill', desc: 'Extra damage die with heavy firearms and launchers.' }
+      { level: 1, name: 'Fire Support', desc: 'Select a Fire Support discipline (Assault or Precision). Each time you select a discipline, its tier increases. Additional picks at 3rd, 7th, 11th, 15th, and 18th level.' },
+      { level: 1, name: 'Brotherhood', desc: 'Select Brotherhood abilities that reward teamwork. Additional picks at 4th, 8th, 12th, 16th, and 19th level.' },
+      { level: 2, name: 'Take A Knee', desc: 'Spend 30 ft movement to brace and make one ranged attack. Cannot use if an enemy is within reach. Cost drops to 25 ft (5th), 20 ft (13th), 15 ft (17th).' },
+      { level: 3, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype (or forgo it for an extra Fire Support path pick or Brotherhood ability).' },
+      { level: 6, name: 'Double Tap', desc: 'When you take the Attack action, you can attack twice instead of once.' },
+      { level: 7, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' },
+      { level: 9, name: 'Triple Tap', desc: 'Extra Attack improves to three attacks.' },
+      { level: 10, name: 'Meat Shield', desc: 'Reaction or part of your action: grab a killed/incapacitated creature within 5 ft for half-cover until you move. -1 to attacks with two-handed small arms while holding. Cannot use heavy/super heavy or Take A Knee while holding.' },
+      { level: 11, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' },
+      { level: 14, name: 'Quadruple Tap', desc: 'Extra Attack improves to four attacks.' },
+      { level: 15, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' },
+      { level: 18, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' },
+      { level: 20, name: 'All In', desc: 'On a hit, empty a full magazine to double the number of attacks from your Attack action against a single target (1/short or long rest). That weapon is then out of ammo.' }
+    ],
+    choiceMenus: [
+      {
+        name: 'Fire Support Path',
+        hint: 'Pick Assault or Precision each time. Repeat picks raise that path\'s tier.',
+        trackTiers: true,
+        levels: [1, 3, 7, 11, 15, 18],
+        options: {
+          'Assault': 'Autofire path. T1: bonus dmg = margin you beat AC (max 5/10 auto-heavy). T2: after hit, +2/+4 attack for path calc. T3: +4/+8. T4: dmg cap doubles (10/20). T5: +8/+16 attack for path calc.',
+          'Precision': 'Single-shot path. T1: +1 to non-autofire attacks. T2: crits roll dmg dice 3× instead of 2×. T3: bank a natural 20 to replace a miss (1/rest); reroll natural 2–3. T5: advantage on non-autofire firearm attacks.'
+        }
+      },
+      {
+        name: 'Brotherhood',
+        hint: 'Teamwork abilities. Pick one at each unlocked level.',
+        levels: [1, 4, 8, 12, 16, 19],
+        options: {
+          'Action Star': 'On a hit vs a creature ≤20 ft, it has disadvantage on attacks that don\'t include you until you leave range/LOS or don\'t attack it before end of your next turn.',
+          'Cauterize': 'Action: heal an injured ally in reach for 1d6 per your level (1/short or long rest).',
+          'Combat Ineffective': 'If an ally in LOS drops to 0 HP, advantage on attacks vs the creature that hit them until it dies, ally recovers, or long rest.',
+          'Comrades In Arms': 'If an ally within 10 ft suffers a crit, advantage on attacks vs that attacker until end of your next turn.',
+          'Covering Fire': 'Attack action at disadvantage: allies in LOS gain +1 AC and advantage on saves vs those targets until start of your next turn.',
+          'For The Common Honor': 'Reaction: when ally within 5 ft is hit, swap places and take the hit instead.',
+          'Front Line Deployment': 'Bonus action: ally within 10 ft gains +1 AC until start of your next turn.',
+          'Jump In Front': 'Reaction: when you + ≥1 ally are hit by ≤60 ft AoE, push allies out; you are targeted once per ally pushed (1/short or long rest).',
+          'Man Down': 'While sharing space with a dead/prone/unconscious ally, they can\'t be targeted by ranged/melee and auto-pass DEX saves. Ends if you leave, they stand, or they attack.',
+          'Member Of A Team': 'Spend 30 ft movement: ally within 5 ft can Disengage for free on their next turn.',
+          'Slow Is Smooth': 'Reduce your speed by 10 ft to pull an ally within 5 ft with you. If you Disengage, they also disengage.',
+          'Snap Out Of It': 'Action: remove charmed, frightened, stunned, or unconscious (not dying) from an ally in reach (1/short or long rest).',
+          'Solid Frame': 'While wielding a two-handed small arm, ignore the -2 penalty to firing while moving.',
+          'Spotter': 'Action: mark an enemy in LOS; one ally within 5 ft of you has advantage on their next attack vs it before end of their next turn.',
+          'Toss Magazine': 'Spend 30 ft movement to reload an ally\'s weapon within 10 ft (you need the proper ammo).'
+        }
+      }
     ]
   },
   'Infiltrator': {
