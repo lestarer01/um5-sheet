@@ -499,7 +499,6 @@ function renderAbilities() {
         let optsHtml = '<option value="">-- Select --</option>';
         let selectedDesc = '';
 
-        // Iterate over the options array from database
         menu.options.forEach(opt => {
           const maxPicks = opt.maxPicks || (opt.tiers ? opt.tiers.length : 1);
           let otherPicks = 0;
