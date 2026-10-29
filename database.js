@@ -1,3 +1,17 @@
+const BACKGROUND_DATA = [
+  'Affluent',
+  'Bruiser',
+  'Delinquent',
+  'Disciple',
+  'Drifter',
+  'Intellectual',
+  'Laborer',
+  'Prodigy',
+  'Recluse',
+  'Regular Joe',
+  'Smooth Talker'
+];
+
 const LADDER_DATA = {
     'Born Leader': {
     desc: 'Confidence, presence, and tactical command. (Key: CHA, INT)',
