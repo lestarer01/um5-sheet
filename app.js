@@ -456,102 +456,125 @@ function renderAbilities() {
     });
   }
 
-    if (cls && $('class-box')) {
-    const list = cls.abilities.filter(a => a.level <= lvl);
-    let html = `<p style="font-size:0.8rem;color:var(--accent2);margin-bottom:10px;">${cls.desc} · Hit Die ${cls.hitDie}</p>`;
-    
-    // Render fixed abilities
-    html += list.map(a => `<div class="ability-entry"><div class="ability-entry-header"><span>${a.name}</span><span class="ability-entry-level">Lvl ${a.level}</span></div><div class="ability-entry-desc">${a.desc}</div></div>`).join('');
+        if (cls && $('class-box')) {
+      const list = cls.abilities.filter(a => a.level <= lvl);
+      let html = `<p style="font-size:0.8rem;color:var(--accent2);margin-bottom:10px;">${cls.desc} · Hit Die ${cls.hitDie}</p>`;
 
-    // Render Choice Menu (e.g., Protagonist Traits)
-        // Normalize to an array of choice menus (supports Face single + Grounder multi)
-    const menus = cls.choiceMenus ? cls.choiceMenus
-      : (cls.choiceMenu ? [cls.choiceMenu] : []);
+      // Normalize choice menus
+      const menus = cls.choiceMenus ? cls.choiceMenus
+        : (cls.choiceMenu ? [cls.choiceMenu] : []);
 
-    if (!c.classChoices) c.classChoices = {};
-    if (!c.classChoices[val('c-class')]) c.classChoices[val('c-class')] = {};
+      if (!c.classChoices) c.classChoices = {};
+      if (!c.classChoices[val('c-class')]) c.classChoices[val('c-class')] = {};
 
-        menus.forEach((menu, menuIdx) => {
-      const key = menu.name;
-      if (!Array.isArray(c.classChoices[val('c-class')][key])) {
-        c.classChoices[val('c-class')][key] = [];
-      }
-      const unlockedCount = menu.levels.filter(l => l <= lvl).length;
-      if (unlockedCount <= 0) return;
+      // Helper function to render a single choice menu block
+      const renderMenuBlock = (menu) => {
+        const key = menu.name;
+        if (!Array.isArray(c.classChoices[val('c-class')][key])) {
+          c.classChoices[val('c-class')][key] = [];
+        }
+        const unlockedCount = menu.levels.filter(l => l <= lvl).length;
+        if (unlockedCount <= 0) return '';
 
-      // Tier summary for paths that allow duplicates (e.g. Fire Support)
-      let tierSummary = '';
-      if (menu.trackTiers) {
-        const counts = {};
-        c.classChoices[val('c-class')][key].forEach(v => { if (v) counts[v] = (counts[v] || 0) + 1; });
-        const parts = Object.keys(counts).map(k => `${k} Tier ${counts[k]}`);
-        if (parts.length) tierSummary = `<div style="font-size:0.75rem;color:var(--accent);margin-bottom:6px;">Current: ${parts.join(' · ')}</div>`;
-      }
-
-      html += `<div class="ability-entry" style="border-left-color: var(--accent2);">
-        <div class="ability-entry-header"><span style="color:var(--accent2);">${menu.name}</span></div>
-        <div class="ability-entry-desc" style="margin-bottom:6px;">${menu.hint || `Select ${unlockedCount} option(s) based on your level.`}</div>
-        ${tierSummary}`;
-
-      for (let i = 0; i < unlockedCount; i++) {
-        const selected = c.classChoices[val('c-class')][key][i] || '';
-        const opts = ['<option value="">-- Select --</option>']
-          .concat(Object.keys(menu.options).map(k =>
-            `<option value="${k}" ${k === selected ? 'selected' : ''}>${k}</option>`
-          )).join('');
-
-        // --- TIER-AWARE DESCRIPTION LOGIC ---
-        let descHtml = '';
-        if (selected && menu.options[selected]) {
-          const optionData = menu.options[selected];
-          if (Array.isArray(optionData)) {
-            // Tiered option: count how many times this option has been picked
-            // up to and including slot index i
-            let tierCount = 0;
-            for (let j = 0; j <= i; j++) {
-              if (c.classChoices[val('c-class')][key][j] === selected) tierCount++;
-            }
-            // Show only the tier description for this pick's tier (1-indexed)
-            const tierIndex = tierCount - 1;
-            if (tierIndex >= 0 && tierIndex < optionData.length) {
-              descHtml = `<div style="font-size:0.75rem;color:var(--text);margin-top:4px;padding:6px;background:rgba(0,0,0,0.3);border-radius:4px;">
-                <span style="color:var(--accent);font-weight:700;">Tier ${tierCount}:</span> ${optionData[tierIndex]}
-              </div>`;
-            }
-          } else {
-            // Non-tiered option: show full description as before
-            descHtml = `<div style="font-size:0.75rem;color:var(--text);margin-top:4px;padding:6px;background:rgba(0,0,0,0.3);border-radius:4px;">${optionData}</div>`;
-          }
+        // Tier summary for paths that allow duplicates
+        let tierSummary = '';
+        if (menu.trackTiers) {
+          const counts = {};
+          c.classChoices[val('c-class')][key].forEach(v => { if (v) counts[v] = (counts[v] || 0) + 1; });
+          const parts = Object.keys(counts).map(k => `${k} Tier ${counts[k]}`);
+          if (parts.length) tierSummary = `<div style="font-size:0.75rem;color:var(--accent);margin-bottom:6px;">Current: ${parts.join(' · ')}</div>`;
         }
 
-        html += `<div class="field-group" style="margin-bottom:8px;">
-          <label style="font-size:0.65rem;color:var(--muted);">Pick at level ${menu.levels[i] || '?'}</label>
-          <select class="class-choice-select" data-menu="${key}" data-idx="${i}" style="background:var(--bg);">${opts}</select>
-          ${descHtml}
-        </div>`;
-      }
-      html += `</div>`;
-    });
+        let menuHtml = `<div class="ability-entry" style="border-left-color: var(--accent2);">
+          <div class="ability-entry-header"><span style="color:var(--accent2);">${menu.name}</span></div>
+          <div class="ability-entry-desc" style="margin-bottom:6px;">${menu.hint || `Select ${unlockedCount} option(s) based on your level.`}</div>
+          ${tierSummary}`;
 
-    $('class-box').innerHTML = html;
+        for (let i = 0; i < unlockedCount; i++) {
+          const selected = c.classChoices[val('c-class')][key][i] || '';
+          const opts = ['<option value="">-- Select --</option>']
+            .concat(Object.keys(menu.options).map(k =>
+              `<option value="${k}" ${k === selected ? 'selected' : ''}>${k}</option>`
+            )).join('');
 
-    $('class-box').querySelectorAll('.class-choice-select').forEach(sel => {
-      sel.addEventListener('change', (e) => {
-        const menuKey = e.target.dataset.menu;
-        const idx = parseInt(e.target.dataset.idx, 10);
-        const char = chars.find(x => x.id === activeId);
-        const className = val('c-class');
-        if (char && char.classChoices && char.classChoices[className]) {
-          if (!Array.isArray(char.classChoices[className][menuKey])) {
-            char.classChoices[className][menuKey] = [];
+          // Tier-aware description
+          let descHtml = '';
+          if (selected && menu.options[selected]) {
+            const optionData = menu.options[selected];
+            if (Array.isArray(optionData)) {
+              let tierCount = 0;
+              for (let j = 0; j <= i; j++) {
+                if (c.classChoices[val('c-class')][key][j] === selected) tierCount++;
+              }
+              const tierIndex = tierCount - 1;
+              if (tierIndex >= 0 && tierIndex < optionData.length) {
+                descHtml = `<div style="font-size:0.75rem;color:var(--text);margin-top:4px;padding:6px;background:rgba(0,0,0,0.3);border-radius:4px;">
+                  <span style="color:var(--accent);font-weight:700;">Tier ${tierCount}:</span> ${optionData[tierIndex]}
+                </div>`;
+              }
+            } else {
+              descHtml = `<div style="font-size:0.75rem;color:var(--text);margin-top:4px;padding:6px;background:rgba(0,0,0,0.3);border-radius:4px;">${optionData}</div>`;
+            }
           }
-          char.classChoices[className][menuKey][idx] = e.target.value;
-          saveStorage();
-          renderAbilities();
+
+          menuHtml += `<div class="field-group" style="margin-bottom:8px;">
+            <label style="font-size:0.65rem;color:var(--muted);">Pick at level ${menu.levels[i] || '?'}</label>
+            <select class="class-choice-select" data-menu="${key}" data-idx="${i}" style="background:var(--bg);">${opts}</select>
+            ${descHtml}
+          </div>`;
+        }
+        menuHtml += `</div>`;
+        return menuHtml;
+      };
+
+      // Track which menus have been rendered (so we only render each once at its FIRST unlock level)
+      const renderedMenus = new Set();
+
+      // Interleave fixed abilities with choice menus by level order
+      list.forEach(a => {
+        html += `<div class="ability-entry"><div class="ability-entry-header"><span>${a.name}</span><span class="ability-entry-level">Lvl ${a.level}</span></div><div class="ability-entry-desc">${a.desc}</div></div>`;
+
+        // After rendering this ability, check if any choice menu's FIRST unlock level matches this ability's level
+        menus.forEach(menu => {
+          if (renderedMenus.has(menu.name)) return;
+          const firstUnlock = menu.levels[0];
+          if (firstUnlock === a.level) {
+            html += renderMenuBlock(menu);
+            renderedMenus.add(menu.name);
+          }
+        });
+      });
+
+      // Fallback: render any choice menus that weren't matched to a level (safety net)
+      menus.forEach(menu => {
+        if (!renderedMenus.has(menu.name)) {
+          const block = renderMenuBlock(menu);
+          if (block) {
+            html += block;
+            renderedMenus.add(menu.name);
+          }
         }
       });
-    });
-  }
+
+      $('class-box').innerHTML = html;
+
+      $('class-box').querySelectorAll('.class-choice-select').forEach(sel => {
+        sel.addEventListener('change', (e) => {
+          const menuKey = e.target.dataset.menu;
+          const idx = parseInt(e.target.dataset.idx, 10);
+          const char = chars.find(x => x.id === activeId);
+          const className = val('c-class');
+          if (char && char.classChoices && char.classChoices[className]) {
+            if (!Array.isArray(char.classChoices[className][menuKey])) {
+              char.classChoices[className][menuKey] = [];
+            }
+            char.classChoices[className][menuKey][idx] = e.target.value;
+            saveStorage();
+            renderAbilities();
+          }
+        });
+      });
+    }
 }
 
 function switchTab(id) {
