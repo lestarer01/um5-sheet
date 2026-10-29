@@ -679,6 +679,35 @@ const WEAPON_DATA = {
   'Stun Baton': { type: 'Melee', damage: '1d6', magSize: 0, range: '5', properties: 'Shock, Nonlethal' }
 };
 
+const ARCHETYPE_DATA = [
+  'Anti-Anti-hero',
+  'Authority',
+  'Banner Head',
+  'Brawler',
+  'Brother of Blood',
+  'Cleaner',
+  'Country Gunman',
+  'Diplomat',
+  'Driver',
+  'Field Machinist',
+  'Field Medic',
+  'Grandmaster',
+  'Gun Dancer',
+  'Infantry Support Specialist',
+  'Machine of War',
+  'Man-at-Arms',
+  'Mecha Pilot',
+  'Militarist',
+  'Pathfinder',
+  'Pistolero',
+  'Recon Intelligence',
+  'Ring Fighter',
+  'Sapper',
+  'Selfless Protector',
+  'Skirmisher',
+  'Suave'
+];
+
 const ARMOR_DATA = {
   // --- TL2 ARMOUR ---
   // Light Armour
