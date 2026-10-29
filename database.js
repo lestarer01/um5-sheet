@@ -165,7 +165,7 @@ const CLASS_DATA = {
             "Tier 2: after hit, +2/+4 attack for path calc.",
             "Tier 3:  +4/+8. T4: dmg cap doubles (10/20). T5: +8/+16 attack for path calc."
           ]
-        },
+        }
         {
           name: "Precision",
           tiers: [
