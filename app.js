@@ -456,14 +456,15 @@ function renderAbilities() {
     });
   }
 
-  if (cls && $('class-box')) {
+    if (cls && $('class-box')) {
     const list = cls.abilities.filter(a => a.level <= lvl);
     let html = `<p style="font-size:0.8rem;color:var(--accent2);margin-bottom:10px;">${cls.desc} · Hit Die ${cls.hitDie}</p>`;
     
     // Render fixed abilities
     html += list.map(a => `<div class="ability-entry"><div class="ability-entry-header"><span>${a.name}</span><span class="ability-entry-level">Lvl ${a.level}</span></div><div class="ability-entry-desc">${a.desc}</div></div>`).join('');
 
-    // Normalize to an array of choice menus
+    // Render Choice Menu (e.g., Protagonist Traits)
+        // Normalize to an array of choice menus (supports Face single + Grounder multi)
     const menus = cls.choiceMenus ? cls.choiceMenus
       : (cls.choiceMenu ? [cls.choiceMenu] : []);
 
@@ -475,15 +476,14 @@ function renderAbilities() {
       if (!Array.isArray(c.classChoices[val('c-class')][key])) {
         c.classChoices[val('c-class')][key] = [];
       }
-      const choicesArr = c.classChoices[val('c-class')][key];
       const unlockedCount = menu.levels.filter(l => l <= lvl).length;
       if (unlockedCount <= 0) return;
 
-      // Tier summary for paths that allow duplicates
+      // Tier summary for paths that allow duplicates (e.g. Fire Support)
       let tierSummary = '';
       if (menu.trackTiers) {
         const counts = {};
-        choicesArr.forEach(v => { if (v) counts[v] = (counts[v] || 0) + 1; });
+        c.classChoices[val('c-class')][key].forEach(v => { if (v) counts[v] = (counts[v] || 0) + 1; });
         const parts = Object.keys(counts).map(k => `${k} Tier ${counts[k]}`);
         if (parts.length) tierSummary = `<div style="font-size:0.75rem;color:var(--accent);margin-bottom:6px;">Current: ${parts.join(' · ')}</div>`;
       }
@@ -494,45 +494,17 @@ function renderAbilities() {
         ${tierSummary}`;
 
       for (let i = 0; i < unlockedCount; i++) {
-        const selected = choicesArr[i] || '';
-        
-        let optsHtml = '<option value="">-- Select --</option>';
-        let selectedDesc = '';
-
-        menu.options.forEach(opt => {
-          const maxPicks = opt.maxPicks || (opt.tiers ? opt.tiers.length : 1);
-          let otherPicks = 0;
-          
-          choicesArr.forEach((ch, chIdx) => {
-            if (chIdx !== i && ch === opt.name) otherPicks++;
-          });
-
-          // Show if it's already selected here, OR hasn't reached its pick limit
-          if (opt.name === selected || otherPicks < maxPicks) {
-            const isSel = opt.name === selected ? 'selected' : '';
-            optsHtml += `<option value="${opt.name}" ${isSel}>${opt.name}</option>`;
-          }
-
-          // Gather description for currently selected
-          if (opt.name === selected) {
-            let tierNum = 0;
-            for (let k = 0; k <= i; k++) {
-              if (choicesArr[k] === selected) tierNum++;
-            }
-            if (opt.tiers && opt.tiers.length > 0) {
-              const safeTier = Math.min(tierNum - 1, opt.tiers.length - 1);
-              selectedDesc = Math.max(0, safeTier) >= 0 ? opt.tiers[safeTier] : opt.tiers[0];
-            } else {
-              selectedDesc = opt.desc || '';
-            }
-          }
-        });
+        const selected = c.classChoices[val('c-class')][key][i] || '';
+        const opts = ['<option value="">-- Select --</option>']
+          .concat(Object.keys(menu.options).map(k =>
+            `<option value="${k}" ${k === selected ? 'selected' : ''}>${k}</option>`
+          )).join('');
 
         html += `<div class="field-group" style="margin-bottom:8px;">
           <label style="font-size:0.65rem;color:var(--muted);">Pick at level ${menu.levels[i] || '?'}</label>
-          <select class="class-choice-select" data-menu="${key}" data-idx="${i}" style="background:var(--bg);">${optsHtml}</select>
-          ${selectedDesc
-            ? `<div style="font-size:0.75rem;color:var(--text);margin-top:4px;padding:6px;background:rgba(0,0,0,0.3);border-radius:4px;">${selectedDesc}</div>`
+          <select class="class-choice-select" data-menu="${key}" data-idx="${i}" style="background:var(--bg);">${opts}</select>
+          ${selected && menu.options[selected]
+            ? `<div style="font-size:0.75rem;color:var(--text);margin-top:4px;padding:6px;background:rgba(0,0,0,0.3);border-radius:4px;">${menu.options[selected]}</div>`
             : ''}
         </div>`;
       }
