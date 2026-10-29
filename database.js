@@ -154,50 +154,26 @@ const CLASS_DATA = {
   choiceMenus: [
     {
       name: "Fire Support Path",
-      levelReqs: [1, 3, 5, 9, 11, 13, 17],
+      levelReqs: [1, 3, 5, 7, 11, 15, 18],
       trackTiers: true,
-      levels: [1, 3, 5, 9, 11, 13, 17],
+      levels: [1, 3, 5, 7, 11, 15, 18],
       options: [
         {
-          name: "Support Specialty: Explosive",
+          name: "Assault",
           tiers: [
-            "Tier 1: Splash damage from your explosive weapons increases by your Wisdom modifier (min +1).",
-            "Tier 2: Range of explosive area attacks increases by 5 feet.",
-            "Tier 3: Targets failing saving throws against your explosives are knocked prone."
+            "Tier 1: bonus dmg = margin you beat AC (max 5/10 auto-heavy).",
+            "Tier 2: after hit, +2/+4 attack for path calc.",
+            "Tier 3:  +4/+8. T4: dmg cap doubles (10/20). T5: +8/+16 attack for path calc."
           ]
         },
         {
-          name: "Support Specialty: Heavy",
+          name: "Precision",
           tiers: [
-            "Tier 1: Heavy weapon attacks gain +1 bonus to attack rolls.",
-            "Tier 2: Reloading heavy weapons requires only a bonus action instead of an action.",
-            "Tier 3: Critical hits with heavy weapons deal extra damage equal to your Grounder level."
+            "Tier 1: +1 to non-autofire attacks.",
+            "Tier 2: crits roll dmg dice 3× instead of 2×.,
+            "Tier 3: advantage on non-autofire firearm attacks."
           ]
         },
-        {
-          name: "Support Specialty: Precision",
-          tiers: [
-            "Tier 1: Ranged attacks ignore half cover.",
-            "Tier 2: Ranged attacks ignore three-quarters cover.",
-            "Tier 3: Ranged critical hit threshold reduces by 1 (e.g. 19-20)."
-          ]
-        },
-        {
-          name: "Support Specialty: Suppression",
-          tiers: [
-            "Tier 1: Suppressing fire imposes disadvantage on target's next attack roll.",
-            "Tier 2: Suppressed targets have their movement speed reduced by half.",
-            "Tier 3: Suppressed targets cannot take reactions until the start of your next turn."
-          ]
-        },
-        {
-          name: "Support Specialty: Tactical",
-          tiers: [
-            "Tier 1: As a bonus action, grant an ally within 30ft +2 bonus to AC until your next turn.",
-            "Tier 2: Directed ally can also move up to half their speed as a reaction.",
-            "Tier 3: Directed ally gains advantage on their next attack roll."
-          ]
-        }
       ]
     },
     {
