@@ -79,6 +79,10 @@ function populateSelects() {
     $('c-arch').innerHTML = '<option value="">-- Select Archetype --</option>' +
       ARCHETYPE_DATA.map(a => `<option value="${a}">${a}</option>`).join('');
   }
+  if (typeof BACKGROUND_DATA !== 'undefined' && $('c-background')) {
+    $('c-background').innerHTML = '<option value="">-- Select Background --</option>' +
+      BACKGROUND_DATA.map(b => `<option value="${b}">${b}</option>`).join('');
+  }
 }
 
 function populateArmorPresets(filterType) {
