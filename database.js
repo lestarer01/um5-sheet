@@ -175,7 +175,7 @@ const CLASS_DATA = {
           ]
         },
       ]
-    }
+    },
   [
     { 
     name: 'Brotherhood', 
