@@ -471,7 +471,7 @@ function renderAbilities() {
     if (!c.classChoices) c.classChoices = {};
     if (!c.classChoices[val('c-class')]) c.classChoices[val('c-class')] = {};
 
-    menus.forEach((menu, menuIdx) => {
+        menus.forEach((menu, menuIdx) => {
       const key = menu.name;
       if (!Array.isArray(c.classChoices[val('c-class')][key])) {
         c.classChoices[val('c-class')][key] = [];
@@ -500,12 +500,34 @@ function renderAbilities() {
             `<option value="${k}" ${k === selected ? 'selected' : ''}>${k}</option>`
           )).join('');
 
+        // --- TIER-AWARE DESCRIPTION LOGIC ---
+        let descHtml = '';
+        if (selected && menu.options[selected]) {
+          const optionData = menu.options[selected];
+          if (Array.isArray(optionData)) {
+            // Tiered option: count how many times this option has been picked
+            // up to and including slot index i
+            let tierCount = 0;
+            for (let j = 0; j <= i; j++) {
+              if (c.classChoices[val('c-class')][key][j] === selected) tierCount++;
+            }
+            // Show only the tier description for this pick's tier (1-indexed)
+            const tierIndex = tierCount - 1;
+            if (tierIndex >= 0 && tierIndex < optionData.length) {
+              descHtml = `<div style="font-size:0.75rem;color:var(--text);margin-top:4px;padding:6px;background:rgba(0,0,0,0.3);border-radius:4px;">
+                <span style="color:var(--accent);font-weight:700;">Tier ${tierCount}:</span> ${optionData[tierIndex]}
+              </div>`;
+            }
+          } else {
+            // Non-tiered option: show full description as before
+            descHtml = `<div style="font-size:0.75rem;color:var(--text);margin-top:4px;padding:6px;background:rgba(0,0,0,0.3);border-radius:4px;">${optionData}</div>`;
+          }
+        }
+
         html += `<div class="field-group" style="margin-bottom:8px;">
           <label style="font-size:0.65rem;color:var(--muted);">Pick at level ${menu.levels[i] || '?'}</label>
           <select class="class-choice-select" data-menu="${key}" data-idx="${i}" style="background:var(--bg);">${opts}</select>
-          ${selected && menu.options[selected]
-            ? `<div style="font-size:0.75rem;color:var(--text);margin-top:4px;padding:6px;background:rgba(0,0,0,0.3);border-radius:4px;">${menu.options[selected]}</div>`
-            : ''}
+          ${descHtml}
         </div>`;
       }
       html += `</div>`;
