@@ -115,7 +115,7 @@ const CLASS_DATA = {
     ],
     choiceMenu: {
       name: 'Protagonist Traits',
-      levels: [1, 1, 5, 10, 15, 20], // You get two at level 1, then one at 5, 10, 15, 20.
+      levels: [1, 1, 5, 10, 15, 20],
       options: {
         'Biting Taunt': 'Action: Target makes CHA save or has disadvantage on attack rolls and ability checks until the beginning of your next turn. (If pass, immune for 24 hrs).',
         'Cognitive Empathy': 'Action: Target within 30ft (INT 4+) makes CHA save. Fail: you learn surface thoughts, likely actions, and emotional state until end of your next turn. (1/target/long rest).',
@@ -158,8 +158,20 @@ const CLASS_DATA = {
         trackTiers: true,
         levels: [1, 3, 7, 11, 15, 18],
         options: {
-          'Assault': 'Autofire path. T1: bonus dmg = margin you beat AC (max 5/10 auto-heavy). T2: after hit, +2/+4 attack for path calc. T3: +4/+8. T4: dmg cap doubles (10/20). T5: +8/+16 attack for path calc.',
-          'Precision': 'Single-shot path. T1: +1 to non-autofire attacks. T2: crits roll dmg dice 3× instead of 2×. T3: bank a natural 20 to replace a miss (1/rest); reroll natural 2–3. T5: advantage on non-autofire firearm attacks.'
+          'Assault': [
+            'T1: Bonus dmg = margin you beat AC (max 5; max 10 for auto-heavy).',
+            'T2: After hit, +2 to attack roll for path calc (+4 for auto-heavy).',
+            'T3: After hit, +4 to attack roll for path calc (+8 for auto-heavy).',
+            'T4: Damage cap doubles (max 10; max 20 for auto-heavy).',
+            'T5: After hit, +8 to attack roll for path calc (+16 for auto-heavy).'
+          ],
+          'Precision': [
+            'T1: +1 to non-autofire attack rolls.',
+            'T2: Crits roll damage dice 3× instead of 2×.',
+            'T3: Bank a natural 20 to replace a miss (1/rest); reroll natural 2–3.',
+            'T4: Reroll natural 2–5 on non-autofire attacks.',
+            'T5: Advantage on all non-autofire firearm attacks.'
+          ]
         }
       },
       {
@@ -215,21 +227,61 @@ const CLASS_DATA = {
       {
         name: 'Kata Exploits',
         hint: 'Select exploits fueled by Kata points. Pick a second time at L10+ to unlock the Enhanced version.',
+        trackTiers: true,
         levels: [1, 1, 2, 4, 8, 12, 16, 19],
         options: {
-          'Abnormally Fast (1 Kata)': 'Double speed until next turn; if hit before next turn, regain 1 Kata. [Enhanced: +10 ft speed].',
-          'Between The Knees (1 Kata)': 'Advantage on ranged attack; double ability mod on hit. If both miss, regain 1 Kata. [Enhanced: Triple ability mod dmg].',
-          'Blood In The Eyes (1 Kata)': 'Reaction when enemy crits you: make ranged attack. Auto-crit if hit; regain 1 Kata if miss by 5+. [Enhanced: Regain 1 Kata on any miss].',
-          'Boundary Threshold (1 Kata)': 'Within 5 ft of ≥2 enemies: spend 30 ft movement for 1 ranged attack. [Enhanced: 15 ft cost, attack between movement].',
-          'Classic Tumble (1 Kata)': 'Reaction on hit or failed DEX save: take 1/4 damage. [Enhanced: Take 0 damage].',
-          'Equilibrium (1 Kata)': 'Reaction when enemy misses ranged attack vs you: make ranged attack; regain 1 Kata on crit. [Enhanced: Gain advantage].',
-          'Hydrostatic Shot (1 Kata)': 'After hit: +2d6 dmg. If target moves/attacks, knock prone as reaction. [Enhanced: +3d6 dmg].',
-          'Just One Bullet (1 Kata)': 'Spend before attack action: +2 dmg to all attacks this turn; regain 1 Kata on crit. [Enhanced: +4 dmg].',
-          'Kinesics (1 Kata)': 'Bonus action: ignore diff terrain, no opportunity attacks, disadvantage on attacks vs you. Regain 1 Kata if hit >1 time. [Enhanced: +5 ft speed].',
-          'Limber Up (1 Kata)': 'Bonus action: advantage on DEX/STR checks & saves until end of turn. [Enhanced: Reroll results ≤8].',
-          'Rapid Kill (2 Kata)': 'After hit: turn hit into a critical hit. [Enhanced: Triple dmg dice instead of double].',
-          'Way Of The Gun (1 Kata)': 'Hit target ≥20 ft away: make extra attack vs enemy within 5 ft of target. [Enhanced: Trigger target up to 50 ft, bonus target within 15 ft].',
-          'Weak Spot (4 Kata)': 'After hit: +3 dmg to every hit vs that target until dead or 5 mins. [Enhanced: +5 dmg].'
+          'Abnormally Fast (1 Kata)': [
+            'Double speed until next turn; if hit before next turn, regain 1 Kata.',
+            'ENHANCED: Also gain +10 ft speed.'
+          ],
+          'Between The Knees (1 Kata)': [
+            'Advantage on ranged attack; double ability mod on hit. If both miss, regain 1 Kata.',
+            'ENHANCED: Triple ability mod damage on hit.'
+          ],
+          'Blood In The Eyes (1 Kata)': [
+            'Reaction when enemy crits you: make ranged attack. Auto-crit if hit; regain 1 Kata if miss by 5+.',
+            'ENHANCED: Regain 1 Kata on any miss.'
+          ],
+          'Boundary Threshold (1 Kata)': [
+            'Within 5 ft of ≥2 enemies: spend 30 ft movement for 1 ranged attack.',
+            'ENHANCED: Costs only 15 ft; can attack between movement.'
+          ],
+          'Classic Tumble (1 Kata)': [
+            'Reaction on hit or failed DEX save: take 1/4 damage.',
+            'ENHANCED: Take 0 damage instead.'
+          ],
+          'Equilibrium (1 Kata)': [
+            'Reaction when enemy misses ranged attack vs you: make ranged attack; regain 1 Kata on crit.',
+            'ENHANCED: Gain advantage on this attack.'
+          ],
+          'Hydrostatic Shot (1 Kata)': [
+            'After hit: +2d6 dmg. If target moves/attacks, knock prone as reaction.',
+            'ENHANCED: +3d6 dmg instead.'
+          ],
+          'Just One Bullet (1 Kata)': [
+            'Spend before attack action: +2 dmg to all attacks this turn; regain 1 Kata on crit.',
+            'ENHANCED: +4 dmg instead.'
+          ],
+          'Kinesics (1 Kata)': [
+            'Bonus action: ignore diff terrain, no opportunity attacks, disadvantage on attacks vs you. Regain 1 Kata if hit >1 time.',
+            'ENHANCED: Also gain +5 ft speed.'
+          ],
+          'Limber Up (1 Kata)': [
+            'Bonus action: advantage on DEX/STR checks & saves until end of turn.',
+            'ENHANCED: Also reroll results ≤8.'
+          ],
+          'Rapid Kill (2 Kata)': [
+            'After hit: turn hit into a critical hit.',
+            'ENHANCED: Triple damage dice instead of double.'
+          ],
+          'Way Of The Gun (1 Kata)': [
+            'Hit target ≥20 ft away: make extra attack vs enemy within 5 ft of target.',
+            'ENHANCED: Trigger on target up to 50 ft; bonus target within 15 ft.'
+          ],
+          'Weak Spot (4 Kata)': [
+            'After hit: +3 dmg to every hit vs that target until dead or 5 mins.',
+            'ENHANCED: +5 dmg instead.'
+          ]
         }
       }
     ]
@@ -239,7 +291,7 @@ const CLASS_DATA = {
     hitDie: 'd10',
     primaryStat: 'STR / CON',
     abilities: [
-      { level: 1, name: 'Artillery Talents', desc: 'Gain 4 Artillery Talents at 1st level, and 1 more at 2nd, 5th, 9th, 13th, 17th, and 20th level. Repeating a talent increases its Tier (max Tier 2 at 1st level).' },
+      { level: 1, name: 'Artillery Talents', desc: 'Gain 4 Artillery Talents at 1st level, and 1 more at 2nd, 5th, 9th, 13th, 17th, and 20th level. Repeating a talent increases its tier.' },
       { level: 3, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype (or forgo it for an extra Artillery Talent).' },
       { level: 6, name: 'Too Close', desc: 'If hit by an opportunity attack, make a single melee attack using your weapon as a club (as an action or part of your action).' },
       { level: 7, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' },
@@ -256,14 +308,56 @@ const CLASS_DATA = {
         trackTiers: true,
         levels: [1, 1, 1, 1, 2, 5, 9, 13, 17, 20],
         options: {
-          'Attack of Necessity': 'Action (auto/auto-heavy): DEX save vs 10-ft cone (15-ft auto-heavy) for weapon dmg. T2: +5 ft cone. T3: Knock target prone on fail. T4: +5 ft cone.',
-          'Rapid Fire': 'Action (auto/auto-heavy): DEX save vs 10-ft cube (20-ft auto-heavy) in range for weapon dmg (-5 DC at max range). T2: +10 ft cube. T3: Halve target speed. T4: +10 ft cube.',
-          'Easy Target': 'Auto/auto-heavy attacks vs Large+ creatures deal bonus dmg (+2 to +5 auto; +3 to +6 auto-heavy). T2: Bonus +1. T3: Bonus +2. T4: Bonus +3.',
-          'Gaming Avatar': 'Action single autofire attack: beat AC by X to trigger effects (push, disadv, zero speed, lose action). T2: +2 to attack roll for talent. T3: +4 to attack. T4: +6 to attack.',
-          'Imposing Frame': 'Spend 30 ft movement: +1 AC, half-cover to allies within 5 ft, adv vs forced move. T2: 3/4 cover for allies. T3: +2 AC. T4: Costs 20 ft movement.',
-          'Overwatch': 'Spend 30 ft movement (auto/auto-heavy): set 10-ft cube (20-ft auto-heavy) as diff terrain; reaction DEX save for dmg if enemy enters. T2: +10 ft cube. T3: 20 ft cost. T4: +10 ft cube. T5: Double area with action. T6: Sustain for 10 ft move.',
-          'Precision Fire': 'Non-autofire attack: reroll 1s on dmg; max dmg die result gives +1 dmg. T2: Crits roll all dmg dice twice & keep higher. T3: +2 dmg on max die. T4: Roll 1d6 on max die. T5: Reroll 1s & 2s.',
-          'Shrapnel': 'Hit with auto/auto-heavy: 1 target within 5 ft (10 ft auto-heavy) takes DEX/STR mod dmg. T2: +10 ft range. T3: Double damage to second target.',
+          'Attack of Necessity': [
+            'T1: Action (auto/auto-heavy): DEX save vs 10-ft cone (15-ft auto-heavy) for weapon dmg.',
+            'T2: Cone size increases by +5 ft.',
+            'T3: Knock target prone on failed save.',
+            'T4: Cone size increases by another +5 ft.'
+          ],
+          'Rapid Fire': [
+            'T1: Action (auto/auto-heavy): DEX save vs 10-ft cube (20-ft auto-heavy) in range for weapon dmg (-5 DC at max range).',
+            'T2: Cube size increases by +10 ft.',
+            'T3: Halve affected target\'s speed on failed save.',
+            'T4: Cube size increases by another +10 ft.'
+          ],
+          'Easy Target': [
+            'T1: Auto/auto-heavy attacks vs Large+ creatures deal +2 bonus dmg (+3 auto-heavy).',
+            'T2: Bonus increases by +1.',
+            'T3: Bonus increases by another +1.',
+            'T4: Bonus increases by another +1.'
+          ],
+          'Gaming Avatar': [
+            'T1: Action single autofire attack: beat AC by X to trigger effects (push, disadv, zero speed, lose action).',
+            'T2: +2 to attack roll for talent calculation.',
+            'T3: +4 to attack roll for talent calculation.',
+            'T4: +6 to attack roll for talent calculation.'
+          ],
+          'Imposing Frame': [
+            'T1: Spend 30 ft movement: +1 AC, half-cover to allies within 5 ft, adv vs forced move.',
+            'T2: Allies gain 3/4 cover instead of half cover.',
+            'T3: Your AC bonus increases to +2.',
+            'T4: Movement cost reduces to 20 ft.'
+          ],
+          'Overwatch': [
+            'T1: Spend 30 ft movement (auto/auto-heavy): set 10-ft cube (20-ft auto-heavy) as diff terrain; reaction DEX save for dmg if enemy enters.',
+            'T2: Cube size increases by +10 ft.',
+            'T3: Movement cost reduces to 20 ft.',
+            'T4: Cube size increases by another +10 ft.',
+            'T5: Spend action to double the area.',
+            'T6: Sustain zone by spending only 10 ft of movement.'
+          ],
+          'Precision Fire': [
+            'T1: Non-autofire attack: reroll 1s on dmg; max dmg die result gives +1 dmg.',
+            'T2: Crits roll all damage dice twice and keep the higher result.',
+            'T3: Max die bonus increases to +2 dmg.',
+            'T4: Roll 1d6 extra damage on a max die result.',
+            'T5: Reroll 1s and 2s on damage dice.'
+          ],
+          'Shrapnel': [
+            'T1: Hit with auto/auto-heavy: 1 target within 5 ft (10 ft auto-heavy) takes DEX/STR mod dmg.',
+            'T2: Shrapnel range increases by +10 ft.',
+            'T3: Double damage to secondary target.'
+          ],
           'Sure-Footed': 'Treat heavy weapons as two-handed small arms for movement penalty purposes (does not apply to super heavy weapons).'
         }
       }
@@ -336,12 +430,30 @@ const CLASS_DATA = {
         trackTiers: true,
         levels: [1, 2, 6, 10, 14, 18],
         options: {
-          'By Example': 'Allies in LOS have adv on INT/WIS/CHA saves. [Boost Action 1/rest: allies in 20ft gain +1 AC for 1 min]. Tier 2: Adds adv on STR/CON saves; Boost gives +2 AC.',
-          'Field Advice': 'Double effects that remove exhaustion; long rest reduces exhaustion by 2 if eaten. [Boost Action 1/rest: reduce ally exhaustion by 1]. Tier 2: Distribute half-level HD on long rest; Boost heals allies 1/4 HP.',
-          'Intimidating Mug': 'Enemies within 10 ft treat area as difficult terrain. [Boost Action 1/rest: double range to 20 ft for 1 min]. Tier 2: Base range 20 ft; Boost range 40 ft.',
-          'Mask of Authority': 'Allies in LOS reroll 1s on damage dice. [Boost Action 1/rest: allies gain +1 dmg for 1 min]. Tier 2: Allies reroll 1s twice; Boost gives +2 dmg.',
-          'Stand As One': 'Allies in LOS reduce damage taken by 1 (2 at L10). [Boost Action 1/rest: grant resistance to 1 energy type for 1 min]. Tier 2: Damage reduction becomes 2 (3 at L10).',
-          'Strategic Precision': '1/turn on hit: ally in LOS gains +2 to next attack roll. [Boost Action 1/rest: +1 attack vs last target hit]. Tier 2: Selected ally gains advantage instead of +2.'
+          'By Example': [
+            'T1: Allies in LOS have adv on INT/WIS/CHA saves. [Boost Action 1/rest: allies in 20ft gain +1 AC for 1 min].',
+            'T2: Also grants adv on STR/CON saves; Boost gives +2 AC instead.'
+          ],
+          'Field Advice': [
+            'T1: Double effects that remove exhaustion; long rest reduces exhaustion by 2 if eaten. [Boost Action 1/rest: reduce ally exhaustion by 1].',
+            'T2: Distribute half-level HD on long rest; Boost heals allies 1/4 HP.'
+          ],
+          'Intimidating Mug': [
+            'T1: Enemies within 10 ft treat area as difficult terrain. [Boost Action 1/rest: double range to 20 ft for 1 min].',
+            'T2: Base range becomes 20 ft; Boost range becomes 40 ft.'
+          ],
+          'Mask of Authority': [
+            'T1: Allies in LOS reroll 1s on damage dice. [Boost Action 1/rest: allies gain +1 dmg for 1 min].',
+            'T2: Allies reroll 1s twice; Boost gives +2 dmg.'
+          ],
+          'Stand As One': [
+            'T1: Allies in LOS reduce damage taken by 1 (2 at L10). [Boost Action 1/rest: grant resistance to 1 energy type for 1 min].',
+            'T2: Damage reduction becomes 2 (3 at L10).'
+          ],
+          'Strategic Precision': [
+            'T1: 1/turn on hit: ally in LOS gains +2 to next attack roll. [Boost Action 1/rest: +1 attack vs last target hit].',
+            'T2: Selected ally gains advantage instead of +2.'
+          ]
         }
       },
       {
