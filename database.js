@@ -176,8 +176,8 @@ const CLASS_DATA = {
         },
       ]
     },
-    {
-      name: 'Brotherhood',
+    { 
+    name: 'Brotherhood', 
       hint: 'Teamwork abilities. Pick one at each unlocked level.',
       levels: [1, 4, 8, 12, 16, 19],
       options: [
