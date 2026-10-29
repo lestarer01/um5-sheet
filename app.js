@@ -75,6 +75,10 @@ function populateSelects() {
   if (typeof ARMOR_DATA !== 'undefined' && $('armor-preset')) {
   populateArmorPresets('__all__');
   }
+  if (typeof ARCHETYPE_DATA !== 'undefined' && $('c-arch')) {
+    $('c-arch').innerHTML = '<option value="">-- Select Archetype --</option>' +
+      ARCHETYPE_DATA.map(a => `<option value="${a}">${a}</option>`).join('');
+  }
 }
 
 function populateArmorPresets(filterType) {
