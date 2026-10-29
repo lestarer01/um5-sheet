@@ -173,10 +173,10 @@ const CLASS_DATA = {
             "Tier 2: crits roll dmg dice 3× instead of 2×.,
             "Tier 3: advantage on non-autofire firearm attacks."
           ]
-        },
+        }
       ]
     },
-  [
+  
     { 
     name: 'Brotherhood', 
       hint: 'Teamwork abilities. Pick one at each unlocked level.',
