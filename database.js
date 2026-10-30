@@ -671,35 +671,92 @@ const CLASS_DATA = {
   },  
 };
 
-const ARCHETYPE_DATA = [
-  'Anti-Anti-hero',
-  'Authority',
-  'Banner Head',
-  'Brawler',
-  'Brother of Blood',
-  'Cleaner',
-  'Country Gunman',
-  'Diplomat',
-  'Driver',
-  'Field Machinist',
-  'Field Medic',
-  'Grandmaster',
-  'Gun Dancer',
-  'Infantry Support Specialist',
-  'Machine of War',
-  'Man-at-Arms',
-  'Mecha Pilot',
-  'Militarist',
-  'Pathfinder',
-  'Pistolero',
-  'Recon Intelligence',
-  'Ring Fighter',
-  'Sapper',
-  'Selfless Protector',
-  'Skirmisher',
-  'Suave'
-];
-
+const ARCHETYPE_DATA = {
+  'Anti-Hero': {
+    desc: 'You are no one\'s friend. A mercenary, a calculating killer who maintains temporary alliances only when it suits you.',
+    synergy: 'Face, Infiltrator, Grounder, Sniper',
+    proficiencies: 'Simple melee weapons and one-handed small arms',
+    abilities: [
+      { level: 3, name: 'Dead Pool', desc: 'Gain a reservoir of death you can tap to inflict additional damage. Add any amount from your dead pool to any hit against a target 20 ft or closer. Long rest reduces dead pool to zero. Gain points: (1) Reduce a creature 20 ft or closer to 0 HP → gain 5 points; additional damage beyond zero is added (max 5, 10 total). (2) Roll the maximum value of a damage die vs a target 20 ft or closer → add half that value (once until start of next turn). (3) An enemy scores a critical hit on you → gain 10 points. Pool size: 10 (3rd) / 20 (7th) / 30 (11th) / 40 (15th) / 50 (18th).' },
+      { level: 7, name: 'Fourth Wall', desc: 'If any ally within 50 ft suffers any damage, your dead pool is filled by the same value. Once you use this ability, you cannot use it again until you finish a long rest.' },
+      { level: 11, name: 'Cheat', desc: 'When you finish a long rest, set a d20 roll to 20 and put it aside. You can replace any attack roll, saving throw, or ability check made by you with that die (at which point it is used up). No action. Can do so before or after a roll, but not after determining the results. An unused die is lost when you finish a long rest.' },
+      { level: 15, name: 'The Less Interesting 15th Level Ability', desc: 'As a bonus action, you can use any amount from your dead pool to recover your hit points.' },
+      { level: 18, name: 'The Benefit of Friends', desc: 'If an ally is reduced to 0 hit points, you gain 20 points to your dead pool.' }
+    ]
+  },
+  'Authority': {
+    desc: 'You are the best in your field. Among the esteemed elite, you consider yourself an equal — leading scientist, world expert, or a head doctor.',
+    synergy: 'Civilian, Face, Marshal, Medic, Techie',
+    proficiencies: 'One of: Intelligence (Demolitions), Intelligence (Engineering), Intelligence (History), or Intelligence (Sciences). Or pick a skill you already possess to gain a +2 bonus to that skill.',
+    abilities: [
+      { level: 3, name: 'PHD', desc: 'Select one Intelligence skill of your choice. You can set your d20 roll to 20 when you really need a roll to succeed. Once you use this ability, you cannot use it again until you finish a long rest.' },
+      { level: 7, name: 'Resident Expert', desc: 'Instead of using your Hit Dice to recover hit points, you can spend an action and spend one hit die (recover no hit points) to gain a +10 bonus to any failed Intelligence skill check.' },
+      { level: 11, name: 'Second Nature', desc: 'When attempting any Intelligence skill, it only takes a bonus action instead of an action. Additionally, if you roll less than 10 for an Intelligence check, increase the result to 10.' },
+      { level: 15, name: 'Sherlock', desc: 'You can use the Search action as a bonus action. You also gain half your proficiency bonus (round down) to every Intelligence skill you are not already proficient in.' },
+      { level: 18, name: 'Straight Dope', desc: 'Your selected skill with PHD improves — unless you have disadvantage with the check, it always results in a natural 20.' }
+    ]
+  },
+  'Banner Head': {
+    desc: 'You are not a pretty individual. You have one job. You shoot people twice in the chest and once in the head. You are the champion hero — the one target enemies need to take down.',
+    synergy: 'Grounder, Gunslinger, Heavy, Marshal, Martial Artist',
+    proficiencies: 'Any two ranged weapons of your choice',
+    abilities: [
+      { level: 3, name: 'Fleeting Adversary', desc: 'After rolling initiative (no action), select one creature within 50 ft and line of sight. That target is your fleeting adversary. You gain a +1 bonus to attack your fleeting adversary, and it suffers disadvantage on attack rolls that don\'t include you as a target. Ends if you drop to 0 HP, the creature drops to 0 HP, you move beyond 50 ft, or line of sight is broken. Once selected, you cannot select another until you roll for initiative again.' },
+      { level: 7, name: 'The War Pose', desc: 'You can take a −1 penalty to attack rolls for each weapon you wield to wield a two-handed small arm with one hand. The weapon only counts as a one-handed small arm for purposes of how many hands you use to wield it and for abilities and feats.' },
+      { level: 11, name: 'Adversarial Rage', desc: 'As a bonus action, gain +2 damage against your fleeting adversary, increasing to +3 at 15th level, +4 at 18th level. This increase ends if the target is no longer your fleeting adversary. Once you use this feature, you cannot select another until you finish a long rest.' },
+      { level: 15, name: 'Remember Me?', desc: 'If your fleeting adversary attacks an ally, you can make a single ranged attack against it as a reaction.' },
+      { level: 18, name: 'Unexpected Response', desc: 'Until your fleeting adversary is reduced to 0 hit points, each time it hits you, you gain a +1 bonus to attack rolls against it. This bonus is cumulative up to +3 but is lost if you attack any creature other than your fleeting adversary or you score a hit.' }
+    ]
+  },
+  'Brawler': {
+    desc: 'You\'re a thug, pure and simple. Scrappy. Your talents are less about martial discipline and more about using brute strength to manhandle opponents.',
+    synergy: 'Gunslinger, Marshal, Martial Artist',
+    proficiencies: 'All simple melee weapons and unarmed strikes',
+    abilities: [
+      { level: 3, name: 'Ham Hands', desc: 'You can use both hands when grappling a target your size or smaller to have advantage on all rolls related to the grapple.' },
+      { level: 7, name: 'Head-Butt', desc: 'While grappling a creature your size or smaller, you can inflict 1d6 damage per character level on the target as a bonus action. Once you use this feature, you cannot use it again until you take a short rest or long rest.' },
+      { level: 11, name: 'Head Slam', desc: 'If you have one grappled creature in each hand, you can use a bonus action and make an unarmed melee attack against each target. A hit deals 2d6 + your Strength modifier damage to each target.' },
+      { level: 15, name: 'Bear Hug', desc: 'When grappling a target your size or smaller with two hands, you may attempt a bear hug. Make an unarmed strike as your action (or one of your attacks). A hit inflicts 2d6 + your Strength modifier damage.' },
+      { level: 18, name: 'Neck Snap', desc: 'If you make an unarmed strike against a target you are grappling, you score a critical hit on a natural roll of 19 or 20.' }
+    ]
+  },
+  'Brother of Blood': {
+    desc: 'On the battlefield, every ally is a brother. You know when one is hurt. You would never take risks that endanger another brother\'s life. NOTE: This archetype\'s abilities are useless unless at least one other party member has taken the same archetype.',
+    synergy: 'Grounder, Heavy, Marshal, Medic, Sniper',
+    proficiencies: 'One weapon and one armor (except exo-armor) another brother of blood is proficient in. If you both select this archetype at the same time, you can both choose new items, as long as you both choose the same items.',
+    abilities: [
+      { level: 3, name: 'More Like Family', desc: 'If a creature scores a critical hit on an allied brother of blood, you can make a single ranged attack against the attacker as a reaction.' },
+      { level: 7, name: 'Allied Support', desc: 'As a bonus action, target one allied brother of blood in line of sight. The targeted brother gains an action that must be used before the end of your turn (does not count as a reaction for the ally). Each brother of blood can benefit from Allied Support only once per round. Once per short or long rest. You gain one additional use at 11th, 15th, and 18th level before being required to finish a short or long rest to regain all spent uses.' },
+      { level: 11, name: 'Army of Many', desc: 'You grant a +2 bonus to damage rolls to each brother of blood within 10 feet of you (cumulative up to +6). Remember that they will be granting you this same bonus.' },
+      { level: 15, name: 'Better Reflexes', desc: 'You can use the Help action on another allied brother of blood as a bonus action.' },
+      { level: 18, name: 'Team Effort', desc: 'After rolling for initiative, you and all allied brothers of blood act on the highest initiative among you. You all can decide which order you act in.' }
+    ]
+  },
+  'Cleaner': {
+    desc: 'Someone hands you an image, an address, or just a name. You move in quickly and quietly, eliminating defenses, dispatch the enemy efficiently, and vanish into the shadows.',
+    synergy: 'Face, Gunslinger, Infiltrator, Martial Artist',
+    proficiencies: 'All simple melee weapons and one-handed small arms',
+    abilities: [
+      { level: 3, name: 'Once In The Head', desc: 'If you score a hit on a target 20 feet away or closer with a melee weapon or a one-handed small arm, you inflict additional damage equal to three times your level. You can use this ability once before taking a short or long rest, or twice if you kill the first target with this attack.' },
+      { level: 7, name: 'Twice In The Chest', desc: 'If wielding a melee weapon or a one-handed small arm, as an action you can make three attacks against a single target 20 feet away or closer. All attacks have advantage. You can use this ability once before taking a short or long rest, or twice if you kill your target with one of these attacks.' },
+      { level: 11, name: 'Quick Succession', desc: 'If you use Once In The Head but fail to kill the target, make one additional identical attack. This attack automatically hits, and you inflict additional damage equal to three times your level (including the additional damage with Once In The Head). Once you use this feature, you cannot use it again until you take a long rest.' },
+      { level: 15, name: 'Out Of The Blue', desc: 'If you have advantage against a target that is surprised or from whom you are hidden, your first hit against them is an automatic critical hit assuming you hit before the end of your first turn.' },
+      { level: 18, name: 'Desperate Solution', desc: 'As an action, add up all the enemies you can see — you then gain a number of attacks equal to double that number as part of that same action (Max 20 attacks). You can distribute the attacks any way you see fit. Once you use this feature, you cannot use it again until you take a long rest.' }
+    ]
+  },
+  'Country Gunman': {
+    desc: 'You keep your weapon holstered until the last second. You prefer to stare down opponents than use your firearm. However, when drawn, you make it quick and final — single shots, single kills.',
+    synergy: 'Face, Grounder, Gunslinger, Marshal',
+    proficiencies: 'All one-handed small arms',
+    abilities: [
+      { level: 3, name: 'Improved Reaction Time', desc: 'You add 2d4 to all your initiative rolls.' },
+      { level: 7, name: 'Precise Shot', desc: 'If you act before any enemy in the encounter, you have advantage with all attack rolls made with one-handed small arms until the first enemy acts.' },
+      { level: 11, name: 'Quick and the Dead', desc: 'If you have the highest initiative value at the start of an encounter, add your initiative roll (including your bonus from Improved Reaction Time) as bonus damage to your first hit with a one-handed small arm. This bonus to damage is lost if not applied by the end of your first turn.' },
+      { level: 15, name: 'Reputation', desc: 'If you have the highest initiative value at the start of an encounter, you gain one additional action on your first turn.' },
+      { level: 18, name: '12 O\'Clock', desc: 'When you ready an attack action with a one-handed small arm, you have advantage with the attack, and if you hit the target, the attack becomes a critical hit. If you employ this ability, you can only make a single attack.' }
+    ]
+  }
+};
 const WEAPON_DATA = {
   'M4 Carbine': { type: 'Assault Rifle', damage: '2d6', magSize: 30, range: '80/300', properties: 'Burst, Two-Handed' },
   'AK-47': { type: 'Assault Rifle', damage: '2d6+1', magSize: 30, range: '70/280', properties: 'Burst, Reliable' },
