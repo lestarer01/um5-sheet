@@ -887,6 +887,111 @@ const ARCHETYPE_DATA = {
       { level: 18, name: 'Battle Leader', desc: 'If you are reduced to 0 hit points, you gain 10 TP and can use as many Coordination abilities as you want and can afford as a reaction (even ones which are usually bonus actions). You fall unconscious as normal as soon as all these effects are resolved.' }
     ]
   },
+  // Add these to the ARCHETYPE_DATA object in database.js
+
+    "Pathfinder": {
+        desc: "You move in darkness behind enemy lines, sneaking through shadows or strolling in broad daylight to reach your destination without evidence.",
+        synergy: "This archetype works best with the Face, Infiltrator, Martial Artist, and Sniper classes.",
+        proficiencies: "Proficiency in Dexterity (Stealth).",
+        abilities: [
+            { level: 3, name: "Dust", desc: "Gain a dust pool of 20 feet. If no opponents see you, you can use your dust pool to 'teleport' to an area out of sight. This replaces your normal movement. Every 10 feet you do not move on your turn refills the pool by 5 feet." },
+            { level: 7, name: "Back of Your Head / Dust (25ft)", desc: "If you roll 5 or less on any Dexterity (Stealth) check, you can re-roll. Your dust pool increases to 25 feet." },
+            { level: 11, name: "Like a Hawk / Dust (30ft)", desc: "If you use at least 10 feet from your dust pool on your turn, you gain 10 feet of additional walking speed that turn. Your dust pool increases to 30 feet." },
+            { level: 15, name: "Under Any Shadow / Dust (35ft)", desc: "If you have cover at the beginning of your turn, you retain the benefit of cover until the beginning of your next turn, regardless of where you move. Your dust pool increases to 35 feet." },
+            { level: 18, name: "Complete Covertness / Dust (40ft)", desc: "If you use 20 feet from your dust pool, you gain 20 feet of walking speed (replaces Like a Hawk). Your dust pool increases to 40 feet." }
+        ]
+    },
+
+    "Pistolero": {
+        desc: "You prefer close-quarters gunplay, placing perfect shots at point-blank range while maximizing your own defense.",
+        synergy: "This archetype works best with the Gunslinger, Medic, and Techie classes.",
+        proficiencies: "Proficiency with all one-handed small arms.",
+        abilities: [
+            { level: 3, name: "Point Shot", desc: "As an action, make a single ranged attack with a non-auto one-handed small arm against a creature 20ft or closer. Inflict an additional 1d6 damage." },
+            { level: 7, name: "Weaver Stance / Point Shot (2d6)", desc: "If wielding one small arm with two hands, suffer -20ft speed but increase Point Shot damage by 1 step. Gain a bonus to Point Shot attack rolls equal to half the damage steps (e.g., 4d6 = +2). Point Shot increases to 2d6." },
+            { level: 11, name: "Kill Shot / Point Shot (3d6)", desc: "If Point Shot reduces a creature to HP less than your level, use 1 extra ammo to kill the target as a bonus action. Point Shot increases to 3d6." },
+            { level: 15, name: "Kinetic Shot / Point Shot (4d6)", desc: "If you act before an enemy in initiative, increase Point Shot damage against them by two steps until they act. Point Shot increases to 4d6." },
+            { level: 18, name: "Only Need One / Point Shot (5d6)", desc: "If you score a critical hit with Point Shot, increase your damage by two steps. Point Shot increases to 5d6." }
+        ]
+    },
+
+    "Recon Intelligence": {
+        desc: "You become one with the terrain, waiting for the perfect moment where no wind or gravity can stop your single, lethal shot.",
+        synergy: "This archetype works best with the Face, Medic, Techie, and Sniper classes.",
+        proficiencies: "Light armor, ghillie/yowie suits, sniper weapons, and Dexterity (Stealth).",
+        abilities: [
+            { level: 3, name: "Flawless Reputation", desc: "When making Stealth vs Perception, roll 1d10 and set it aside (your reputation die). Use it to replace any attack or Stealth roll later. You can only have one die at a time; lost on long rest." },
+            { level: 7, name: "Yowie Specialization", desc: "If wearing a ghillie/yowie suit in its proper environment, use an action to become invisible until you move or attack." },
+            { level: 11, name: "Brilliant Shadow", desc: "Roll all acquired reputation dice twice and set aside the higher value." },
+            { level: 15, name: "Psychological Warfare", desc: "If you drop a creature 25ft or further away to 0 HP, gain one additional reputation die." },
+            { level: 18, name: "Specter", desc: "You can have two reputation dice at once (three if one was acquired from Psychological Warfare)." }
+        ]
+    },
+
+    "Ring Fighter": {
+        desc: "A master of the physical realm, you have fought hard for respect and the belt. Few boast the record you have.",
+        synergy: "This archetype works best with the Grounder, Gunslinger, Marshal, and Martial Artist classes.",
+        proficiencies: "Proficiency with simple melee weapons.",
+        abilities: [
+            { level: 3, name: "Grapple Discipline", desc: "You have advantage on all rolls related to grappling." },
+            { level: 7, name: "Guard Control", desc: "While grappling a creature, you gain a +1 bonus to AC." },
+            { level: 11, name: "Tolerance Threshold", desc: "If grappling a creature, you have resistance to any piercing, bludgeoning, or slashing damage from nonmagical weapons from that target." },
+            { level: 15, name: "Choke / Lock", desc: "Each turn you sustain a grapple, you inflict damage equal to your Str or Dex modifier. This does not count as an action." },
+            { level: 18, name: "Mounted Attack", desc: "While grappling a creature, it suffers disadvantage on escape attempts." }
+        ]
+    },
+
+    "Sapper": {
+        desc: "Combat engineers approach bombs while others run. You can be a bridge builder and a bridge destroyer.",
+        synergy: "This archetype works best with the Civilian, Marshal, Medic, and Techie classes.",
+        proficiencies: "Proficiency with Intelligence (Demolitions).",
+        abilities: [
+            { level: 3, name: "The Long Walk", desc: "Advantage on Intelligence (Demolitions) checks. When a target takes damage from an 'exp' property weapon you threw/set, add your level to the damage." },
+            { level: 7, name: "Render Safe Procedures", desc: "If forced to make a Dex save vs an explosion, move 5ft as a reaction before rolling (possibly escaping the area)." },
+            { level: 11, name: "Slight Chemical Improvement", desc: "Explosions (10ft+ blast radius) from your thrown/set explosives increase their radius by 5ft." },
+            { level: 15, name: "Proper Application", desc: "When determining Save DC for your explosives, double your Int modifier. If a target fails the save, increase the number of damage dice by two." },
+            { level: 18, name: "Scorched Earth", desc: "After detonating an explosive, a lingering fire deals Int modifier + level damage to any targets entering/starting their turn in the area for 1 minute." }
+        ]
+    },
+
+    "Selfless Protector": {
+        desc: "From the traditions of respected security forces, you possess a natural instinct to protect your assigned ward.",
+        synergy: "This archetype works best with the Face, Grounder, Heavy, and Martial Artist classes.",
+        proficiencies: "None.",
+        abilities: [
+            { level: 3, name: "Take A Bullet", desc: "Select one creature within reach as your focus. If they are hit or fail a Dex save, you can use your AC or take the damage/effects instead. Focus is lost if you move or take a short rest." },
+            { level: 7, name: "Licensed Response", desc: "If your focus is hit, you can make an attack against the attacker as a reaction. If the focus suffered damage, you have advantage on this attack." },
+            { level: 11, name: "Job Well Done", desc: "Gain +1 AC while protecting your focus. If you take a short rest after a period where the focus suffered no damage, you regain double your Hit Dice." },
+            { level: 15, name: "Evasive Techniques", desc: "If your focus is within reach and caught in an area effect, as a reaction, throw your focus up to 15ft away before the effect activates." },
+            { level: 18, name: "Keep It Together", desc: "Each time you regain hit points, you can give your focus any amount of those hit points instead." }
+        ]
+    },
+
+    "Skirmisher": {
+        desc: "You disrupt enemy lines by surgically removing officers and threats, causing disarray and fear.",
+        synergy: "This archetype works best with the Grounder, Gunslinger, Infiltrator, and Sniper classes.",
+        proficiencies: "Proficiency with all sniper weapons.",
+        abilities: [
+            { level: 3, name: "Automatic Reflexes", desc: "After hitting a creature 25ft+ away, make an extra ranged attack against a different target in range as part of the same action. (1/short rest)." },
+            { level: 7, name: "Waste of Skill / Reflexes (2)", desc: "On a crit, you may choose normal damage to make a single ranged attack against any target in range. Reflexes uses increase at 7, 11, 15, 18." },
+            { level: 11, name: "The Second Shooter / Reflexes (3)", desc: "After a ranged attack vs a creature 50ft+ away, move up to half speed without it counting as movement." },
+            { level: 15, name: "Splintering Shrapnel / Reflexes (4)", desc: "If you drop a creature 25ft+ away to 0 HP, each creature within 5ft takes damage equal to your attack ability modifier." },
+            { level: 18, name: "Perfect Shot Placement / Reflexes (5)", desc: "If you drop a creature 50ft+ away to 0 HP, you can make another single ranged attack as part of the same action (1/turn)." }
+        ]
+    },
+
+    "Suave": {
+        desc: "Debonair and charming, you talk, walk, and sway your way into areas keys never could.",
+        synergy: "This archetype works best with the Civilian, Face, Marshal, Martial Artist, and Medic classes.",
+        proficiencies: "Proficiency in Deception, Insight, Perception, and Persuasion.",
+        abilities: [
+            { level: 3, name: "It's the Clothes", desc: "Double proficiency bonus for Charisma (Deception) and (Persuasion) checks. Gain +1 bonus to attack rolls." },
+            { level: 7, name: "Shaken, Not Stirred", desc: "While wearing no armor, you have advantage on all saving throws." },
+            { level: 11, name: "Spilled Drink", desc: "If you fail any skill or tool check, you have advantage on attack rolls until the end of your next turn." },
+            { level: 15, name: "Surreptitious Walk", desc: "Spend an action to gain advantage on your next Wis/Cha skill check. Useable twice per long rest (if the check fails, the use is not spent)." },
+            { level: 18, name: "Mesmer Stare", desc: "Triple proficiency bonus to your next Charisma skill check. Useable once per long rest (if the check fails, the use is not spent)." }
+        ]
+    }
 };
 
 const WEAPON_DATA = {
