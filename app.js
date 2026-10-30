@@ -75,9 +75,9 @@ function populateSelects() {
   if (typeof ARMOR_DATA !== 'undefined' && $('armor-preset')) {
   populateArmorPresets('__all__');
   }
-  if (typeof ARCHETYPE_DATA !== 'undefined' && $('c-arch')) {
+    if (typeof ARCHETYPE_DATA !== 'undefined' && $('c-arch')) {
     $('c-arch').innerHTML = '<option value="">-- Select Archetype --</option>' +
-      ARCHETYPE_DATA.map(a => `<option value="${a}">${a}</option>`).join('');
+      Object.keys(ARCHETYPE_DATA).map(a => `<option value="${a}">${a}</option>`).join('');
   }
   if (typeof BACKGROUND_DATA !== 'undefined' && $('c-background')) {
     $('c-background').innerHTML = '<option value="">-- Select Background --</option>' +
@@ -535,6 +535,28 @@ function renderAbilities() {
         return menuHtml;
       };
 
+        // --- ARCHETYPE FEATURES ---
+  const archKey = val('c-arch');
+  const arch = (typeof ARCHETYPE_DATA !== 'undefined' && archKey) ? ARCHETYPE_DATA[archKey] : null;
+  const archBox = $('archetype-box');
+  if (archBox) {
+    if (arch) {
+      const archList = arch.abilities.filter(a => a.level <= lvl);
+      let archHtml = `<p style="font-size:0.8rem;color:var(--accent2);margin-bottom:6px;">${arch.desc}</p>`;
+      archHtml += `<p style="font-size:0.72rem;color:var(--muted);margin-bottom:4px;"><strong>Synergy:</strong> ${arch.synergy}</p>`;
+      archHtml += `<p style="font-size:0.72rem;color:var(--muted);margin-bottom:10px;"><strong>Proficiencies:</strong> ${arch.proficiencies}</p>`;
+      if (archList.length === 0) {
+        archHtml += `<p style="font-size:0.75rem;color:var(--muted);">Archetype features unlock at level 3.</p>`;
+      } else {
+        archHtml += archList.map(a =>
+          `<div class="ability-entry"><div class="ability-entry-header"><span>${a.name}</span><span class="ability-entry-level">Lvl ${a.level}</span></div><div class="ability-entry-desc">${a.desc}</div></div>`
+        ).join('');
+      }
+      archBox.innerHTML = archHtml;
+    } else {
+      archBox.innerHTML = `<p style="font-size:0.75rem;color:var(--muted);">Select an Archetype on the Core tab to see features.</p>`;
+    }
+  }
       // Track which menus have been rendered (so we only render each once at its FIRST unlock level)
       const renderedMenus = new Set();
 
