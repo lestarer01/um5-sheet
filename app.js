@@ -67,10 +67,12 @@ function saveStorage() {
 
 function populateSelects() {
   if (typeof LADDER_DATA !== 'undefined' && $('c-ladder')) {
-    $('c-ladder').innerHTML = Object.keys(LADDER_DATA).map(k => `<option value="${k}">${k}</option>`).join('');
+    $('c-ladder').innerHTML = '<option value="">-- Select Ladder --</option>' +
+      Object.keys(LADDER_DATA).map(k => `<option value="${k}">${k}</option>`).join('');
   }
   if (typeof CLASS_DATA !== 'undefined' && $('c-class')) {
-    $('c-class').innerHTML = Object.keys(CLASS_DATA).map(k => `<option value="${k}">${k}</option>`).join('');
+    $('c-class').innerHTML = '<option value="">-- Select Class --</option>' +
+      Object.keys(CLASS_DATA).map(k => `<option value="${k}">${k}</option>`).join('');
   }
   if (typeof ARMOR_DATA !== 'undefined' && $('armor-preset')) {
   populateArmorPresets('__all__');
