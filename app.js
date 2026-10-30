@@ -660,6 +660,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
   if ($('c-class')) $('c-class').addEventListener('change', renderAbilities);
   if ($('c-lvl')) $('c-lvl').addEventListener('change', renderAbilities);
+  if ($('c-arch')) $('c-arch').addEventListener('change', renderAbilities);
 
   if (chars.length) {
     loadToForm(chars[0]);
