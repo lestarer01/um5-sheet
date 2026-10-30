@@ -314,7 +314,7 @@ function applyArmor() {
 
 function blankChar() {
   return {
-    id: 'c_' + Date.now(), name: 'New Operative', species: 'Human', arch: '', background: '', ladder: 'Born Leader', className: 'Gunslinger', lvl: 1,
+    id: 'c_' + Date.now(), name: 'New Operative', species: 'Human', arch: '', background: '', ladder: '', className: '', lvl: 1,
     str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10, vig: 10,
     saveProfs: {str:false, dex:false, con:false, int:false, wis:false, cha:false, vig:false},
     hpMax: 10, hpCur: 10, hpTemp: 0, hd: '1d10', ac: 10, spd: 30, init: 0,
