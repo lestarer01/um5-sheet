@@ -467,14 +467,21 @@ function renderAbilities() {
   }
 // Magic Tab Auto-Calculations & UI Rendering
 function renderMagic() {
-    if (!$('tab-magic')) return;
+    const magicTab = $('tab-magic');
+    if (!magicTab) return;
 
-    // 1. Calculate River Max based on Vigor modifier
-    const vigorScore = parseInt($('c-stat-vigor')?.value || 10, 10);
+    // 1. Safely find Vigor stat using your exact HTML ID (s-vig)
+    const vigorEl = $('s-vig'); 
+    const vigorScore = parseInt(vigorEl?.value || 10, 10) || 10;
     const vigorMod = Math.floor((vigorScore - 10) / 2);
     const riverMax = Math.max(0, vigorMod);
 
-    if ($('m-river-max')) $('m-river-max').textContent = riverMax;
+    const riverCountEl = $('m-river-count');
+    const riverMaxEl = $('m-river-max');
+    if (riverCountEl) riverCountEl.textContent = 0; 
+    if (riverMaxEl) riverMaxEl.textContent = riverMax;
+    
+    // ... rest of renderMagic stays the same
 
     // 2. Exhaustion impact notice
     const exLevel = parseInt($('m-exhaustion')?.value || 0, 10);
