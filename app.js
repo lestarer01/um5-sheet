@@ -292,6 +292,7 @@ function recalc() {
 
 /* --- MAGIC CALCULATIONS --- */
 function renderMagic() {
+function renderMagic() {
   if (!$('tab-magic')) return;
 
   const lvl = parseInt(val('c-lvl') || 1, 10) || 1;
@@ -335,39 +336,6 @@ function renderMagic() {
   }
 
   // 3. Available Assets = (Vigor Modifier x Level), minimum 0
-  const calculatedAssets = Math.max(0, vigorMod * lvl);
-  if ($('m-assets')) $('m-assets').value = calculatedAssets;
-
-  // 4. Render River Slots
-  const riverContainer = $('river-slots-container');
-  if (riverContainer) {
-    if (riverMax <= 0) {
-      riverContainer.innerHTML = '<p style="font-size:0.8rem;color:var(--muted);">Vigor modifier is 0 or lower. No River slots available.</p>';
-    } else {
-      let html = '';
-      for (let i = 0; i < riverMax; i++) {
-        html += `<div style="border:1px dashed var(--border-color,#444);border-radius:6px;padding:10px;text-align:center;background:rgba(0,0,0,0.2);">
-          <small style="color:var(--muted);font-size:0.75rem;display:block;">River Slot ${i + 1}</small>
-          <span style="font-size:0.85rem;font-style:italic;">Empty Slot</span>
-        </div>`;
-      }
-      riverContainer.innerHTML = html;
-    }
-  }
-}
-
-  // Set Max Vessel
-  if ($('m-vessel-max')) $('m-vessel-max').value = calculatedMaxVessel;
-  
-  // Clamp Current Vessel so it cannot exceed Max Vessel
-  if ($('m-vessel-cur')) {
-    let curVessel = parseInt($('m-vessel-cur').value || 0, 10);
-    if (curVessel > calculatedMaxVessel) {
-      $('m-vessel-cur').value = calculatedMaxVessel;
-    }
-  }
-
-  // 3. Auto-calculate Available Assets = (Vigor Modifier x Level), minimum 0
   const calculatedAssets = Math.max(0, vigorMod * lvl);
   if ($('m-assets')) $('m-assets').value = calculatedAssets;
 
