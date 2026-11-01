@@ -291,23 +291,26 @@ function recalc() {
 }
 
 /* --- MAGIC CALCULATIONS --- */
+/* --- MAGIC CALCULATIONS --- */
 function renderMagic() {
   if (!$('tab-magic')) return;
 
-  const lvl = parseInt(val('c-lvl') || 1, 10) || 1;
-  const vigorScore = parseInt(val('s-vig') || 10, 10) || 10;
+  const lvl = Math.max(1, parseInt(val('c-lvl'), 10) || 1);
+  const vigorScore = parseInt(val('s-vig'), 10) || 10;
   const vigorMod = Math.floor((vigorScore - 10) / 2);
-  const riverMax = Math.max(0, vigorMod);
+  
+  // Cap river slots to a safe maximum (0 to 10) to prevent freeze
+  const riverMax = Math.min(10, Math.max(0, vigorMod));
 
   // 1. Update River Capacity Display
   if ($('m-river-max')) $('m-river-max').textContent = riverMax;
   if ($('m-river-count')) $('m-river-count').textContent = 0;
 
-  // 2. Auto-calculate Base Vessel = Vigor Ability Score + Character Level
-  let baseVessel = Math.max(0, vigorScore + lvl);
+  // 2. Base Vessel = Half Vigor Score + Character Level
+  const baseVessel = Math.max(0, Math.floor(vigorScore / 2) + lvl);
   
   // Calculate Exhaustion level impact on Max Vessel
-  const exLevel = parseInt(val('m-exhaustion') || 0, 10) || 0;
+  const exLevel = parseInt(val('m-exhaustion'), 10) || 0;
   let calculatedMaxVessel = baseVessel;
   
   const noteEl = $('m-exhaustion-note');
@@ -328,7 +331,7 @@ function renderMagic() {
   
   // Clamp Current Vessel so it cannot exceed Max Vessel
   if ($('m-vessel-cur')) {
-    let curVessel = parseInt($('m-vessel-cur').value || 0, 10);
+    let curVessel = parseInt($('m-vessel-cur').value, 10) || 0;
     if (curVessel > calculatedMaxVessel) {
       $('m-vessel-cur').value = calculatedMaxVessel;
     }
