@@ -361,6 +361,7 @@ function saveCurrent() {
   saveStorage();
   recalc();
   renderRoster();
+  renderMagic();
 }
 
 function loadToForm(c) {
@@ -393,6 +394,7 @@ function loadToForm(c) {
   recalc();
   renderAbilities();
   renderRoster();
+  renderMagic();
 }
 
 function renderRoster() {
