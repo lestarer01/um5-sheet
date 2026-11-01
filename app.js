@@ -472,7 +472,7 @@ function renderMagic() {
 
     // 1. Safely find Vigor stat using your exact HTML ID (s-vig)
     const vigorEl = $('s-vig'); 
-    const vigorScore = parseInt(vigorEl?.value || 10, 10) || 10;
+    const vigorScore = parseInt(vigorEl.value || 10, 10) || 10;
     const vigorMod = Math.floor((vigorScore - 10) / 2);
     const riverMax = Math.max(0, vigorMod);
 
