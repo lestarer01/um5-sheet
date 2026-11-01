@@ -73,11 +73,12 @@ function populateSelects() {
     $('c-class').innerHTML = Object.keys(CLASS_DATA).map(k => `<option value="${k}">${k}</option>`).join('');
   }
   if (typeof ARMOR_DATA !== 'undefined' && $('armor-preset')) {
-  populateArmorPresets('__all__');
+    populateArmorPresets('__all__');
   }
+  // FIX: Object.keys() ensures it works with your updated ARCHETYPE_DATA object
   if (typeof ARCHETYPE_DATA !== 'undefined' && $('c-arch')) {
     $('c-arch').innerHTML = '<option value="">-- Select Archetype --</option>' +
-      ARCHETYPE_DATA.map(a => `<option value="${a}">${a}</option>`).join('');
+      Object.keys(ARCHETYPE_DATA).map(a => `<option value="${a}">${a}</option>`).join('');
   }
   if (typeof BACKGROUND_DATA !== 'undefined' && $('c-background')) {
     $('c-background').innerHTML = '<option value="">-- Select Background --</option>' +
@@ -163,7 +164,6 @@ function renderWeapons() {
     </div>
   `).join('');
 
-  // Set selected dropdown values
   c.weapons.forEach((w, i) => {
     const sel = box.querySelector(`.wpn-preset-select[data-idx="${i}"]`);
     if (sel) sel.value = w.preset || '__custom__';
@@ -176,7 +176,6 @@ function bindWeaponEvents() {
   const box = $('weapons-container');
   if (!box) return;
 
-  // Preset Select
   box.querySelectorAll('.wpn-preset-select').forEach(sel => {
     sel.onchange = (e) => {
       const idx = parseInt(e.target.dataset.idx, 10);
@@ -187,13 +186,7 @@ function bindWeaponEvents() {
       if (key !== '__custom__' && typeof WEAPON_DATA !== 'undefined' && WEAPON_DATA[key]) {
         const data = WEAPON_DATA[key];
         c.weapons[idx] = {
-          preset: key,
-          name: key,
-          dmg: data.damage,
-          range: data.range,
-          props: data.properties,
-          max: data.magSize,
-          cur: data.magSize
+          preset: key, name: key, dmg: data.damage, range: data.range, props: data.properties, max: data.magSize, cur: data.magSize
         };
       } else {
         c.weapons[idx].preset = '__custom__';
@@ -203,7 +196,6 @@ function bindWeaponEvents() {
     };
   });
 
-  // Shoot
   box.querySelectorAll('.btn-fire-wpn').forEach(btn => {
     btn.onclick = (e) => {
       const idx = parseInt(e.target.dataset.idx, 10);
@@ -217,7 +209,6 @@ function bindWeaponEvents() {
     };
   });
 
-  // Reload
   box.querySelectorAll('.btn-reload-wpn').forEach(btn => {
     btn.onclick = (e) => {
       const idx = parseInt(e.target.dataset.idx, 10);
@@ -231,7 +222,6 @@ function bindWeaponEvents() {
     };
   });
 
-  // Remove
   box.querySelectorAll('.btn-remove-wpn').forEach(btn => {
     btn.onclick = (e) => {
       const idx = parseInt(e.target.dataset.idx, 10);
@@ -244,7 +234,6 @@ function bindWeaponEvents() {
     };
   });
 
-  // Text Inputs
   box.querySelectorAll('input').forEach(inp => {
     inp.oninput = (e) => {
       const idx = parseInt(e.target.dataset.idx, 10);
@@ -297,49 +286,42 @@ function recalc() {
     if ($('sk-bonus-' + i)) $('sk-bonus-' + i).textContent = fmtMod(total);
   });
 
-  // Automatically update Magic Tab when stats change
+  // Automatically update Magic UI when stats change (e.g. Vigor change updates River slots)
   renderMagic();
 }
 
-/* --- MAGIC SYSTEM CALCULATIONS --- */
-
+/* --- MAGIC CALCULATIONS --- */
 function renderMagic() {
-  const magicTab = $('tab-magic');
-  if (!magicTab) return;
+  if (!$('tab-magic')) return;
 
-  const vigorEl = $('s-vig');
-  if (!vigorEl) return;
-
-  const vigorScore = parseInt(vigorEl.value, 10) || 10;
+  const vigorScore = parseInt(val('s-vig') || 10, 10) || 10;
   const vigorMod = Math.floor((vigorScore - 10) / 2);
   const riverMax = Math.max(0, vigorMod);
 
-  const riverMaxEl = $('m-river-max');
-  if (riverMaxEl) riverMaxEl.textContent = riverMax;
+  if ($('m-river-max')) $('m-river-max').textContent = riverMax;
+  if ($('m-river-count')) $('m-river-count').textContent = 0; // Baseline count
 
-  const exSelect = $('m-exhaustion');
-  const exLevel = parseInt(exSelect?.value || 0, 10);
+  const exLevel = parseInt(val('m-exhaustion') || 0, 10) || 0;
   const noteEl = $('m-exhaustion-note');
   if (noteEl) {
-    if (exLevel >= 5) noteEl.textContent = "WARNING: Max Vessel is reduced to 0!";
-    else if (exLevel >= 2) noteEl.textContent = "NOTICE: Max Vessel is halved.";
-    else noteEl.textContent = "";
+    if (exLevel >= 5) noteEl.textContent = 'WARNING: Max Vessel is reduced to 0!';
+    else if (exLevel >= 2) noteEl.textContent = 'NOTICE: Max Vessel is halved.';
+    else noteEl.textContent = '';
   }
 
   const riverContainer = $('river-slots-container');
   if (riverContainer) {
-    if (riverMax === 0) {
+    if (riverMax <= 0) {
       riverContainer.innerHTML = '<p style="font-size:0.8rem;color:var(--muted);">Vigor modifier is 0 or lower. No River slots available.</p>';
     } else {
-      let slotsHtml = '';
+      let html = '';
       for (let i = 0; i < riverMax; i++) {
-        slotsHtml += `
-          <div style="border: 1px dashed var(--border-color, #444); border-radius: 6px; padding: 10px; text-align: center; background: rgba(0,0,0,0.2);">
-            <small style="color:var(--muted); font-size:0.75rem; display:block;">River Slot ${i + 1}</small>
-            <span style="font-size:0.85rem; font-style:italic;">Empty Slot</span>
-          </div>`;
+        html += `<div style="border:1px dashed var(--border-color,#444);border-radius:6px;padding:10px;text-align:center;background:rgba(0,0,0,0.2);">
+          <small style="color:var(--muted);font-size:0.75rem;display:block;">River Slot ${i + 1}</small>
+          <span style="font-size:0.85rem;font-style:italic;">Empty Slot</span>
+        </div>`;
       }
-      riverContainer.innerHTML = slotsHtml;
+      riverContainer.innerHTML = html;
     }
   }
 }
@@ -367,7 +349,8 @@ function blankChar() {
     weapons: [emptyWeapon()],
     credits: 500, inventory: '', skills: {}, ladderTaken: null, classChoices: {}, featNotes: '',
     mpMax: 0, mpCur: 0, spellDc: 10, spellAtk: 0, magicSource: '', spellList: '',
-    vesselCur: 0, vesselMax: 0, assets: 0, exhaustion: 0 // New Dark Magic fields
+    // New Dark Magic Fields
+    vesselCur: 0, vesselMax: 0, assets: 0, exhaustion: 0
   };
 }
 
@@ -403,7 +386,6 @@ function saveCurrent() {
   c.featNotes = val('feat-notes'); c.mpMax = val('mp-max'); c.mpCur = val('mp-cur');
   c.spellDc = val('spell-dc'); c.spellAtk = val('spell-atk'); c.magicSource = val('magic-source'); c.spellList = val('spell-list');
 
-  // Save specific Dark Magic fields
   c.vesselCur = val('m-vessel-cur');
   c.vesselMax = val('m-vessel-max');
   c.assets = val('m-assets');
@@ -440,7 +422,6 @@ function loadToForm(c) {
   val('feat-notes', c.featNotes); val('mp-max', c.mpMax); val('mp-cur', c.mpCur);
   val('spell-dc', c.spellDc); val('spell-atk', c.spellAtk); val('magic-source', c.magicSource); val('spell-list', c.spellList);
   
-  // Load specific Dark Magic fields
   val('m-vessel-cur', c.vesselCur || 0);
   val('m-vessel-max', c.vesselMax || 0);
   val('m-assets', c.assets || 0);
@@ -468,6 +449,7 @@ function renderAbilities() {
   const lad = typeof LADDER_DATA !== 'undefined' ? LADDER_DATA[val('c-ladder')] : null;
   const cls = typeof CLASS_DATA !== 'undefined' ? CLASS_DATA[val('c-class')] : null;
   const c = chars.find(x => x.id === activeId);
+  const arch = typeof ARCHETYPE_DATA !== 'undefined' ? ARCHETYPE_DATA[val('c-arch')] : null;
 
   if (lad && $('ladder-box')) {
     if (!c.ladderTaken || !Array.isArray(c.ladderTaken) || c.ladderTaken.length !== lad.abilities.length) {
@@ -523,125 +505,140 @@ function renderAbilities() {
     });
   }
 
-        if (cls && $('class-box')) {
-      const list = cls.abilities.filter(a => a.level <= lvl);
-      let html = `<p style="font-size:0.8rem;color:var(--accent2);margin-bottom:10px;">${cls.desc} · Hit Die ${cls.hitDie}</p>`;
-
-      // Normalize choice menus
-      const menus = cls.choiceMenus ? cls.choiceMenus
-        : (cls.choiceMenu ? [cls.choiceMenu] : []);
-
-      if (!c.classChoices) c.classChoices = {};
-      if (!c.classChoices[val('c-class')]) c.classChoices[val('c-class')] = {};
-
-      // Helper function to render a single choice menu block
-      const renderMenuBlock = (menu) => {
-        const key = menu.name;
-        if (!Array.isArray(c.classChoices[val('c-class')][key])) {
-          c.classChoices[val('c-class')][key] = [];
-        }
-        const unlockedCount = menu.levels.filter(l => l <= lvl).length;
-        if (unlockedCount <= 0) return '';
-
-        // Tier summary for paths that allow duplicates
-        let tierSummary = '';
-        if (menu.trackTiers) {
-          const counts = {};
-          c.classChoices[val('c-class')][key].forEach(v => { if (v) counts[v] = (counts[v] || 0) + 1; });
-          const parts = Object.keys(counts).map(k => `${k} Tier ${counts[k]}`);
-          if (parts.length) tierSummary = `<div style="font-size:0.75rem;color:var(--accent);margin-bottom:6px;">Current: ${parts.join(' · ')}</div>`;
-        }
-
-        let menuHtml = `<div class="ability-entry" style="border-left-color: var(--accent2);">
-          <div class="ability-entry-header"><span style="color:var(--accent2);">${menu.name}</span></div>
-          <div class="ability-entry-desc" style="margin-bottom:6px;">${menu.hint || `Select ${unlockedCount} option(s) based on your level.`}</div>
-          ${tierSummary}`;
-
-        for (let i = 0; i < unlockedCount; i++) {
-          const selected = c.classChoices[val('c-class')][key][i] || '';
-          const opts = ['<option value="">-- Select --</option>']
-            .concat(Object.keys(menu.options).map(k =>
-              `<option value="${k}" ${k === selected ? 'selected' : ''}>${k}</option>`
-            )).join('');
-
-          // Tier-aware description
-          let descHtml = '';
-          if (selected && menu.options[selected]) {
-            const optionData = menu.options[selected];
-            if (Array.isArray(optionData)) {
-              let tierCount = 0;
-              for (let j = 0; j <= i; j++) {
-                if (c.classChoices[val('c-class')][key][j] === selected) tierCount++;
-              }
-              const tierIndex = tierCount - 1;
-              if (tierIndex >= 0 && tierIndex < optionData.length) {
-                descHtml = `<div style="font-size:0.75rem;color:var(--text);margin-top:4px;padding:6px;background:rgba(0,0,0,0.3);border-radius:4px;">
-                  <span style="color:var(--accent);font-weight:700;">Tier ${tierCount}:</span> ${optionData[tierIndex]}
-                </div>`;
-              }
-            } else {
-              descHtml = `<div style="font-size:0.75rem;color:var(--text);margin-top:4px;padding:6px;background:rgba(0,0,0,0.3);border-radius:4px;">${optionData}</div>`;
-            }
-          }
-
-          menuHtml += `<div class="field-group" style="margin-bottom:8px;">
-            <label style="font-size:0.65rem;color:var(--muted);">Pick at level ${menu.levels[i] || '?'}</label>
-            <select class="class-choice-select" data-menu="${key}" data-idx="${i}" style="background:var(--bg);">${opts}</select>
-            ${descHtml}
+  // Archetype Box (New logic you had prior)
+  if ($('archetype-box')) {
+    if (!arch) {
+      $('archetype-box').innerHTML = '<p style="color:var(--muted);font-size:0.8rem;">Select an Archetype on the Core tab to view its features here.</p>';
+    } else {
+      let html = `<p style="font-size:0.8rem;color:var(--accent2);margin-bottom:6px;">${arch.desc}</p>
+        <p style="font-size:0.75rem;margin-bottom:2px;"><strong>Synergy:</strong> ${arch.synergy}</p>
+        <p style="font-size:0.75rem;margin-bottom:10px;"><strong>Proficiencies:</strong> ${arch.proficiencies}</p>`;
+      
+      const archAbils = arch.abilities.filter(a => a.level <= lvl);
+      if (archAbils.length === 0) {
+        html += `<p style="color:var(--muted);font-size:0.8rem;margin-top:10px;">No archetype features unlocked yet (starts at Level 3).</p>`;
+      } else {
+        archAbils.forEach(a => {
+          html += `<div class="ability-entry">
+            <div class="ability-entry-header"><span>${a.name}</span><span class="ability-entry-level">Lvl ${a.level}</span></div>
+            <div class="ability-entry-desc">${a.desc}</div>
           </div>`;
-        }
-        menuHtml += `</div>`;
-        return menuHtml;
-      };
-
-      // Track which menus have been rendered (so we only render each once at its FIRST unlock level)
-      const renderedMenus = new Set();
-
-      // Interleave fixed abilities with choice menus by level order
-      list.forEach(a => {
-        html += `<div class="ability-entry"><div class="ability-entry-header"><span>${a.name}</span><span class="ability-entry-level">Lvl ${a.level}</span></div><div class="ability-entry-desc">${a.desc}</div></div>`;
-
-        // After rendering this ability, check if any choice menu's FIRST unlock level matches this ability's level
-        menus.forEach(menu => {
-          if (renderedMenus.has(menu.name)) return;
-          const firstUnlock = menu.levels[0];
-          if (firstUnlock === a.level) {
-            html += renderMenuBlock(menu);
-            renderedMenus.add(menu.name);
-          }
         });
-      });
-
-      // Fallback: render any choice menus that weren't matched to a level (safety net)
-      menus.forEach(menu => {
-        if (!renderedMenus.has(menu.name)) {
-          const block = renderMenuBlock(menu);
-          if (block) {
-            html += block;
-            renderedMenus.add(menu.name);
-          }
-        }
-      });
-
-      $('class-box').innerHTML = html;
-
-      $('class-box').querySelectorAll('.class-choice-select').forEach(sel => {
-        sel.addEventListener('change', (e) => {
-          const menuKey = e.target.dataset.menu;
-          const idx = parseInt(e.target.dataset.idx, 10);
-          const char = chars.find(x => x.id === activeId);
-          const className = val('c-class');
-          if (char && char.classChoices && char.classChoices[className]) {
-            if (!Array.isArray(char.classChoices[className][menuKey])) {
-              char.classChoices[className][menuKey] = [];
-            }
-            char.classChoices[className][menuKey][idx] = e.target.value;
-            saveStorage();
-            renderAbilities();
-          }
-        });
-      });
+      }
+      $('archetype-box').innerHTML = html;
     }
+  }
+
+  if (cls && $('class-box')) {
+    const list = cls.abilities.filter(a => a.level <= lvl);
+    let html = `<p style="font-size:0.8rem;color:var(--accent2);margin-bottom:10px;">${cls.desc} · Hit Die ${cls.hitDie}</p>`;
+
+    const menus = cls.choiceMenus ? cls.choiceMenus : (cls.choiceMenu ? [cls.choiceMenu] : []);
+
+    if (!c.classChoices) c.classChoices = {};
+    if (!c.classChoices[val('c-class')]) c.classChoices[val('c-class')] = {};
+
+    const renderMenuBlock = (menu) => {
+      const key = menu.name;
+      if (!Array.isArray(c.classChoices[val('c-class')][key])) {
+        c.classChoices[val('c-class')][key] = [];
+      }
+      const unlockedCount = menu.levels.filter(l => l <= lvl).length;
+      if (unlockedCount <= 0) return '';
+
+      let tierSummary = '';
+      if (menu.trackTiers) {
+        const counts = {};
+        c.classChoices[val('c-class')][key].forEach(v => { if (v) counts[v] = (counts[v] || 0) + 1; });
+        const parts = Object.keys(counts).map(k => `${k} Tier ${counts[k]}`);
+        if (parts.length) tierSummary = `<div style="font-size:0.75rem;color:var(--accent);margin-bottom:6px;">Current: ${parts.join(' · ')}</div>`;
+      }
+
+      let menuHtml = `<div class="ability-entry" style="border-left-color: var(--accent2);">
+        <div class="ability-entry-header"><span style="color:var(--accent2);">${menu.name}</span></div>
+        <div class="ability-entry-desc" style="margin-bottom:6px;">${menu.hint || `Select ${unlockedCount} option(s) based on your level.`}</div>
+        ${tierSummary}`;
+
+      for (let i = 0; i < unlockedCount; i++) {
+        const selected = c.classChoices[val('c-class')][key][i] || '';
+        const opts = ['<option value="">-- Select --</option>']
+          .concat(Object.keys(menu.options).map(k =>
+            `<option value="${k}" ${k === selected ? 'selected' : ''}>${k}</option>`
+          )).join('');
+
+        let descHtml = '';
+        if (selected && menu.options[selected]) {
+          const optionData = menu.options[selected];
+          if (Array.isArray(optionData)) {
+            let tierCount = 0;
+            for (let j = 0; j <= i; j++) {
+              if (c.classChoices[val('c-class')][key][j] === selected) tierCount++;
+            }
+            const tierIndex = tierCount - 1;
+            if (tierIndex >= 0 && tierIndex < optionData.length) {
+              descHtml = `<div style="font-size:0.75rem;color:var(--text);margin-top:4px;padding:6px;background:rgba(0,0,0,0.3);border-radius:4px;">
+                <span style="color:var(--accent);font-weight:700;">Tier ${tierCount}:</span> ${optionData[tierIndex]}
+              </div>`;
+            }
+          } else {
+            descHtml = `<div style="font-size:0.75rem;color:var(--text);margin-top:4px;padding:6px;background:rgba(0,0,0,0.3);border-radius:4px;">${optionData}</div>`;
+          }
+        }
+
+        menuHtml += `<div class="field-group" style="margin-bottom:8px;">
+          <label style="font-size:0.65rem;color:var(--muted);">Pick at level ${menu.levels[i] || '?'}</label>
+          <select class="class-choice-select" data-menu="${key}" data-idx="${i}" style="background:var(--bg);">${opts}</select>
+          ${descHtml}
+        </div>`;
+      }
+      menuHtml += `</div>`;
+      return menuHtml;
+    };
+
+    const renderedMenus = new Set();
+
+    list.forEach(a => {
+      html += `<div class="ability-entry"><div class="ability-entry-header"><span>${a.name}</span><span class="ability-entry-level">Lvl ${a.level}</span></div><div class="ability-entry-desc">${a.desc}</div></div>`;
+
+      menus.forEach(menu => {
+        if (renderedMenus.has(menu.name)) return;
+        const firstUnlock = menu.levels[0];
+        if (firstUnlock === a.level) {
+          html += renderMenuBlock(menu);
+          renderedMenus.add(menu.name);
+        }
+      });
+    });
+
+    menus.forEach(menu => {
+      if (!renderedMenus.has(menu.name)) {
+        const block = renderMenuBlock(menu);
+        if (block) {
+          html += block;
+          renderedMenus.add(menu.name);
+        }
+      }
+    });
+
+    $('class-box').innerHTML = html;
+
+    $('class-box').querySelectorAll('.class-choice-select').forEach(sel => {
+      sel.addEventListener('change', (e) => {
+        const menuKey = e.target.dataset.menu;
+        const idx = parseInt(e.target.dataset.idx, 10);
+        const char = chars.find(x => x.id === activeId);
+        const className = val('c-class');
+        if (char && char.classChoices && char.classChoices[className]) {
+          if (!Array.isArray(char.classChoices[className][menuKey])) {
+            char.classChoices[className][menuKey] = [];
+          }
+          char.classChoices[className][menuKey][idx] = e.target.value;
+          saveStorage();
+          renderAbilities();
+        }
+      });
+    });
+  }
 }
 
 function switchTab(id) {
@@ -650,6 +647,7 @@ function switchTab(id) {
   if (id === 'tab-abilities') renderAbilities();
   if (id === 'tab-skills' || id === 'tab-core') recalc();
   if (id === 'tab-combat') renderWeapons();
+  if (id === 'tab-magic') renderMagic(); // Force render magic UI when opening the tab
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -716,6 +714,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (ch) ch.ladderTaken = null;
     renderAbilities();
   });
+  if ($('c-arch')) $('c-arch').addEventListener('change', renderAbilities);
   if ($('c-class')) $('c-class').addEventListener('change', renderAbilities);
   if ($('c-lvl')) $('c-lvl').addEventListener('change', renderAbilities);
 
