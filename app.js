@@ -294,21 +294,51 @@ function recalc() {
 function renderMagic() {
   if (!$('tab-magic')) return;
 
+  const lvl = parseInt(val('c-lvl') || 1, 10) || 1;
   const vigorScore = parseInt(val('s-vig') || 10, 10) || 10;
   const vigorMod = Math.floor((vigorScore - 10) / 2);
   const riverMax = Math.max(0, vigorMod);
 
+  // 1. Update River Capacity Display
   if ($('m-river-max')) $('m-river-max').textContent = riverMax;
-  if ($('m-river-count')) $('m-river-count').textContent = 0; // Baseline count
+  if ($('m-river-count')) $('m-river-count').textContent = 0;
 
+  // 2. Auto-calculate Base Vessel (Vigor Modifier, min 0)
+  let baseVessel = Math.max(0, vigorMod);
+  
+  // Calculate Exhaustion level impact on Max Vessel
   const exLevel = parseInt(val('m-exhaustion') || 0, 10) || 0;
+  let calculatedMaxVessel = baseVessel;
+  
   const noteEl = $('m-exhaustion-note');
   if (noteEl) {
-    if (exLevel >= 5) noteEl.textContent = 'WARNING: Max Vessel is reduced to 0!';
-    else if (exLevel >= 2) noteEl.textContent = 'NOTICE: Max Vessel is halved.';
-    else noteEl.textContent = '';
+    if (exLevel >= 5) {
+      calculatedMaxVessel = 0;
+      noteEl.textContent = 'WARNING: Max Vessel is reduced to 0!';
+    } else if (exLevel >= 2) {
+      calculatedMaxVessel = Math.floor(baseVessel / 2);
+      noteEl.textContent = 'NOTICE: Max Vessel is halved due to exhaustion.';
+    } else {
+      noteEl.textContent = '';
+    }
   }
 
+  // Set Max Vessel
+  if ($('m-vessel-max')) $('m-vessel-max').value = calculatedMaxVessel;
+  
+  // Clamp Current Vessel so it cannot exceed Max Vessel
+  if ($('m-vessel-cur')) {
+    let curVessel = parseInt($('m-vessel-cur').value || 0, 10);
+    if (curVessel > calculatedMaxVessel) {
+      $('m-vessel-cur').value = calculatedMaxVessel;
+    }
+  }
+
+  // 3. Auto-calculate Available Assets = (Vigor Modifier x Level), minimum 0
+  const calculatedAssets = Math.max(0, vigorMod * lvl);
+  if ($('m-assets')) $('m-assets').value = calculatedAssets;
+
+  // 4. Render River Slots
   const riverContainer = $('river-slots-container');
   if (riverContainer) {
     if (riverMax <= 0) {
