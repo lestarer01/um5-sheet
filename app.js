@@ -470,21 +470,15 @@ function renderMagic() {
     const magicTab = $('tab-magic');
     if (!magicTab) return;
 
-    // 1. Safely find Vigor stat using your exact HTML ID (s-vig)
-    const vigorEl = $('s-vig'); 
-    const vigorScore = parseInt(vigorEl.value || 10, 10) || 10;
+    // 1. Calculate River Max based on Vigor modifier (ID: s-vig)
+    const vigorScore = parseInt($('s-vig')?.value || 10, 10) || 10;
     const vigorMod = Math.floor((vigorScore - 10) / 2);
     const riverMax = Math.max(0, vigorMod);
 
-    const riverCountEl = $('m-river-count');
-    const riverMaxEl = $('m-river-max');
-    if (riverCountEl) riverCountEl.textContent = 0; 
-    if (riverMaxEl) riverMaxEl.textContent = riverMax;
-    
-    // ... rest of renderMagic stays the same
+    if ($('m-river-max')) $('m-river-max').textContent = riverMax;
 
     // 2. Exhaustion impact notice
-    const exLevel = parseInt($('m-exhaustion')?.value || 0, 10);
+    const exLevel = parseInt($('m-exhaustion')?.value || 0, 10) || 0;
     const noteEl = $('m-exhaustion-note');
     if (noteEl) {
         if (exLevel >= 5) noteEl.textContent = "WARNING: Max Vessel is reduced to 0!";
@@ -492,18 +486,18 @@ function renderMagic() {
         else noteEl.textContent = "";
     }
 
-    // 3. Render Empty/Filled River Slots
+    // 3. Render River Slots dynamically
     const riverContainer = $('river-slots-container');
     if (riverContainer) {
         if (riverMax === 0) {
-            riverContainer.innerHTML = `<p class="help-text">Vigor modifier is 0 or lower. You have no River slots available.</p>`;
+            riverContainer.innerHTML = `<p style="font-size:0.8rem;color:var(--muted);">Vigor modifier is 0 or lower. You have no River slots available.</p>`;
         } else {
             let slotsHtml = '';
             for (let i = 0; i < riverMax; i++) {
                 slotsHtml += `
-                    <div class="river-slot">
-                        <small class="text-muted">River Slot ${i + 1}</small>
-                        <div class="text-center"><em>Empty Slot</em></div>
+                    <div style="border: 1px dashed var(--border-color, #444); border-radius: 6px; padding: 10px; text-align: center; background: rgba(0,0,0,0.2);">
+                        <small style="color:var(--muted); font-size:0.75rem; display:block;">River Slot ${i + 1}</small>
+                        <span style="font-size:0.85rem; font-style:italic;">Empty Slot</span>
                     </div>`;
             }
             riverContainer.innerHTML = slotsHtml;
@@ -511,33 +505,40 @@ function renderMagic() {
     }
 }
 
-// Attach Quick Listeners for Magic Dashboard
+// Wire up event listeners
 document.addEventListener('DOMContentLoaded', () => {
-    // Vessel Buttons
+    // Listen for changes on Vigor score to update River slots instantly
+    $('s-vig')?.addEventListener('input', renderMagic);
+    $('s-vig')?.addEventListener('change', renderMagic);
+
+    // Vessel adjustment buttons
     $('m-vessel-refill')?.addEventListener('click', () => {
         if ($('m-vessel-max') && $('m-vessel-cur')) {
             $('m-vessel-cur').value = $('m-vessel-max').value;
-            saveChar();
+            if (typeof saveChar === 'function') saveChar();
         }
     });
     $('m-vessel-sub1')?.addEventListener('click', () => {
         if ($('m-vessel-cur')) {
-            $('m-vessel-cur').value = Math.max(0, parseInt($('m-vessel-cur').value || 0, 10) - 1);
-            saveChar();
+            const val = parseInt($('m-vessel-cur').value || 0, 10);
+            $('m-vessel-cur').value = Math.max(0, val - 1);
+            if (typeof saveChar === 'function') saveChar();
         }
     });
     $('m-vessel-add1')?.addEventListener('click', () => {
         if ($('m-vessel-cur')) {
-            $('m-vessel-cur').value = parseInt($('m-vessel-cur').value || 0, 10) + 1;
-            saveChar();
+            const val = parseInt($('m-vessel-cur').value || 0, 10);
+            $('m-vessel-cur').value = val + 1;
+            if (typeof saveChar === 'function') saveChar();
         }
     });
 
-    // Re-render magic calculations when Vigor or Exhaustion changes
-    $('c-stat-vigor')?.addEventListener('input', renderMagic);
+    // Exhaustion listener
     $('m-exhaustion')?.addEventListener('change', renderMagic);
+
+    // Initial calculation on load
+    renderMagic();
 });
-  
 
         if (cls && $('class-box')) {
       const list = cls.abilities.filter(a => a.level <= lvl);
