@@ -67,19 +67,17 @@ function saveStorage() {
 
 function populateSelects() {
   if (typeof LADDER_DATA !== 'undefined' && $('c-ladder')) {
-    $('c-ladder').innerHTML = '<option value="">-- Select Ladder --</option>' +
-      Object.keys(LADDER_DATA).map(k => `<option value="${k}">${k}</option>`).join('');
+    $('c-ladder').innerHTML = Object.keys(LADDER_DATA).map(k => `<option value="${k}">${k}</option>`).join('');
   }
   if (typeof CLASS_DATA !== 'undefined' && $('c-class')) {
-    $('c-class').innerHTML = '<option value="">-- Select Class --</option>' +
-      Object.keys(CLASS_DATA).map(k => `<option value="${k}">${k}</option>`).join('');
+    $('c-class').innerHTML = Object.keys(CLASS_DATA).map(k => `<option value="${k}">${k}</option>`).join('');
   }
   if (typeof ARMOR_DATA !== 'undefined' && $('armor-preset')) {
   populateArmorPresets('__all__');
   }
-    if (typeof ARCHETYPE_DATA !== 'undefined' && $('c-arch')) {
+  if (typeof ARCHETYPE_DATA !== 'undefined' && $('c-arch')) {
     $('c-arch').innerHTML = '<option value="">-- Select Archetype --</option>' +
-      Object.keys(ARCHETYPE_DATA).map(a => `<option value="${a}">${a}</option>`).join('');
+      ARCHETYPE_DATA.map(a => `<option value="${a}">${a}</option>`).join('');
   }
   if (typeof BACKGROUND_DATA !== 'undefined' && $('c-background')) {
     $('c-background').innerHTML = '<option value="">-- Select Background --</option>' +
@@ -314,7 +312,7 @@ function applyArmor() {
 
 function blankChar() {
   return {
-    id: 'c_' + Date.now(), name: 'New Operative', species: 'Human', arch: '', background: '', ladder: '', className: '', lvl: 1,
+    id: 'c_' + Date.now(), name: 'New Operative', species: 'Human', arch: '', background: '', ladder: 'Born Leader', className: 'Gunslinger', lvl: 1,
     str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10, vig: 10,
     saveProfs: {str:false, dex:false, con:false, int:false, wis:false, cha:false, vig:false},
     hpMax: 10, hpCur: 10, hpTemp: 0, hd: '1d10', ac: 10, spd: 30, init: 0,
@@ -361,7 +359,6 @@ function saveCurrent() {
   saveStorage();
   recalc();
   renderRoster();
-  renderMagic();
 }
 
 function loadToForm(c) {
@@ -394,7 +391,6 @@ function loadToForm(c) {
   recalc();
   renderAbilities();
   renderRoster();
-  renderMagic();
 }
 
 function renderRoster() {
@@ -467,80 +463,6 @@ function renderAbilities() {
       });
     });
   }
-// Magic Tab Auto-Calculations & UI Rendering
-function renderMagic() {
-    const magicTab = $('tab-magic');
-    if (!magicTab) return;
-
-    // 1. Calculate River Max based on Vigor modifier (ID: s-vig)
-    const vigorScore = parseInt($('s-vig')?.value || 10, 10) || 10;
-    const vigorMod = Math.floor((vigorScore - 10) / 2);
-    const riverMax = Math.max(0, vigorMod);
-
-    if ($('m-river-max')) $('m-river-max').textContent = riverMax;
-
-    // 2. Exhaustion impact notice
-    const exLevel = parseInt($('m-exhaustion')?.value || 0, 10) || 0;
-    const noteEl = $('m-exhaustion-note');
-    if (noteEl) {
-        if (exLevel >= 5) noteEl.textContent = "WARNING: Max Vessel is reduced to 0!";
-        else if (exLevel >= 2) noteEl.textContent = "NOTICE: Max Vessel is halved.";
-        else noteEl.textContent = "";
-    }
-
-    // 3. Render River Slots dynamically
-    const riverContainer = $('river-slots-container');
-    if (riverContainer) {
-        if (riverMax === 0) {
-            riverContainer.innerHTML = `<p style="font-size:0.8rem;color:var(--muted);">Vigor modifier is 0 or lower. You have no River slots available.</p>`;
-        } else {
-            let slotsHtml = '';
-            for (let i = 0; i < riverMax; i++) {
-                slotsHtml += `
-                    <div style="border: 1px dashed var(--border-color, #444); border-radius: 6px; padding: 10px; text-align: center; background: rgba(0,0,0,0.2);">
-                        <small style="color:var(--muted); font-size:0.75rem; display:block;">River Slot ${i + 1}</small>
-                        <span style="font-size:0.85rem; font-style:italic;">Empty Slot</span>
-                    </div>`;
-            }
-            riverContainer.innerHTML = slotsHtml;
-        }
-    }
-}
-
-// Wire up event listeners
-document.addEventListener('DOMContentLoaded', () => {
-    // Listen for changes on Vigor score to update River slots instantly
-    $('s-vig')?.addEventListener('input', renderMagic);
-    $('s-vig')?.addEventListener('change', renderMagic);
-
-    // Vessel adjustment buttons
-    $('m-vessel-refill')?.addEventListener('click', () => {
-        if ($('m-vessel-max') && $('m-vessel-cur')) {
-            $('m-vessel-cur').value = $('m-vessel-max').value;
-            if (typeof saveChar === 'function') saveChar();
-        }
-    });
-    $('m-vessel-sub1')?.addEventListener('click', () => {
-        if ($('m-vessel-cur')) {
-            const val = parseInt($('m-vessel-cur').value || 0, 10);
-            $('m-vessel-cur').value = Math.max(0, val - 1);
-            if (typeof saveChar === 'function') saveChar();
-        }
-    });
-    $('m-vessel-add1')?.addEventListener('click', () => {
-        if ($('m-vessel-cur')) {
-            const val = parseInt($('m-vessel-cur').value || 0, 10);
-            $('m-vessel-cur').value = val + 1;
-            if (typeof saveChar === 'function') saveChar();
-        }
-    });
-
-    // Exhaustion listener
-    $('m-exhaustion')?.addEventListener('change', renderMagic);
-
-    // Initial calculation on load
-    renderMagic();
-});
 
         if (cls && $('class-box')) {
       const list = cls.abilities.filter(a => a.level <= lvl);
@@ -613,28 +535,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return menuHtml;
       };
 
-        // --- ARCHETYPE FEATURES ---
-  const archKey = val('c-arch');
-  const arch = (typeof ARCHETYPE_DATA !== 'undefined' && archKey) ? ARCHETYPE_DATA[archKey] : null;
-  const archBox = $('archetype-box');
-  if (archBox) {
-    if (arch) {
-      const archList = arch.abilities.filter(a => a.level <= lvl);
-      let archHtml = `<p style="font-size:0.8rem;color:var(--accent2);margin-bottom:6px;">${arch.desc}</p>`;
-      archHtml += `<p style="font-size:0.72rem;color:var(--muted);margin-bottom:4px;"><strong>Synergy:</strong> ${arch.synergy}</p>`;
-      archHtml += `<p style="font-size:0.72rem;color:var(--muted);margin-bottom:10px;"><strong>Proficiencies:</strong> ${arch.proficiencies}</p>`;
-      if (archList.length === 0) {
-        archHtml += `<p style="font-size:0.75rem;color:var(--muted);">Archetype features unlock at level 3.</p>`;
-      } else {
-        archHtml += archList.map(a =>
-          `<div class="ability-entry"><div class="ability-entry-header"><span>${a.name}</span><span class="ability-entry-level">Lvl ${a.level}</span></div><div class="ability-entry-desc">${a.desc}</div></div>`
-        ).join('');
-      }
-      archBox.innerHTML = archHtml;
-    } else {
-      archBox.innerHTML = `<p style="font-size:0.75rem;color:var(--muted);">Select an Archetype on the Core tab to see features.</p>`;
-    }
-  }
       // Track which menus have been rendered (so we only render each once at its FIRST unlock level)
       const renderedMenus = new Set();
 
@@ -738,7 +638,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
   if ($('c-class')) $('c-class').addEventListener('change', renderAbilities);
   if ($('c-lvl')) $('c-lvl').addEventListener('change', renderAbilities);
-  if ($('c-arch')) $('c-arch').addEventListener('change', renderAbilities);
 
   if (chars.length) {
     loadToForm(chars[0]);
