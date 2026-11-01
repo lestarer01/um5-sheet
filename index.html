@@ -225,21 +225,95 @@
     </section>
 
     <!-- TAB 6: MAGIC -->
-    <section id="tab-magic" class="tab-page">
-      <div class="card">
-        <h2>Dark System Magic</h2>
-        <div class="grid-2">
-          <div class="field-group"><label>Max Mana / MP</label><input type="number" id="mp-max" /></div>
-          <div class="field-group"><label>Current Mana</label><input type="number" id="mp-cur" /></div>
+    <div id="tab-magic" class="tab-content">
+    <!-- 1. Dark Magic Resource Dashboard -->
+    <div class="card">
+        <h2>Dark Magic Dashboard</h2>
+        <div class="grid grid-4 gap-1">
+            <!-- Vessel Tracker -->
+            <div class="form-group">
+                <label>Vessel (Current / Max)</label>
+                <div class="vessel-input-group">
+                    <input type="number" id="m-vessel-cur" value="0" min="0">
+                    <span class="divider">/</span>
+                    <input type="number" id="m-vessel-max" value="0" min="0">
+                </div>
+                <div class="btn-group margin-top-half">
+                    <button type="button" class="btn btn-sm" id="m-vessel-sub1">-1</button>
+                    <button type="button" class="btn btn-sm" id="m-vessel-add1">+1</button>
+                    <button type="button" class="btn btn-sm btn-primary" id="m-vessel-refill">Refill</button>
+                </div>
+            </div>
+
+            <!-- Asset Points -->
+            <div class="form-group">
+                <label>Available Assets</label>
+                <input type="number" id="m-assets" value="0" min="0">
+                <small class="help-text">Spent to unlock Paths & Spells</small>
+            </div>
+
+            <!-- River Capacity -->
+            <div class="form-group">
+                <label>River Slots</label>
+                <div class="stat-badge-box">
+                    <span id="m-river-count">0</span> / <span id="m-river-max">0</span>
+                </div>
+                <small class="help-text">Max = Vigor Modifier</small>
+            </div>
+
+            <!-- Exhaustion Tracker -->
+            <div class="form-group">
+                <label>Exhaustion Level</label>
+                <select id="m-exhaustion">
+                    <option value="0">0 - Normal</option>
+                    <option value="1">1 - Disadv. Ability Checks</option>
+                    <option value="2">2 - Speed & Max Vessel Halved</option>
+                    <option value="3">3 - Disadv. Attacks & Saves</option>
+                    <option value="4">4 - HP Max & Vessel Halved</option>
+                    <option value="5">5 - Speed & Vessel = 0</option>
+                    <option value="6">6 - Death</option>
+                </select>
+                <small id="m-exhaustion-note" class="help-text text-warn"></small>
+            </div>
         </div>
-        <div class="grid-2">
-          <div class="field-group"><label>Spell Save DC</label><input type="number" id="spell-dc" /></div>
-          <div class="field-group"><label>Spell Attack</label><input type="number" id="spell-atk" /></div>
+    </div>
+
+    <!-- 2. The River (Quick-Cast Dock) -->
+    <div class="card">
+        <div class="card-header-flex">
+            <h2>The River <small class="text-muted">(Quick-Cast Bank)</small></h2>
+            <span class="badge badge-info">1 Min &rarr; Action | 1 Action &rarr; Bonus | Bonus &rarr; Free (1/turn)</span>
         </div>
-        <div class="field-group"><label>Magic Tradition / Source</label><input type="text" id="magic-source" /></div>
-        <div class="field-group"><label>Spells & Dark Powers</label><textarea id="spell-list" rows="10"></textarea></div>
-      </div>
-    </section>
+        <p class="help-text">Spells slotted here cast faster. Swap during rests. (No Rituals allowed).</p>
+        <div id="river-slots-container" class="river-grid">
+            <!-- Dynamic River Slots rendered by JS -->
+        </div>
+    </div>
+
+    <!-- 3. Known Spells & Rituals -->
+    <div class="card">
+        <div class="card-header-flex">
+            <h2>Known Spells & Rituals</h2>
+            <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-filter active" data-filter="all">All</button>
+                <button type="button" class="btn btn-sm btn-filter" data-filter="river">In River</button>
+                <button type="button" class="btn btn-sm btn-filter" data-filter="ritual">Rituals</button>
+            </div>
+        </div>
+        <div id="known-spells-list" class="spells-list margin-top">
+            <p class="help-text">No dark spells acquired yet. Unlock paths in the Dark Sequence below to buy spells.</p>
+        </div>
+    </div>
+
+    <!-- 4. Dark Sequence (Path & Spell Store) -->
+    <div class="card">
+        <h2>Dark Sequence (Paths & Spells)</h2>
+        <p class="help-text">Unlock a Path (2 Assets) to gain access to its Root and higher-tier spells.</p>
+        <div id="dark-sequence-container" class="sequence-accordion-group">
+            <!-- Dynamic Dark Sequence Paths rendered by JS -->
+        </div>
+    </div>
+</div>
   </main>
 
   <script src="database.js"></script>
