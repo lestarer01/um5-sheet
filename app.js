@@ -292,7 +292,6 @@ function recalc() {
 
 /* --- MAGIC CALCULATIONS --- */
 function renderMagic() {
-function renderMagic() {
   if (!$('tab-magic')) return;
 
   const lvl = parseInt(val('c-lvl') || 1, 10) || 1;
