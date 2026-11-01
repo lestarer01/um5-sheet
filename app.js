@@ -465,6 +465,72 @@ function renderAbilities() {
       });
     });
   }
+// Magic Tab Auto-Calculations & UI Rendering
+function renderMagic() {
+    if (!$('tab-magic')) return;
+
+    // 1. Calculate River Max based on Vigor modifier
+    const vigorScore = parseInt($('c-stat-vigor')?.value || 10, 10);
+    const vigorMod = Math.floor((vigorScore - 10) / 2);
+    const riverMax = Math.max(0, vigorMod);
+
+    if ($('m-river-max')) $('m-river-max').textContent = riverMax;
+
+    // 2. Exhaustion impact notice
+    const exLevel = parseInt($('m-exhaustion')?.value || 0, 10);
+    const noteEl = $('m-exhaustion-note');
+    if (noteEl) {
+        if (exLevel >= 5) noteEl.textContent = "WARNING: Max Vessel is reduced to 0!";
+        else if (exLevel >= 2) noteEl.textContent = "NOTICE: Max Vessel is halved.";
+        else noteEl.textContent = "";
+    }
+
+    // 3. Render Empty/Filled River Slots
+    const riverContainer = $('river-slots-container');
+    if (riverContainer) {
+        if (riverMax === 0) {
+            riverContainer.innerHTML = `<p class="help-text">Vigor modifier is 0 or lower. You have no River slots available.</p>`;
+        } else {
+            let slotsHtml = '';
+            for (let i = 0; i < riverMax; i++) {
+                slotsHtml += `
+                    <div class="river-slot">
+                        <small class="text-muted">River Slot ${i + 1}</small>
+                        <div class="text-center"><em>Empty Slot</em></div>
+                    </div>`;
+            }
+            riverContainer.innerHTML = slotsHtml;
+        }
+    }
+}
+
+// Attach Quick Listeners for Magic Dashboard
+document.addEventListener('DOMContentLoaded', () => {
+    // Vessel Buttons
+    $('m-vessel-refill')?.addEventListener('click', () => {
+        if ($('m-vessel-max') && $('m-vessel-cur')) {
+            $('m-vessel-cur').value = $('m-vessel-max').value;
+            saveChar();
+        }
+    });
+    $('m-vessel-sub1')?.addEventListener('click', () => {
+        if ($('m-vessel-cur')) {
+            $('m-vessel-cur').value = Math.max(0, parseInt($('m-vessel-cur').value || 0, 10) - 1);
+            saveChar();
+        }
+    });
+    $('m-vessel-add1')?.addEventListener('click', () => {
+        if ($('m-vessel-cur')) {
+            $('m-vessel-cur').value = parseInt($('m-vessel-cur').value || 0, 10) + 1;
+            saveChar();
+        }
+    });
+
+    // Re-render magic calculations when Vigor or Exhaustion changes
+    $('c-stat-vigor')?.addEventListener('input', renderMagic);
+    $('m-exhaustion')?.addEventListener('change', renderMagic);
+});
+  
 
         if (cls && $('class-box')) {
       const list = cls.abilities.filter(a => a.level <= lvl);
