@@ -810,7 +810,8 @@ function characterHasRootInPath(c, pathKey) {
   });
 }
 
-/* ---- DARK SEQUENCE (Paths & Spells Store) ---- */
+
+/* ---- DARK SEQUENCE (Clean UI & Rules) ---- */
 
 function renderDarkSequence() {
   const box = $('dark-sequence-container');
@@ -820,109 +821,155 @@ function renderDarkSequence() {
   if (!c) { box.innerHTML = ''; return; }
 
   const assets = getAssets();
-
   let html = '';
-  Object.entries(MAGIC_PATHS).forEach(([pathKey, path]) => {
-    const unlocked = characterHasPath(c, pathKey);
-    const hasRoot = characterHasRootInPath(c, pathKey);
 
-    html += `<div class="ability-entry" style="border-left-color:${unlocked ? 'var(--success)' : 'var(--accent2)'}; margin-bottom:10px;">
-      <div class="ability-entry-header">
-        <span>${path.name}</span>
-        <span class="ability-entry-level">${unlocked ? 'UNLOCKED' : `Cost: ${path.cost} Assets`}</span>
-      </div>
-      <div class="ability-entry-desc" style="margin-bottom:6px;">
-        <strong>Benefit:</strong> ${path.benefit}<br>
-        <strong>Synergy:</strong> ${path.synergy}<br>
-        <em style="font-size:0.75rem;">${path.traits}</em>
-      </div>`;
+  // Separate paths into Unlocked and Locked
+  const unlocked = Object.keys(MAGIC_PATHS).filter(k => characterHasPath(c, k));
+  const locked = Object.keys(MAGIC_PATHS).filter(k => !characterHasPath(c, k));
 
-    if (!unlocked) {
-      const canAfford = assets >= path.cost;
-      html += `<button type="button" class="btn btn-primary btn-unlock-path"
-        data-path="${pathKey}" ${canAfford ? '' : 'disabled'}
-        style="margin-bottom:6px;">
-        Unlock Path (${path.cost} Assets)${canAfford ? '' : ' - Not enough Assets'}
-      </button>`;
-    } else {
-      // Group spells by tier
-      const tiers = {};
-      path.spells.forEach(sp => {
-        if (!tiers[sp.tier]) tiers[sp.tier] = [];
-        tiers[sp.tier].push(sp);
-      });
+  // 1. UNLOCKED PATHS SECTION
+  if (unlocked.length > 0) {
+    html += `<h4 style="color:var(--accent); border-bottom:1px solid var(--border); padding-bottom:4px; margin-bottom:10px;">Unlocked Paths</h4>`;
+    unlocked.forEach(pathKey => {
+      html += renderPathCard(c, pathKey, assets, true);
+    });
+  } else {
+    html += `<div style="padding:10px; background:rgba(0,0,0,0.2); border-radius:6px; text-align:center; color:var(--muted); margin-bottom:15px;">
+      No paths unlocked yet. Use your Assets to unlock one below.
+    </div>`;
+  }
 
-      Object.keys(tiers).sort().forEach(tier => {
-        html += `<div style="margin-top:8px;">
-          <div style="font-size:0.75rem; color:var(--accent); font-weight:700; margin-bottom:4px;">
-            Tier ${tier}${tier === '0' ? ' (Root)' : ''}
-          </div>`;
-
-        tiers[tier].forEach(sp => {
-          const known = characterKnowsSpell(c, pathKey, sp.name);
-          const needsRoot = parseInt(tier, 10) > 0 && !hasRoot;
-          const canAfford = assets >= sp.ap;
-          const canBuy = !known && !needsRoot && canAfford;
-
-          let btnLabel = '';
-          if (known) btnLabel = '✓ Known';
-          else if (needsRoot) btnLabel = `Buy (${sp.ap} AP) - Need a root first`;
-          else if (!canAfford) btnLabel = `Buy (${sp.ap} AP) - Not enough Assets`;
-          else btnLabel = `Buy (${sp.ap} AP)`;
-
-          html += `<div style="background:rgba(0,0,0,0.2); padding:6px 8px; border-radius:4px; margin-bottom:4px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:4px;">
-              <span style="font-size:0.82rem; font-weight:700;">
-                ${sp.name}${sp.ritual ? ' <small style="color:var(--muted);">(Ritual)</small>' : ''}
-              </span>
-              <button type="button" class="btn btn-sm btn-buy-spell"
-                data-path="${pathKey}" data-name="${sp.name}"
-                ${canBuy ? '' : 'disabled'}
-                style="font-size:0.7rem; padding:4px 8px; background:${known ? 'var(--success)' : 'var(--accent2)'}; color:#000;">
-                ${btnLabel}
-              </button>
-            </div>
-            <div style="font-size:0.7rem; color:var(--muted); margin-top:2px;">
-              AP ${sp.ap}${sp.cc ? ` · CC ${sp.cc}` : ''} · ${sp.time} · ${sp.range} · ${sp.duration} · ${sp.comp}
-            </div>
-          </div>`;
-        });
-
-        html += `</div>`;
-      });
-    }
-
-    html += `</div>`;
-  });
+  // 2. EXPLORE & UNLOCK SECTION
+  if (locked.length > 0) {
+    html += `<h4 style="color:var(--accent2); border-bottom:1px solid var(--border); padding-bottom:4px; margin-top:20px; margin-bottom:10px;">Explore & Unlock Paths</h4>`;
+    html += `<div class="field-group" style="margin-bottom:10px;">
+      <select id="path-explore-select" style="background:var(--bg); border:1px solid var(--accent2);">
+        <option value="">-- Select a Path to explore --</option>
+        ${locked.map(k => `<option value="${k}">${MAGIC_PATHS[k].name} (Cost: ${MAGIC_PATHS[k].cost})</option>`).join('')}
+      </select>
+    </div>`;
+    html += `<div id="path-preview-container"></div>`;
+  }
 
   box.innerHTML = html;
 
-  // Bind unlock-path buttons
-  box.querySelectorAll('.btn-unlock-path').forEach(btn => {
-    btn.onclick = () => unlockPath(btn.dataset.path);
-  });
-
-  // Bind buy-spell buttons
+  // Bind "Buy Spell" buttons for unlocked paths
   box.querySelectorAll('.btn-buy-spell').forEach(btn => {
     btn.onclick = () => buySpell(btn.dataset.path, btn.dataset.name);
   });
+
+  // Bind the Dropdown to show the path preview instantly
+  const sel = $('path-explore-select');
+  if (sel) {
+    sel.addEventListener('change', (e) => {
+      const previewBox = $('path-preview-container');
+      if (!e.target.value) {
+        previewBox.innerHTML = '';
+      } else {
+        // Render the selected path as a locked preview
+        previewBox.innerHTML = renderPathCard(c, e.target.value, assets, false);
+        
+        // Bind the unlock button inside the preview
+        const btnUnlock = previewBox.querySelector('.btn-unlock-path');
+        if (btnUnlock) {
+          btnUnlock.onclick = () => {
+            unlockPath(e.target.value);
+          };
+        }
+      }
+    });
+  }
 }
 
-function unlockPath(pathKey) {
-  const c = getActiveChar();
-  if (!c || !MAGIC_PATHS[pathKey]) return;
+// Helper to generate the HTML for a single Path
+function renderPathCard(c, pathKey, assets, isUnlocked) {
   const path = MAGIC_PATHS[pathKey];
-  const assets = getAssets();
-  if (assets < path.cost) {
-    alert('Not enough Assets to unlock this path.');
-    return;
-  }
-  if (!confirm(`Unlock ${path.name} for ${path.cost} Assets?`)) return;
+  if (!path) return '';
 
-  if (!c.unlockedPaths) c.unlockedPaths = [];
-  c.unlockedPaths.push(pathKey);
-  setAssets(assets - path.cost);
-  renderMagic();
+  let html = `<div class="ability-entry" style="border-left-color:${isUnlocked ? 'var(--success)' : 'var(--accent2)'}; margin-bottom:10px; background:var(--input);">
+    <div class="ability-entry-header">
+      <span style="color:${isUnlocked ? 'var(--success)' : 'var(--accent2)'};">${path.name}</span>
+      <span class="ability-entry-level">${isUnlocked ? 'UNLOCKED' : `Cost: ${path.cost} Assets`}</span>
+    </div>
+    <div class="ability-entry-desc" style="margin-bottom:10px;">
+      <strong style="color:var(--accent);">Benefit:</strong> ${path.benefit}<br>
+      <strong style="color:var(--accent);">Synergy:</strong> ${path.synergy}<br>
+      <em style="font-size:0.75rem; color:var(--muted);">${path.traits}</em>
+    </div>`;
+
+  if (!isUnlocked) {
+    const canAfford = assets >= path.cost;
+    html += `<button type="button" class="btn btn-primary btn-unlock-path"
+      data-path="${pathKey}" ${canAfford ? '' : 'disabled'}
+      style="margin-bottom:10px; width:100%; background:var(--accent2); color:#000;">
+      Unlock ${path.name} (${path.cost} Assets)${canAfford ? '' : ' - Need more Assets'}
+    </button>`;
+  }
+
+  // Group spells by tier
+  const tiers = {};
+  path.spells.forEach(sp => {
+    if (!tiers[sp.tier]) tiers[sp.tier] = [];
+    tiers[sp.tier].push(sp);
+  });
+
+  Object.keys(tiers).sort().forEach(tier => {
+    html += `<div style="margin-top:8px;">
+      <div style="font-size:0.75rem; color:var(--accent); font-weight:700; margin-bottom:4px; border-bottom:1px solid rgba(0,242,254,0.2);">
+        Tier ${tier}${tier === '0' ? ' (Root)' : ''}
+      </div>`;
+
+    tiers[tier].forEach(sp => {
+      const known = characterKnowsSpell(c, pathKey, sp.name);
+      let canBuy = false;
+      let btnLabel = '';
+
+      if (!isUnlocked) {
+        btnLabel = `AP ${sp.ap}`; // Just show cost text if locked
+      } else {
+        // Strict Rule: Must have a spell in EVERY lower tier
+        let hasLowerTiers = true;
+        for (let t = 0; t < sp.tier; t++) {
+          const hasT = c.knownSpells.some(s => s.pathKey === pathKey && path.spells.find(x => x.name === s.name)?.tier === t);
+          if (!hasT) hasLowerTiers = false;
+        }
+
+        const canAfford = assets >= sp.ap;
+        canBuy = !known && hasLowerTiers && canAfford;
+
+        if (known) btnLabel = '✓ Known';
+        else if (!hasLowerTiers) btnLabel = `Buy (${sp.ap} AP) - Need prior tiers`;
+        else if (!canAfford) btnLabel = `Buy (${sp.ap} AP) - Not enough Assets`;
+        else btnLabel = `Buy (${sp.ap} AP)`;
+      }
+
+      html += `<div style="background:rgba(0,0,0,0.3); padding:6px 8px; border-radius:4px; margin-bottom:4px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:4px;">
+          <span style="font-size:0.82rem; font-weight:700; color:${isUnlocked ? 'var(--text)' : 'var(--muted)'};">
+            ${sp.name}${sp.ritual ? ' <small style="color:var(--accent2);">(Ritual)</small>' : ''}
+          </span>`;
+
+      if (isUnlocked) {
+        html += `<button type="button" class="btn btn-sm btn-buy-spell"
+          data-path="${pathKey}" data-name="${sp.name}"
+          ${canBuy ? '' : 'disabled'}
+          style="font-size:0.7rem; padding:4px 8px; background:${known ? 'var(--success)' : 'var(--accent)'}; color:#000;">
+          ${btnLabel}
+        </button>`;
+      } else {
+        html += `<span style="font-size:0.7rem; color:var(--muted); font-weight:bold;">${btnLabel}</span>`;
+      }
+
+      html += `</div>
+        <div style="font-size:0.7rem; color:var(--muted); margin-top:2px;">
+          ${sp.cc ? `CC ${sp.cc} · ` : ''}${sp.time} · ${sp.range} · ${sp.duration} · ${sp.comp}
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  html += `</div>`;
+  return html;
 }
 
 function buySpell(pathKey, name) {
@@ -939,10 +986,19 @@ function buySpell(pathKey, name) {
   }
   if (characterKnowsSpell(c, pathKey, name)) return;
 
-  // Tier > 0 requires a root
-  if (sp.tier > 0 && !characterHasRootInPath(c, pathKey)) {
-    alert('You must acquire a root (Tier 0) spell in this path first.');
-    return;
+  // Strict rule check: Must own at least one spell in EACH lower tier
+  if (sp.tier > 0) {
+    for (let t = 0; t < sp.tier; t++) {
+      const hasSpellInTier = c.knownSpells.some(s => {
+        if (s.pathKey !== pathKey) return false;
+        const knownSp = path.spells.find(x => x.name === s.name);
+        return knownSp && knownSp.tier === t;
+      });
+      if (!hasSpellInTier) {
+        alert(`You must know at least one Tier ${t} spell in this path before buying a Tier ${sp.tier} spell.`);
+        return;
+      }
+    }
   }
 
   if (!confirm(`Buy "${sp.name}" for ${sp.ap} Assets?`)) return;
@@ -951,10 +1007,9 @@ function buySpell(pathKey, name) {
   c.knownSpells.push({ pathKey, name: sp.name });
   setAssets(assets - sp.ap);
 
-  // SYNERGY: when buying a higher-tier (>0) spell, grant a free spell from synergy path
+  // SYNERGY RULE (Matches page 229)
   if (sp.tier > 0 && path.synergy && MAGIC_PATHS[path.synergy] && characterHasPath(c, path.synergy)) {
     const synPath = MAGIC_PATHS[path.synergy];
-    // Find the lowest tier spell in synergy path that character does NOT already know
     const sorted = [...synPath.spells].sort((a, b) => a.tier - b.tier);
     const freeSpell = sorted.find(s => !characterKnowsSpell(c, path.synergy, s.name));
     if (freeSpell) {
@@ -964,6 +1019,26 @@ function buySpell(pathKey, name) {
   }
 
   saveStorage();
+  renderMagic();
+}
+
+
+    
+
+function unlockPath(pathKey) {
+  const c = getActiveChar();
+  if (!c || !MAGIC_PATHS[pathKey]) return;
+  const path = MAGIC_PATHS[pathKey];
+  const assets = getAssets();
+  if (assets < path.cost) {
+    alert('Not enough Assets to unlock this path.');
+    return;
+  }
+  if (!confirm(`Unlock ${path.name} for ${path.cost} Assets?`)) return;
+
+  if (!c.unlockedPaths) c.unlockedPaths = [];
+  c.unlockedPaths.push(pathKey);
+  setAssets(assets - path.cost);
   renderMagic();
 }
 
