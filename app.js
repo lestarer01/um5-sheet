@@ -982,10 +982,11 @@ function renderPathCard(c, pathKey, assets, isUnlocked) {
         html += `<span style="font-size:0.7rem; color:var(--muted); font-weight:bold;">${btnLabel}</span>`;
       }
 
-      html += `</div>
+            html += `</div>
         <div style="font-size:0.7rem; color:var(--muted); margin-top:2px;">
           ${sp.cc ? `CC ${sp.cc} · ` : ''}${sp.time} · ${sp.range} · ${sp.duration} · ${sp.comp}
         </div>
+        ${sp.desc ? `<div style="font-size:0.75rem; color:var(--text); margin-top:4px; border-top:1px dashed rgba(255,255,255,0.1); padding-top:4px;">${sp.desc}</div>` : ''}
       </div>`;
     });
     html += `</div>`;
