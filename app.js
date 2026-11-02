@@ -365,7 +365,7 @@ function blankChar() {
     credits: 500, inventory: '', skills: {}, ladderTaken: null, classChoices: {}, featNotes: '',
     mpMax: 0, mpCur: 0, spellDc: 10, spellAtk: 0, magicSource: '', spellList: '',
     // New Dark Magic Fields
-    vesselCur: 0, vesselMax: 0, assets: 0, exhaustion: 0
+    vesselCur: 0, vesselMax: 0, assets: 0, exhaustion: 0,
     unlockedPaths: [],
     knownSpells: [],
     riverSpells: []
