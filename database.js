@@ -1078,3 +1078,365 @@ const ARMOR_DATA = {
   'Samurai O-yoroi': { type: 'Heavy Armor', baseAc: 17, maxDex: 0, props: 'Cost: $800 | Str 13 | Stealth Disadv | Speed -20 ft. | Wt: 50 lb. | TL0' },
   'Splint Mail': { type: 'Heavy Armor', baseAc: 17, maxDex: 0, props: 'Cost: $200 | Str 15 | Stealth Disadv | Speed -20 ft. | Wt: 60 lb. | TL0' }
 };
+
+// ============================================================
+// MAGIC SYSTEM DATA (Ultramodern5 - Chapter Nine: Magic)
+// ============================================================
+
+const MAGIC_RULES = {
+  exhaustionLevels: [
+    { level: 1, effect: "Disadvantage on ability checks (affects Vigor)." },
+    { level: 2, effect: "Speed and max vessel halved." },
+    { level: 3, effect: "Disadvantage on attack rolls and saving throws." },
+    { level: 4, effect: "Hit point maximum halved, and VR reduced to 0." },
+    { level: 5, effect: "Speed and vessel reduced to 0." },
+    { level: 6, effect: "Death." }
+  ],
+  darkSequence: "Spell acquisition follows the Dark Sequence: a chain of linked spells from basic cantrips (root spells) to larger epic spells. You must acquire a spell in each tier of a path (including root) to gain a higher-tier spell. There are no character level requirements.",
+  pathRules: "To pursue a path, spend the Path Cost (always 2 Assets) plus the asset cost of at least one root spell. You then gain the Path Benefit. Your first root spell is more expensive than some later spells.",
+  synergyRules: "Each path has a related focus (Synergy Path). If you purchase the path cost of this related path, when you acquire a spell from a higher tier you gain one spell from the lowest tier you have access to from the related path for free (or a root, if it's the lowest). Note: a GM may make a path available without its synergy path.",
+  rootRules: "A character must purchase at least one root spell to acquire additional spells along that same path.",
+  ritualRules: "Rituals (marked *) take longer to cast and cannot be placed in your river, but cost no dark from your vessel. They carry their own sacrifice (exhaustion, lost hit dice/points, or other conditions). Hit point spending incurs psychic damage that cannot be resisted.",
+  concentrationRules: "Only one concentration spell at a time. Concentration doesn't consume dark beyond initial cast. You cannot recover vessel with any action on your turn while concentrating, but items can still restore vessel."
+};
+
+// Collective spells available to any spellcaster
+const COLLECTIVE_SPELLS = [
+  { name: "Dispel", ap: 2, cc: 3, time: "1 action", range: "60 ft.", duration: "Inst.", comp: "V, S", ritual: false,
+    desc: "Target one spell. Make a Vigor (Induce) check against the spell's save DC. On success, the spell ends." },
+  { name: "Parlor Tricks", ap: 1, cc: null, time: "1 action", range: "Varies", duration: "Varies", comp: "V, S", ritual: true,
+    desc: "Minor magical effects: light a candle, chill a drink, create a sound, etc. GM adjudicates." }
+];
+
+// Full Paths list
+const MAGIC_PATHS = {
+  air: {
+    name: "Path of Air", cost: 2, synergy: "movement",
+    benefit: "You can hold your breath indefinitely and gain a +10 ft bonus to flying speeds.",
+    traits: "Air spells require boisterous hand movements, with little to no vocalization.",
+    spells: [
+      { tier: 0, name: "Wave", ap: 2, cc: 3, time: "1 action", range: "15 ft.", duration: "Inst.", comp: "S", ritual: false },
+      { tier: 0, name: "Jump", ap: 2, cc: null, time: "1 bonus action", range: "Touch", duration: "1 minute", comp: "S", ritual: false },
+      { tier: 1, name: "Feather Fall", ap: 3, cc: null, time: "1 reaction", range: "60 ft.", duration: "1 minute", comp: "S", ritual: false },
+      { tier: 1, name: "Levitate", ap: 3, cc: 4, time: "1 action", range: "60 ft.", duration: "Conc. up to 10 minutes", comp: "S", ritual: false },
+      { tier: 2, name: "God's Breath", ap: 5, cc: 6, time: "1 action", range: "Self (60-ft cone)", duration: "Inst.", comp: "S", ritual: false },
+      { tier: 2, name: "Storm Wall", ap: 5, cc: 6, time: "1 action", range: "120 ft.", duration: "Conc. up to 10 minutes", comp: "S", ritual: false },
+      { tier: 2, name: "Fly", ap: 5, cc: 6, time: "1 action", range: "Touch", duration: "Conc. up to 10 minutes", comp: "S", ritual: false },
+      { tier: 3, name: "Freedom", ap: 7, cc: null, time: "1 action", range: "Touch", duration: "1 hour", comp: "S", ritual: false },
+      { tier: 3, name: "Wind Road", ap: 7, cc: null, time: "1 minute", range: "Self", duration: "8 hours", comp: "S", ritual: true },
+      { tier: 4, name: "Weather Master", ap: 10, cc: null, time: "10 minutes", range: "5 miles", duration: "Conc. up to 8 hours", comp: "V, S, M", ritual: false }
+    ]
+  },
+
+  attraction: {
+    name: "Path of Attraction", cost: 2, synergy: "knowledge",
+    benefit: "You have advantage on Charisma (Persuasion) checks.",
+    traits: "Attraction spells rely on eye contact and subtle gestures; most require verbal components.",
+    spells: [
+      { tier: 0, name: "Command", ap: 2, cc: 3, time: "1 action", range: "60 ft.", duration: "1 round", comp: "V", ritual: false },
+      { tier: 1, name: "Charm", ap: 3, cc: 4, time: "1 action", range: "30 ft.", duration: "1 hour", comp: "V, S", ritual: false },
+      { tier: 1, name: "Sleep", ap: 3, cc: 4, time: "1 action", range: "90 ft.", duration: "1 minute", comp: "V, S, M", ritual: false },
+      { tier: 2, name: "Captivation", ap: 5, cc: 6, time: "1 action", range: "60 ft.", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false },
+      { tier: 2, name: "Suggestion", ap: 5, cc: 6, time: "1 action", range: "30 ft.", duration: "Conc. up to 8 hours", comp: "V, M", ritual: false },
+      { tier: 2, name: "Fear/Terror", ap: 5, cc: 6, time: "1 action", range: "Self (30-ft cone)", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false },
+      { tier: 3, name: "Compulsion", ap: 7, cc: 8, time: "1 action", range: "30 ft.", duration: "Conc. up to 1 minute", comp: "V", ritual: false },
+      { tier: 3, name: "Dominate", ap: 7, cc: 8, time: "1 action", range: "60 ft.", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false },
+      { tier: 4, name: "Memory Writer", ap: 10, cc: 11, time: "1 minute", range: "10 ft.", duration: "Inst.", comp: "V, S, M", ritual: false },
+      { tier: 4, name: "Mob Rule", ap: 10, cc: 11, time: "1 action", range: "300 ft.", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false }
+    ]
+  },
+
+  creation: {
+    name: "Path of Creation", cost: 2, synergy: "technology",
+    benefit: "+2 bonus to your Vessel maximum.",
+    traits: "Creation spells involve shaping gestures and often chalk/sand components.",
+    spells: [
+      { tier: 0, name: "Mending", ap: 2, cc: null, time: "1 minute", range: "Touch", duration: "Inst.", comp: "V, S, M", ritual: true },
+      { tier: 0, name: "Purify", ap: 2, cc: null, time: "1 action", range: "10 ft.", duration: "Inst.", comp: "V, S", ritual: true },
+      { tier: 1, name: "Chef", ap: 3, cc: null, time: "10 minutes", range: "Touch", duration: "Inst.", comp: "V, S, M", ritual: true },
+      { tier: 1, name: "Create Elemental", ap: 3, cc: 4, time: "1 action", range: "30 ft.", duration: "Conc. up to 1 hour", comp: "V, S", ritual: false },
+      { tier: 2, name: "Fabricate", ap: 5, cc: null, time: "10 minutes", range: "120 ft.", duration: "Inst.", comp: "V, S, M", ritual: true },
+      { tier: 3, name: "Bag of Anything", ap: 7, cc: null, time: "1 action", range: "Self", duration: "24 hours", comp: "V, S, M", ritual: true },
+      { tier: 4, name: "Create Beast", ap: 10, cc: 11, time: "1 hour", range: "Touch", duration: "Inst.", comp: "V, S, M", ritual: false }
+    ]
+  },
+
+  death: {
+    name: "Path of Death", cost: 2, synergy: "decay",
+    benefit: "Convert spell HP healing to Vessel at a 5:1 ratio (5 HP healed = 1 Vessel).",
+    traits: "Death spells carry morbid gestures and whispered incantations.",
+    spells: [
+      { tier: 0, name: "Drain Touch", ap: 2, cc: 3, time: "1 action", range: "Touch", duration: "Inst.", comp: "V, S", ritual: false },
+      { tier: 0, name: "Dead Life", ap: 2, cc: null, time: "1 action", range: "10 ft.", duration: "Inst.", comp: "V, S", ritual: false },
+      { tier: 1, name: "Death Curse", ap: 3, cc: 4, time: "1 action", range: "60 ft.", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false },
+      { tier: 1, name: "Animate", ap: 3, cc: 4, time: "1 minute", range: "10 ft.", duration: "Inst.", comp: "V, S, M", ritual: false },
+      { tier: 2, name: "Perish", ap: 5, cc: 6, time: "1 action", range: "60 ft.", duration: "Inst.", comp: "V, S", ritual: false },
+      { tier: 2, name: "Line of Death", ap: 5, cc: 6, time: "1 action", range: "Self (100-ft line)", duration: "Inst.", comp: "V, S", ritual: false },
+      { tier: 3, name: "Greater Animate", ap: 7, cc: 8, time: "1 minute", range: "10 ft.", duration: "Inst.", comp: "V, S, M", ritual: false },
+      { tier: 3, name: "Lifeforce", ap: 7, cc: 8, time: "1 action", range: "60 ft.", duration: "Inst.", comp: "V, S", ritual: false },
+      { tier: 4, name: "Hand of Death", ap: 10, cc: 11, time: "1 action", range: "60 ft.", duration: "Inst.", comp: "V, S", ritual: false },
+      { tier: 4, name: "Resurrection", ap: 10, cc: null, time: "1 hour", range: "Touch", duration: "Inst.", comp: "V, S, M", ritual: true }
+    ]
+  },
+
+  decay: {
+    name: "Path of Decay", cost: 2, synergy: "death",
+    benefit: "Resistance to poison and acid damage.",
+    traits: "Decay spells involve wet, hissing sounds and corrosive gestures.",
+    spells: [
+      { tier: 0, name: "Acidic Touch", ap: 2, cc: 3, time: "1 action", range: "Touch", duration: "Inst.", comp: "V, S", ritual: false },
+      { tier: 0, name: "Acid Ball", ap: 2, cc: 3, time: "1 action", range: "60 ft.", duration: "Inst.", comp: "V, S", ritual: false },
+      { tier: 1, name: "Acid Spray", ap: 3, cc: 4, time: "1 action", range: "Self (15-ft cone)", duration: "Inst.", comp: "V, S", ritual: false },
+      { tier: 1, name: "Poison Puff", ap: 3, cc: 4, time: "1 action", range: "30 ft.", duration: "Inst.", comp: "V, S", ritual: false },
+      { tier: 2, name: "Acid/Poison Spit", ap: 5, cc: 6, time: "1 action", range: "Self (30-ft line)", duration: "Inst.", comp: "V, S", ritual: false },
+      { tier: 2, name: "Condition", ap: 5, cc: 6, time: "1 action", range: "60 ft.", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false },
+      { tier: 3, name: "Decomposition", ap: 7, cc: 8, time: "1 action", range: "60 ft.", duration: "Inst.", comp: "V, S", ritual: false },
+      { tier: 3, name: "Contagion", ap: 7, cc: 8, time: "1 action", range: "Touch", duration: "7 days", comp: "V, S", ritual: false },
+      { tier: 4, name: "Plague", ap: 10, cc: 11, time: "1 action", range: "500 ft.", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false }
+    ]
+  },
+
+  earth: {
+    name: "Path of Earth", cost: 2, synergy: "water",
+    benefit: "Advantage on Intelligence (Nature) checks.",
+    traits: "Earth spells use heavy, grounded gestures and little vocalization.",
+    spells: [
+      { tier: 0, name: "Snap", ap: 2, cc: 3, time: "1 action", range: "30 ft.", duration: "Inst.", comp: "S", ritual: false },
+      { tier: 0, name: "Clap", ap: 2, cc: 3, time: "1 action", range: "Self (15-ft cone)", duration: "Inst.", comp: "S", ritual: false },
+      { tier: 1, name: "Entangle", ap: 3, cc: 4, time: "1 action", range: "90 ft.", duration: "Conc. up to 1 minute", comp: "S", ritual: false },
+      { tier: 1, name: "Animal Kinship", ap: 3, cc: null, time: "10 minutes", range: "Self", duration: "24 hours", comp: "S", ritual: true },
+      { tier: 2, name: "Thunderwave", ap: 5, cc: 6, time: "1 action", range: "Self (15-ft cube)", duration: "Inst.", comp: "S", ritual: false },
+      { tier: 2, name: "Spines", ap: 5, cc: 6, time: "1 action", range: "60 ft.", duration: "Conc. up to 1 minute", comp: "S", ritual: false },
+      { tier: 3, name: "Wall of Earth", ap: 7, cc: 8, time: "1 action", range: "120 ft.", duration: "Conc. up to 10 minutes", comp: "S", ritual: false },
+      { tier: 3, name: "Terraform", ap: 7, cc: null, time: "10 minutes", range: "150 ft.", duration: "Inst.", comp: "S, M", ritual: false },
+      { tier: 4, name: "Earthquake", ap: 10, cc: 11, time: "1 action", range: "500 ft.", duration: "Conc. up to 1 minute", comp: "S", ritual: false }
+    ]
+  },
+
+  flame: {
+    name: "Path of Flame", cost: 2, synergy: "self",
+    benefit: "Resistance to fire damage; immune to your own magical fire.",
+    traits: "Flame spells require vocal shouts and sweeping gestures.",
+    spells: [
+      { tier: 0, name: "Fire Bolt", ap: 2, cc: 3, time: "1 action", range: "120 ft.", duration: "Inst.", comp: "V, S", ritual: false },
+      { tier: 0, name: "Enchant Flame", ap: 2, cc: null, time: "1 action", range: "Touch", duration: "1 hour", comp: "V, S", ritual: false },
+      { tier: 1, name: "Flamethrower", ap: 3, cc: 4, time: "1 action", range: "Self (15-ft cone)", duration: "Inst.", comp: "V, S", ritual: false },
+      { tier: 1, name: "Forever Flame", ap: 3, cc: null, time: "1 action", range: "Touch", duration: "Until dismissed", comp: "V, S", ritual: true },
+      { tier: 1, name: "Flame Ball", ap: 3, cc: 4, time: "1 action", range: "150 ft.", duration: "Inst.", comp: "V, S, M", ritual: false },
+      { tier: 2, name: "Pillars of Fire", ap: 5, cc: 6, time: "1 action", range: "60 ft.", duration: "Inst.", comp: "V, S", ritual: false },
+      { tier: 2, name: "Blazing Barrier", ap: 5, cc: 6, time: "1 action", range: "120 ft.", duration: "Conc. up to 10 minutes", comp: "V, S", ritual: false },
+      { tier: 3, name: "Artillery Flare", ap: 7, cc: 8, time: "1 action", range: "500 ft.", duration: "Inst.", comp: "V, S", ritual: false },
+      { tier: 3, name: "Fire Storm", ap: 7, cc: 8, time: "1 action", range: "150 ft.", duration: "Inst.", comp: "V, S", ritual: false },
+      { tier: 4, name: "Incendiary Bomb", ap: 10, cc: 11, time: "1 action", range: "1500 ft.", duration: "Inst.", comp: "V, S", ritual: false }
+    ]
+  },
+
+  illusion: {
+    name: "Path of Illusion", cost: 2, synergy: "power",
+    benefit: "+2 bonus to your Vessel maximum.",
+    traits: "Illusion spells use theatrical gestures and whispered words.",
+    spells: [
+      { tier: 0, name: "Artifice", ap: 2, cc: 3, time: "1 action", range: "30 ft.", duration: "1 minute", comp: "V, S", ritual: false },
+      { tier: 0, name: "Pose", ap: 2, cc: 3, time: "1 action", range: "Self", duration: "1 hour", comp: "V, S", ritual: false },
+      { tier: 1, name: "Mirror", ap: 3, cc: 4, time: "1 action", range: "Self", duration: "1 minute", comp: "V, S", ritual: false },
+      { tier: 1, name: "Hallucination", ap: 3, cc: 4, time: "1 action", range: "60 ft.", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false },
+      { tier: 2, name: "Dreamscape", ap: 5, cc: null, time: "1 minute", range: "Special", duration: "8 hours", comp: "V, S, M", ritual: true },
+      { tier: 2, name: "Masquerade", ap: 5, cc: null, time: "1 action", range: "Self", duration: "1 hour", comp: "V, S", ritual: true },
+      { tier: 3, name: "Program", ap: 7, cc: null, time: "10 minutes", range: "120 ft.", duration: "Until dispelled", comp: "V, S, M", ritual: true },
+      { tier: 3, name: "Mirage", ap: 7, cc: null, time: "10 minutes", range: "Sight", duration: "24 hours", comp: "V, S", ritual: true },
+      { tier: 4, name: "Projection", ap: 10, cc: 11, time: "1 action", range: "500 ft.", duration: "Conc. up to 10 minutes", comp: "V, S", ritual: false }
+    ]
+  },
+
+  knowledge: {
+    name: "Path of Knowledge", cost: 2, synergy: "attraction",
+    benefit: "You may use your Vigor score instead of Intelligence for skill checks.",
+    traits: "Knowledge spells rarely require components beyond concentration.",
+    spells: [
+      { tier: 0, name: "Comprehension", ap: 2, cc: null, time: "1 minute", range: "Self", duration: "1 hour", comp: "V, S", ritual: false },
+      { tier: 1, name: "Communication", ap: 3, cc: 4, time: "1 action", range: "500 ft.", duration: "1 minute", comp: "V", ritual: false },
+      { tier: 1, name: "Locate", ap: 3, cc: null, time: "1 minute", range: "Self", duration: "Conc. up to 10 minutes", comp: "V, S, M", ritual: true },
+      { tier: 2, name: "Clairvoyance", ap: 5, cc: null, time: "10 minutes", range: "1 mile", duration: "Conc. up to 10 minutes", comp: "V, S, M", ritual: true },
+      { tier: 2, name: "Premonition", ap: 5, cc: 6, time: "1 action", range: "Self", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false },
+      { tier: 3, name: "Dreamwalker", ap: 7, cc: 8, time: "1 minute", range: "Special", duration: "8 hours", comp: "V, S, M", ritual: false },
+      { tier: 3, name: "Predestination", ap: 7, cc: 8, time: "1 minute", range: "Touch", duration: "8 hours", comp: "V, S", ritual: false },
+      { tier: 4, name: "Anticipation", ap: 10, cc: 11, time: "1 action", range: "Self", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false }
+    ]
+  },
+
+  life: {
+    name: "Path of Life", cost: 2, synergy: "light",
+    benefit: "+2 max HP for each Life spell you know.",
+    traits: "Life spells use laying-on-hands and soft vocalizations.",
+    spells: [
+      { tier: 0, name: "Touch of Life", ap: 2, cc: 3, time: "1 action", range: "Touch", duration: "Inst.", comp: "V, S", ritual: false },
+      { tier: 0, name: "Alleviate", ap: 2, cc: 3, time: "1 action", range: "Touch", duration: "Inst.", comp: "V, S", ritual: false },
+      { tier: 1, name: "Revivify", ap: 3, cc: 4, time: "1 action", range: "Touch", duration: "Inst.", comp: "V, S, M", ritual: false },
+      { tier: 1, name: "Minor Exorcism", ap: 3, cc: null, time: "1 minute", range: "Touch", duration: "Inst.", comp: "V, S", ritual: true },
+      { tier: 2, name: "Healing Wave", ap: 5, cc: 6, time: "1 action", range: "60 ft.", duration: "Inst.", comp: "V, S", ritual: false },
+      { tier: 2, name: "Death Ward", ap: 5, cc: null, time: "1 action", range: "Touch", duration: "8 hours", comp: "V, S", ritual: true },
+      { tier: 3, name: "Cleanse", ap: 7, cc: null, time: "1 action", range: "Touch", duration: "Inst.", comp: "V, S", ritual: true },
+      { tier: 3, name: "Restore", ap: 7, cc: 8, time: "1 action", range: "Touch", duration: "Inst.", comp: "V, S", ritual: false },
+      { tier: 4, name: "Regenerate", ap: 10, cc: null, time: "1 minute", range: "Touch", duration: "1 hour", comp: "V, S", ritual: true },
+      { tier: 4, name: "Healing Aura", ap: 10, cc: 11, time: "1 action", range: "Self (30-ft radius)", duration: "Conc. up to 10 minutes", comp: "V, S", ritual: false }
+    ]
+  },
+
+  light: {
+    name: "Path of Light", cost: 2, synergy: "life",
+    benefit: "You cannot be blinded.",
+    traits: "Light spells shed bright illumination and use luminous gestures.",
+    spells: [
+      { tier: 0, name: "Radiant Strike", ap: 2, cc: 3, time: "1 action", range: "Touch", duration: "Inst.", comp: "V, S", ritual: false },
+      { tier: 0, name: "Light", ap: 2, cc: null, time: "1 action", range: "Touch", duration: "1 hour", comp: "V, S", ritual: true },
+      { tier: 1, name: "Bolt of Heaven", ap: 3, cc: 4, time: "1 action", range: "120 ft.", duration: "Inst.", comp: "V, S", ritual: false },
+      { tier: 1, name: "Starburst", ap: 3, cc: 4, time: "1 action", range: "60 ft.", duration: "Inst.", comp: "V, S", ritual: false },
+      { tier: 2, name: "Sunsphere", ap: 5, cc: null, time: "1 action", range: "60 ft.", duration: "Conc. up to 10 minutes", comp: "V, S", ritual: true },
+      { tier: 2, name: "Extradite", ap: 5, cc: 6, time: "1 action", range: "60 ft.", duration: "Inst.", comp: "V, S", ritual: false },
+      { tier: 3, name: "Sunbeam", ap: 7, cc: 8, time: "1 action", range: "Self (60-ft line)", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false },
+      { tier: 3, name: "Nova", ap: 7, cc: 8, time: "1 action", range: "150 ft.", duration: "Inst.", comp: "V, S", ritual: false },
+      { tier: 4, name: "Sunrise", ap: 10, cc: null, time: "1 minute", range: "Sight", duration: "1 hour", comp: "V, S", ritual: true }
+    ]
+  },
+
+  might: {
+    name: "Path of Might", cost: 2, synergy: "protection",
+    benefit: "Proficiency with all melee weapons.",
+    traits: "Might spells enhance physical capabilities with brief gestures.",
+    spells: [
+      { tier: 0, name: "Pinpoint", ap: 2, cc: 3, time: "1 bonus action", range: "Self", duration: "1 round", comp: "V, S", ritual: false },
+      { tier: 1, name: "Paranormal Aim", ap: 3, cc: 4, time: "1 bonus action", range: "Self", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false },
+      { tier: 1, name: "Compression", ap: 3, cc: 4, time: "1 action", range: "Touch", duration: "1 hour", comp: "V, S", ritual: false },
+      { tier: 2, name: "Wrath", ap: 5, cc: 6, time: "1 bonus action", range: "Self", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false },
+      { tier: 2, name: "Magic Weapon (T2)", ap: 5, cc: null, time: "1 bonus action", range: "Touch", duration: "Conc. up to 1 hour", comp: "V, S", ritual: true,
+        desc: "Target weapon becomes magical with +1 to attack and damage rolls. Sacrifice: disadvantage on Wis checks until long rest." },
+      { tier: 3, name: "Crack", ap: 7, cc: 8, time: "1 action", range: "Touch", duration: "Inst.", comp: "V, S", ritual: false },
+      { tier: 3, name: "Magic Weapon (T3)", ap: 7, cc: null, time: "1 bonus action", range: "Touch", duration: "Conc. up to 1 hour", comp: "V, S", ritual: true,
+        desc: "As T2, but +2 (does not stack with T2 or T4). Sacrifice: disadvantage on Wis checks until long rest." },
+      { tier: 4, name: "Disintegrate", ap: 10, cc: 11, time: "1 action", range: "60 ft.", duration: "Inst.", comp: "V, S", ritual: false },
+      { tier: 4, name: "Magic Weapon (T4)", ap: 10, cc: null, time: "1 bonus action", range: "Touch", duration: "Conc. up to 1 hour", comp: "V, S", ritual: true,
+        desc: "As T3, but +3 (does not stack with T1 or T2). Sacrifice: disadvantage on Wis checks until long rest." }
+    ]
+  },
+
+  movement: {
+    name: "Path of Movement", cost: 2, synergy: "air",
+    benefit: "You can use Vigor instead of Dexterity for Dex saving throws against spells.",
+    traits: "Movement spells employ magic circles and hand movements with little vocalization.",
+    spells: [
+      { tier: 0, name: "Runner", ap: 2, cc: null, time: "1 action", range: "Touch", duration: "1 hour", comp: "S, M", ritual: true },
+      { tier: 1, name: "Swiftness", ap: 4, cc: 5, time: "1 minute", range: "Touch", duration: "Conc. up to 1 minute", comp: "S, M", ritual: false },
+      { tier: 1, name: "Passthrough", ap: 4, cc: null, time: "1 minute", range: "30 ft.", duration: "Conc. up to 5 minutes", comp: "S, M", ritual: true },
+      { tier: 2, name: "Jumper", ap: 6, cc: 7, time: "1 minute", range: "400 ft.", duration: "Inst.", comp: "S, M", ritual: false },
+      { tier: 2, name: "Portal", ap: 6, cc: null, time: "1 minute", range: "Special", duration: "Inst. / Conc. up to 1 minute", comp: "S, M", ritual: true },
+      { tier: 3, name: "Gateway", ap: 8, cc: null, time: "1 minute", range: "500 ft.", duration: "Conc. up to 1 minute", comp: "S, M", ritual: true },
+      { tier: 3, name: "Recall", ap: 8, cc: 9, time: "1 action", range: "500 ft.", duration: "Inst.", comp: "S, M", ritual: false },
+      { tier: 4, name: "Dimension Circle", ap: 12, cc: null, time: "5 minutes", range: "Special", duration: "8 hours", comp: "S, M", ritual: true }
+    ]
+  },
+
+  power: {
+    name: "Path of Power", cost: 2, synergy: "illusion",
+    benefit: "Your river increases by 1.",
+    traits: "Power spells are flashy, colorful, flamboyant gestures with vocal screaming.",
+    spells: [
+      { tier: 0, name: "Electric Arc", ap: 2, cc: 3, time: "1 minute", range: "120 ft.", duration: "Inst.", comp: "V, S", ritual: false },
+      { tier: 0, name: "Shock Strike", ap: 3, cc: 2, time: "1 bonus action", range: "Self", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false },
+      { tier: 1, name: "Shocking Fist", ap: 4, cc: 4, time: "1 minute", range: "60 ft.", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false },
+      { tier: 1, name: "Lightning Bolt", ap: 4, cc: 6, time: "1 minute", range: "120 ft.", duration: "Inst.", comp: "V, S", ritual: false },
+      { tier: 2, name: "Electrified Weapon", ap: 6, cc: 7, time: "1 minute", range: "Touch", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false },
+      { tier: 2, name: "Storm", ap: 6, cc: 7, time: "1 minute", range: "120 ft.", duration: "Inst.", comp: "V, S", ritual: false },
+      { tier: 3, name: "Electrovolt", ap: 8, cc: 9, time: "1 minute", range: "Varies", duration: "Varies", comp: "V, S", ritual: false },
+      { tier: 4, name: "Lightning Sequence", ap: 10, cc: 13, time: "1 minute", range: "120 ft.", duration: "Inst.", comp: "V, S", ritual: false }
+    ]
+  },
+
+  protection: {
+    name: "Path of Protection", cost: 2, synergy: "might",
+    benefit: "If an opponent scores a critical hit on you, your vessel regains 2.",
+    traits: "Protection spells use defensive gestures with little expression.",
+    spells: [
+      { tier: 0, name: "Reprisal", ap: 2, cc: 3, time: "1 action", range: "Self", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false },
+      { tier: 0, name: "Magic Armor", ap: 2, cc: 3, time: "1 minute", range: "Self", duration: "Conc. up to 5 minutes", comp: "V, S", ritual: false },
+      { tier: 1, name: "Shield", ap: 4, cc: 5, time: "1 bonus action", range: "Self", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false,
+        desc: "+2 bonus to AC. If placed in your river, use as a reaction against an incoming hit." },
+      { tier: 1, name: "Hush", ap: 4, cc: 5, time: "1 minute", range: "Self", duration: "Conc. up to 5 minutes", comp: "S, M", ritual: false },
+      { tier: 2, name: "Blur", ap: 6, cc: 6, time: "1 minute", range: "Self", duration: "Conc. up to 5 minutes", comp: "V, S", ritual: false },
+      { tier: 2, name: "Alienation", ap: 6, cc: null, time: "1 minute", range: "Self", duration: "Conc. up to 1 hour", comp: "V, M", ritual: true },
+      { tier: 3, name: "Colossus", ap: 7, cc: 7, time: "1 minute", range: "Self", duration: "Conc. up to 5 minutes", comp: "V, S", ritual: false },
+      { tier: 3, name: "Blender Barrier", ap: 8, cc: null, time: "1 minute", range: "Self", duration: "Conc. up to 1 hour", comp: "V, M", ritual: true },
+      { tier: 4, name: "Invulnerability", ap: 10, cc: 10, time: "1 bonus action", range: "Self", duration: "1 round", comp: "V, M", ritual: false,
+        desc: "Immune to all damage until end of next turn. If in river, use as a reaction." },
+      { tier: 4, name: "Impenetrable", ap: 10, cc: null, time: "1 minute", range: "Self", duration: "Conc. up to 1 hour", comp: "V, M", ritual: true }
+    ]
+  },
+
+  self: {
+    name: "Path of Self", cost: 2, synergy: "flame",
+    benefit: "+2 bonus to your Vessel.",
+    traits: "Self spells have little outward expression beyond minor hand movements.",
+    spells: [
+      { tier: 0, name: "Darkvision", ap: 2, cc: null, time: "1 action", range: "Self", duration: "1 hour", comp: "S", ritual: true },
+      { tier: 0, name: "Channel Bear", ap: 3, cc: 4, time: "1 action", range: "Self", duration: "Conc. up to 5 minutes", comp: "S", ritual: false },
+      { tier: 0, name: "Channel Ape", ap: 3, cc: 4, time: "1 action", range: "Self", duration: "Conc. up to 5 minutes", comp: "S", ritual: false },
+      { tier: 0, name: "Channel Wolf", ap: 3, cc: 4, time: "1 action", range: "Self", duration: "Conc. up to 5 minutes", comp: "S", ritual: false },
+      { tier: 0, name: "Channel Tiger", ap: 3, cc: 4, time: "1 action", range: "Self", duration: "Conc. up to 5 minutes", comp: "S", ritual: false },
+      { tier: 0, name: "Channel Falcon", ap: 3, cc: 4, time: "1 action", range: "Self", duration: "Conc. up to 5 minutes", comp: "S", ritual: false },
+      { tier: 1, name: "Gravity Shifter", ap: 4, cc: 5, time: "1 action", range: "Self", duration: "Conc. up to 5 minutes", comp: "S", ritual: false },
+      { tier: 1, name: "Invisibility", ap: 4, cc: 5, time: "1 minute", range: "Self", duration: "Conc. up to 1 hour", comp: "S", ritual: false },
+      { tier: 2, name: "Sizing", ap: 6, cc: 7, time: "1 minute", range: "Self", duration: "Conc. up to 5 minutes", comp: "S", ritual: false },
+      { tier: 2, name: "Ultravision", ap: 6, cc: null, time: "1 action", range: "Self", duration: "1 hour", comp: "", ritual: true },
+      { tier: 3, name: "Renew", ap: 8, cc: null, time: "1 minute", range: "Self", duration: "Inst.", comp: "S", ritual: true },
+      { tier: 3, name: "Truesight", ap: 8, cc: null, time: "1 minute", range: "Self", duration: "1 hour", comp: "S", ritual: true },
+      { tier: 4, name: "Ghost", ap: 10, cc: null, time: "1 minute", range: "Self", duration: "1 hour", comp: "S", ritual: true }
+    ]
+  },
+
+  technology: {
+    name: "Path of Technology", cost: 2, synergy: "creation",
+    benefit: "Proficient with Engineering; use Vigor instead of Intelligence for tech checks.",
+    traits: "Technology spells access technology magically through various techniques.",
+    spells: [
+      { tier: 0, name: "Construction", ap: 3, cc: null, time: "1 hour", range: "120 ft.", duration: "Inst.", comp: "V, S, M", ritual: true },
+      { tier: 0, name: "Refurbishment", ap: 2, cc: null, time: "1 minute", range: "Touch", duration: "Inst.", comp: "V, S, M", ritual: true },
+      { tier: 1, name: "Magic Firearm", ap: 4, cc: null, time: "1 minute", range: "Touch", duration: "Conc. up to 5 minutes", comp: "V, S", ritual: true },
+      { tier: 1, name: "EMP", ap: 4, cc: 5, time: "1 minute", range: "30 ft.", duration: "Inst.", comp: "V, S, M", ritual: false },
+      { tier: 1, name: "Access", ap: 4, cc: null, time: "1 action", range: "Touch", duration: "Inst.", comp: "V, S", ritual: true },
+      { tier: 1, name: "Eyes of SOL", ap: 5, cc: null, time: "1 minute", range: "Self", duration: "Conc. up to 1 hour", comp: "V, S", ritual: true },
+      { tier: 2, name: "Hijack", ap: 5, cc: 6, time: "1 minute", range: "30 ft.", duration: "Conc. up to 1 hour", comp: "V, S", ritual: false },
+      { tier: 2, name: "Presence of SOL", ap: 5, cc: null, time: "1 minute", range: "Self", duration: "Conc. up to 5 minutes", comp: "V, S", ritual: true },
+      { tier: 3, name: "Wireless", ap: 7, cc: null, time: "1 action", range: "Self", duration: "Conc. up to 1 hour", comp: "V, S", ritual: true },
+      { tier: 3, name: "Radial Access", ap: 7, cc: null, time: "1 minute", range: "60 ft.", duration: "Conc. up to 5 minutes", comp: "V, S", ritual: true },
+      { tier: 3, name: "Will of SOL", ap: 7, cc: null, time: "1 minute", range: "Self", duration: "Conc. up to 8 hours", comp: "V, S", ritual: true },
+      { tier: 4, name: "Hammer of SOL", ap: 12, cc: 13, time: "1 minute", range: "1 mile", duration: "Inst.", comp: "V, S, M", ritual: false }
+    ]
+  },
+
+  water: {
+    name: "Path of Water", cost: 2, synergy: "earth",
+    benefit: "Swim speed equal to your ground speed.",
+    traits: "Water spells involve boisterous hand movements and little to no vocalization.",
+    spells: [
+      { tier: 0, name: "Endothermic Ray", ap: 2, cc: 3, time: "1 minute", range: "60 ft.", duration: "Inst.", comp: "S", ritual: false },
+      { tier: 0, name: "Alter Temperature", ap: 2, cc: null, time: "1 action", range: "Touch", duration: "Inst.", comp: "S", ritual: true },
+      { tier: 1, name: "Water Breathing", ap: 3, cc: null, time: "1 action", range: "Self", duration: "Conc. up to 8 hours", comp: "S", ritual: true },
+      { tier: 1, name: "Water Walk", ap: 3, cc: null, time: "1 action", range: "Self", duration: "Conc. up to 8 hours", comp: "S", ritual: true },
+      { tier: 2, name: "Control Water", ap: 4, cc: null, time: "1 action", range: "500 ft.", duration: "Conc. up to 1 hour", comp: "S", ritual: true },
+      { tier: 2, name: "Shard Thrower", ap: 4, cc: 7, time: "1 minute", range: "120 ft.", duration: "Inst.", comp: "S", ritual: false },
+      { tier: 3, name: "Storm", ap: 5, cc: 9, time: "1 minute", range: "500 ft.", duration: "Inst.", comp: "S", ritual: false },
+      { tier: 3, name: "Breath of Cold", ap: 5, cc: 9, time: "1 minute", range: "60 ft.", duration: "Inst.", comp: "S", ritual: false },
+      { tier: 3, name: "Frozen Barrier", ap: 5, cc: 9, time: "1 minute", range: "120 ft.", duration: "Conc. up to 1 minute", comp: "S", ritual: false },
+      { tier: 4, name: "Tsunami", ap: 7, cc: 12, time: "1 minute", range: "Sight", duration: "Conc. up to 1 minute", comp: "S", ritual: false }
+    ]
+  }
+};
+
+// Helper: flat spell list with path tagging for UI/filtering
+const ALL_SPELLS_FLAT = (() => {
+  const list = [];
+  COLLECTIVE_SPELLS.forEach(s => list.push({ ...s, pathKey: "collective", pathName: "Collective", tier: 0 }));
+  Object.entries(MAGIC_PATHS).forEach(([key, p]) => {
+    p.spells.forEach(s => list.push({ ...s, pathKey: key, pathName: p.name }));
+  });
+  return list;
+})();
