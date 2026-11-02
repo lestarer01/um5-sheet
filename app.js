@@ -297,11 +297,13 @@ function renderMagic() {
   const lvl = Math.max(1, parseInt(val('c-lvl'), 10) || 1);
   const vigorScore = parseInt(val('s-vig'), 10) || 10;
   const vigorMod = Math.floor((vigorScore - 10) / 2);
+  
+  // RIVER RULE: Vigor Modifier
   const riverMax = Math.min(10, Math.max(0, vigorMod));
-
   if ($('m-river-max')) $('m-river-max').textContent = riverMax;
 
-  const baseVessel = Math.max(0, Math.floor(vigorScore / 2) + lvl);
+  // VESSEL RULE: Vigor >= 8 required. Formula = Floor(Vigor/2) + Level
+  const baseVessel = vigorScore >= 8 ? Math.floor(vigorScore / 2) + lvl : 0;
   const exLevel = parseInt(val('m-exhaustion'), 10) || 0;
   let calculatedMaxVessel = baseVessel;
 
@@ -309,7 +311,7 @@ function renderMagic() {
   if (noteEl) {
     if (exLevel >= 5) {
       calculatedMaxVessel = 0;
-      noteEl.textContent = 'WARNING: Max Vessel is reduced to 0!';
+      noteEl.textContent = 'WARNING: Max Vessel is 0 (Exhaustion 5+).';
     } else if (exLevel >= 2) {
       calculatedMaxVessel = Math.floor(baseVessel / 2);
       noteEl.textContent = 'NOTICE: Max Vessel is halved due to exhaustion.';
@@ -327,12 +329,32 @@ function renderMagic() {
     }
   }
 
-  const calculatedAssets = Math.max(0, vigorMod * lvl);
-  // Only auto-set assets if character has none stored yet (first-time init)
-  const c = chars.find(x => x.id === activeId);
-  if (c && (c.assets === undefined || c.assets === null || c.assets === '')) {
-    if ($('m-assets')) $('m-assets').value = calculatedAssets;
-    c.assets = calculatedAssets;
+  // ASSET RULE: Currency system with retroactive Level/Vigor deposits
+  const c = getActiveChar();
+  if (c) {
+    const expectedLifetime = Math.max(0, vigorMod * lvl);
+    let needSave = false;
+    
+    // If this is the first time the character accesses magic
+    if (c.lifetimeAssetsEarned === undefined) {
+      c.lifetimeAssetsEarned = expectedLifetime;
+      if (c.assets === undefined || c.assets === null || c.assets === '') {
+        c.assets = expectedLifetime;
+      }
+      needSave = true;
+    } 
+    // If they leveled up or Vigor changed, calculate the difference and deposit it
+    else {
+      const diff = expectedLifetime - c.lifetimeAssetsEarned;
+      if (diff !== 0) {
+        c.assets = Math.max(0, (parseInt(c.assets, 10) || 0) + diff);
+        c.lifetimeAssetsEarned = expectedLifetime;
+        needSave = true;
+      }
+    }
+    
+    if ($('m-assets')) $('m-assets').value = c.assets;
+    if (needSave) saveStorage();
   }
 
   // Render the new magic UI pieces
