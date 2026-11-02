@@ -291,28 +291,20 @@ function recalc() {
 }
 
 /* --- MAGIC CALCULATIONS --- */
-/* --- MAGIC CALCULATIONS --- */
 function renderMagic() {
   if (!$('tab-magic')) return;
 
   const lvl = Math.max(1, parseInt(val('c-lvl'), 10) || 1);
   const vigorScore = parseInt(val('s-vig'), 10) || 10;
   const vigorMod = Math.floor((vigorScore - 10) / 2);
-  
-  // Cap river slots to a safe maximum (0 to 10) to prevent freeze
   const riverMax = Math.min(10, Math.max(0, vigorMod));
 
-  // 1. Update River Capacity Display
   if ($('m-river-max')) $('m-river-max').textContent = riverMax;
-  if ($('m-river-count')) $('m-river-count').textContent = 0;
 
-  // 2. Base Vessel = Half Vigor Score + Character Level
   const baseVessel = Math.max(0, Math.floor(vigorScore / 2) + lvl);
-  
-  // Calculate Exhaustion level impact on Max Vessel
   const exLevel = parseInt(val('m-exhaustion'), 10) || 0;
   let calculatedMaxVessel = baseVessel;
-  
+
   const noteEl = $('m-exhaustion-note');
   if (noteEl) {
     if (exLevel >= 5) {
@@ -326,10 +318,8 @@ function renderMagic() {
     }
   }
 
-  // Set Max Vessel
   if ($('m-vessel-max')) $('m-vessel-max').value = calculatedMaxVessel;
-  
-  // Clamp Current Vessel so it cannot exceed Max Vessel
+
   if ($('m-vessel-cur')) {
     let curVessel = parseInt($('m-vessel-cur').value, 10) || 0;
     if (curVessel > calculatedMaxVessel) {
@@ -337,26 +327,18 @@ function renderMagic() {
     }
   }
 
-  // 3. Available Assets = (Vigor Modifier x Level), minimum 0
   const calculatedAssets = Math.max(0, vigorMod * lvl);
-  if ($('m-assets')) $('m-assets').value = calculatedAssets;
-
-  // 4. Render River Slots
-  const riverContainer = $('river-slots-container');
-  if (riverContainer) {
-    if (riverMax <= 0) {
-      riverContainer.innerHTML = '<p style="font-size:0.8rem;color:var(--muted);">Vigor modifier is 0 or lower. No River slots available.</p>';
-    } else {
-      let html = '';
-      for (let i = 0; i < riverMax; i++) {
-        html += `<div style="border:1px dashed var(--border-color,#444);border-radius:6px;padding:10px;text-align:center;background:rgba(0,0,0,0.2);">
-          <small style="color:var(--muted);font-size:0.75rem;display:block;">River Slot ${i + 1}</small>
-          <span style="font-size:0.85rem;font-style:italic;">Empty Slot</span>
-        </div>`;
-      }
-      riverContainer.innerHTML = html;
-    }
+  // Only auto-set assets if character has none stored yet (first-time init)
+  const c = chars.find(x => x.id === activeId);
+  if (c && (c.assets === undefined || c.assets === null || c.assets === '')) {
+    if ($('m-assets')) $('m-assets').value = calculatedAssets;
+    c.assets = calculatedAssets;
   }
+
+  // Render the new magic UI pieces
+  renderRiverSlots(riverMax);
+  renderKnownSpells();
+  renderDarkSequence();
 }
 
 function applyArmor() {
@@ -384,6 +366,9 @@ function blankChar() {
     mpMax: 0, mpCur: 0, spellDc: 10, spellAtk: 0, magicSource: '', spellList: '',
     // New Dark Magic Fields
     vesselCur: 0, vesselMax: 0, assets: 0, exhaustion: 0
+    unlockedPaths: [],
+    knownSpells: [],
+    riverSpells: []
   };
 }
 
@@ -424,6 +409,11 @@ function saveCurrent() {
   c.assets = val('m-assets');
   c.exhaustion = val('m-exhaustion');
 
+  
+if (!c.unlockedPaths) c.unlockedPaths = [];
+  if (!c.knownSpells) c.knownSpells = [];
+  if (!c.riverSpells) c.riverSpells = [];
+  
   saveStorage();
   recalc();
   renderRoster();
@@ -460,6 +450,10 @@ function loadToForm(c) {
   val('m-assets', c.assets || 0);
   val('m-exhaustion', c.exhaustion || 0);
 
+  if (!c.unlockedPaths) c.unlockedPaths = [];
+  if (!c.knownSpells) c.knownSpells = [];
+  if (!c.riverSpells) c.riverSpells = [];
+  
   renderWeapons();
   recalc();
   renderAbilities();
@@ -759,3 +753,504 @@ document.addEventListener('DOMContentLoaded', () => {
   renderRoster();
   recalc();
 });
+
+/* ============================================================
+   MAGIC SYSTEM WIRING
+   ============================================================ */
+
+function getActiveChar() {
+  return chars.find(x => x.id === activeId);
+}
+
+function getAssets() {
+  return parseInt(val('m-assets'), 10) || 0;
+}
+
+function setAssets(n) {
+  val('m-assets', Math.max(0, n));
+  const c = getActiveChar();
+  if (c) c.assets = Math.max(0, n);
+  saveStorage();
+}
+
+function getVesselCur() {
+  return parseInt(val('m-vessel-cur'), 10) || 0;
+}
+
+function setVesselCur(n) {
+  const max = parseInt(val('m-vessel-max'), 10) || 0;
+  const clamped = Math.max(0, Math.min(max, n));
+  val('m-vessel-cur', clamped);
+  const c = getActiveChar();
+  if (c) c.vesselCur = clamped;
+  saveStorage();
+}
+
+function spellKey(pathKey, name) {
+  return pathKey + '::' + name;
+}
+
+function characterKnowsSpell(c, pathKey, name) {
+  if (!c || !c.knownSpells) return false;
+  return c.knownSpells.some(s => s.pathKey === pathKey && s.name === name);
+}
+
+function characterHasPath(c, pathKey) {
+  if (!c || !c.unlockedPaths) return false;
+  return c.unlockedPaths.includes(pathKey);
+}
+
+function characterHasRootInPath(c, pathKey) {
+  if (!c || !c.knownSpells) return false;
+  return c.knownSpells.some(s => {
+    if (s.pathKey !== pathKey) return false;
+    if (typeof MAGIC_PATHS === 'undefined' || !MAGIC_PATHS[pathKey]) return false;
+    const sp = MAGIC_PATHS[pathKey].spells.find(x => x.name === s.name);
+    return sp && sp.tier === 0;
+  });
+}
+
+/* ---- DARK SEQUENCE (Paths & Spells Store) ---- */
+
+function renderDarkSequence() {
+  const box = $('dark-sequence-container');
+  if (!box || typeof MAGIC_PATHS === 'undefined') return;
+
+  const c = getActiveChar();
+  if (!c) { box.innerHTML = ''; return; }
+
+  const assets = getAssets();
+
+  let html = '';
+  Object.entries(MAGIC_PATHS).forEach(([pathKey, path]) => {
+    const unlocked = characterHasPath(c, pathKey);
+    const hasRoot = characterHasRootInPath(c, pathKey);
+
+    html += `<div class="ability-entry" style="border-left-color:${unlocked ? 'var(--success)' : 'var(--accent2)'}; margin-bottom:10px;">
+      <div class="ability-entry-header">
+        <span>${path.name}</span>
+        <span class="ability-entry-level">${unlocked ? 'UNLOCKED' : `Cost: ${path.cost} Assets`}</span>
+      </div>
+      <div class="ability-entry-desc" style="margin-bottom:6px;">
+        <strong>Benefit:</strong> ${path.benefit}<br>
+        <strong>Synergy:</strong> ${path.synergy}<br>
+        <em style="font-size:0.75rem;">${path.traits}</em>
+      </div>`;
+
+    if (!unlocked) {
+      const canAfford = assets >= path.cost;
+      html += `<button type="button" class="btn btn-primary btn-unlock-path"
+        data-path="${pathKey}" ${canAfford ? '' : 'disabled'}
+        style="margin-bottom:6px;">
+        Unlock Path (${path.cost} Assets)${canAfford ? '' : ' - Not enough Assets'}
+      </button>`;
+    } else {
+      // Group spells by tier
+      const tiers = {};
+      path.spells.forEach(sp => {
+        if (!tiers[sp.tier]) tiers[sp.tier] = [];
+        tiers[sp.tier].push(sp);
+      });
+
+      Object.keys(tiers).sort().forEach(tier => {
+        html += `<div style="margin-top:8px;">
+          <div style="font-size:0.75rem; color:var(--accent); font-weight:700; margin-bottom:4px;">
+            Tier ${tier}${tier === '0' ? ' (Root)' : ''}
+          </div>`;
+
+        tiers[tier].forEach(sp => {
+          const known = characterKnowsSpell(c, pathKey, sp.name);
+          const needsRoot = parseInt(tier, 10) > 0 && !hasRoot;
+          const canAfford = assets >= sp.ap;
+          const canBuy = !known && !needsRoot && canAfford;
+
+          let btnLabel = '';
+          if (known) btnLabel = '✓ Known';
+          else if (needsRoot) btnLabel = `Buy (${sp.ap} AP) - Need a root first`;
+          else if (!canAfford) btnLabel = `Buy (${sp.ap} AP) - Not enough Assets`;
+          else btnLabel = `Buy (${sp.ap} AP)`;
+
+          html += `<div style="background:rgba(0,0,0,0.2); padding:6px 8px; border-radius:4px; margin-bottom:4px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:4px;">
+              <span style="font-size:0.82rem; font-weight:700;">
+                ${sp.name}${sp.ritual ? ' <small style="color:var(--muted);">(Ritual)</small>' : ''}
+              </span>
+              <button type="button" class="btn btn-sm btn-buy-spell"
+                data-path="${pathKey}" data-name="${sp.name}"
+                ${canBuy ? '' : 'disabled'}
+                style="font-size:0.7rem; padding:4px 8px; background:${known ? 'var(--success)' : 'var(--accent2)'}; color:#000;">
+                ${btnLabel}
+              </button>
+            </div>
+            <div style="font-size:0.7rem; color:var(--muted); margin-top:2px;">
+              AP ${sp.ap}${sp.cc ? ` · CC ${sp.cc}` : ''} · ${sp.time} · ${sp.range} · ${sp.duration} · ${sp.comp}
+            </div>
+          </div>`;
+        });
+
+        html += `</div>`;
+      });
+    }
+
+    html += `</div>`;
+  });
+
+  box.innerHTML = html;
+
+  // Bind unlock-path buttons
+  box.querySelectorAll('.btn-unlock-path').forEach(btn => {
+    btn.onclick = () => unlockPath(btn.dataset.path);
+  });
+
+  // Bind buy-spell buttons
+  box.querySelectorAll('.btn-buy-spell').forEach(btn => {
+    btn.onclick = () => buySpell(btn.dataset.path, btn.dataset.name);
+  });
+}
+
+function unlockPath(pathKey) {
+  const c = getActiveChar();
+  if (!c || !MAGIC_PATHS[pathKey]) return;
+  const path = MAGIC_PATHS[pathKey];
+  const assets = getAssets();
+  if (assets < path.cost) {
+    alert('Not enough Assets to unlock this path.');
+    return;
+  }
+  if (!confirm(`Unlock ${path.name} for ${path.cost} Assets?`)) return;
+
+  if (!c.unlockedPaths) c.unlockedPaths = [];
+  c.unlockedPaths.push(pathKey);
+  setAssets(assets - path.cost);
+  renderMagic();
+}
+
+function buySpell(pathKey, name) {
+  const c = getActiveChar();
+  if (!c || !MAGIC_PATHS[pathKey]) return;
+  const path = MAGIC_PATHS[pathKey];
+  const sp = path.spells.find(x => x.name === name);
+  if (!sp) return;
+
+  const assets = getAssets();
+  if (assets < sp.ap) {
+    alert('Not enough Assets to buy this spell.');
+    return;
+  }
+  if (characterKnowsSpell(c, pathKey, name)) return;
+
+  // Tier > 0 requires a root
+  if (sp.tier > 0 && !characterHasRootInPath(c, pathKey)) {
+    alert('You must acquire a root (Tier 0) spell in this path first.');
+    return;
+  }
+
+  if (!confirm(`Buy "${sp.name}" for ${sp.ap} Assets?`)) return;
+
+  if (!c.knownSpells) c.knownSpells = [];
+  c.knownSpells.push({ pathKey, name: sp.name });
+  setAssets(assets - sp.ap);
+
+  // SYNERGY: when buying a higher-tier (>0) spell, grant a free spell from synergy path
+  if (sp.tier > 0 && path.synergy && MAGIC_PATHS[path.synergy] && characterHasPath(c, path.synergy)) {
+    const synPath = MAGIC_PATHS[path.synergy];
+    // Find the lowest tier spell in synergy path that character does NOT already know
+    const sorted = [...synPath.spells].sort((a, b) => a.tier - b.tier);
+    const freeSpell = sorted.find(s => !characterKnowsSpell(c, path.synergy, s.name));
+    if (freeSpell) {
+      c.knownSpells.push({ pathKey: path.synergy, name: freeSpell.name });
+      alert(`Synergy bonus! You gained "${freeSpell.name}" from ${synPath.name} for free.`);
+    }
+  }
+
+  saveStorage();
+  renderMagic();
+}
+
+/* ---- KNOWN SPELLS LIST ---- */
+
+let knownSpellsFilter = 'all'; // 'all' | 'river' | 'rituals'
+
+function renderKnownSpells() {
+  const box = $('known-spells-list');
+  if (!box) return;
+
+  const c = getActiveChar();
+  if (!c) { box.innerHTML = ''; return; }
+
+  // Build filter buttons (reuse existing header buttons if present)
+  const header = box.closest('.card');
+  if (header) {
+    const btns = header.querySelectorAll('.btn-group .btn');
+    btns.forEach(b => {
+      b.classList.remove('active');
+      const label = b.textContent.trim().toLowerCase();
+      if (
+        (knownSpellsFilter === 'all' && label === 'all') ||
+        (knownSpellsFilter === 'river' && label.includes('river')) ||
+        (knownSpellsFilter === 'rituals' && label.includes('ritual'))
+      ) {
+        b.classList.add('active');
+      }
+      b.onclick = () => {
+        if (label === 'all') knownSpellsFilter = 'all';
+        else if (label.includes('river')) knownSpellsFilter = 'river';
+        else if (label.includes('ritual')) knownSpellsFilter = 'rituals';
+        renderKnownSpells();
+      };
+    });
+  }
+
+  // Collect spells: collective + known
+  const list = [];
+
+  if (typeof COLLECTIVE_SPELLS !== 'undefined') {
+    COLLECTIVE_SPELLS.forEach(sp => {
+      list.push({ ...sp, pathKey: 'collective', pathName: 'Collective', tier: 0 });
+    });
+  }
+
+  if (c.knownSpells) {
+    c.knownSpells.forEach(entry => {
+      const path = MAGIC_PATHS[entry.pathKey];
+      if (!path) return;
+      const sp = path.spells.find(x => x.name === entry.name);
+      if (!sp) return;
+      list.push({ ...sp, pathKey: entry.pathKey, pathName: path.name });
+    });
+  }
+
+  // Apply filter
+  const inRiver = c.riverSpells || [];
+  let filtered = list;
+  if (knownSpellsFilter === 'river') {
+    filtered = list.filter(s => inRiver.some(r => r.pathKey === s.pathKey && r.name === s.name));
+  } else if (knownSpellsFilter === 'rituals') {
+    filtered = list.filter(s => s.ritual);
+  }
+
+  if (filtered.length === 0) {
+    box.innerHTML = '<p style="font-size:0.8rem;color:var(--muted);">No spells match this filter.</p>';
+    return;
+  }
+
+  let html = '';
+  filtered.forEach(sp => {
+    const isInRiver = inRiver.some(r => r.pathKey === sp.pathKey && r.name === sp.name);
+    const riverFull = inRiver.length >= (parseInt($('m-river-max')?.textContent, 10) || 0);
+    const canSlot = !sp.ritual && !isInRiver && !riverFull && sp.pathKey !== 'collective';
+
+    html += `<div style="background:var(--input); border-left:3px solid var(--accent); border-radius:0 6px 6px 0; padding:8px 10px; margin-bottom:6px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:4px;">
+        <span style="font-weight:700; font-size:0.85rem;">
+          ${sp.name} <small style="color:var(--muted); font-weight:400;">[${sp.pathName} T${sp.tier}]</small>
+          ${sp.ritual ? '<small style="color:var(--accent2);"> (Ritual)</small>' : ''}
+          ${isInRiver ? '<small style="color:var(--success);"> ★ In River</small>' : ''}
+        </span>
+        <div style="display:flex; gap:4px;">`;
+
+    if (sp.ritual) {
+      html += `<button type="button" class="btn btn-sm btn-cast-ritual"
+        data-path="${sp.pathKey}" data-name="${sp.name}"
+        style="font-size:0.7rem; padding:4px 8px; background:var(--accent2); color:#000;">
+        Cast Ritual
+      </button>`;
+    } else if (sp.pathKey !== 'collective') {
+      if (isInRiver) {
+        html += `<button type="button" class="btn btn-sm btn-remove-river"
+          data-path="${sp.pathKey}" data-name="${sp.name}"
+          style="font-size:0.7rem; padding:4px 8px; background:var(--danger); color:#fff;">
+          Remove from River
+        </button>`;
+      } else {
+        html += `<button type="button" class="btn btn-sm btn-add-river"
+          data-path="${sp.pathKey}" data-name="${sp.name}"
+          ${canSlot ? '' : 'disabled'}
+          style="font-size:0.7rem; padding:4px 8px; background:var(--accent); color:#000;">
+          ${riverFull ? 'River Full' : 'Slot into River'}
+        </button>`;
+      }
+    }
+
+    // Collective spells get a Cast button too
+    if (sp.pathKey === 'collective' && !sp.ritual) {
+      html += `<button type="button" class="btn btn-sm btn-cast-collective"
+        data-name="${sp.name}"
+        style="font-size:0.7rem; padding:4px 8px; background:var(--accent2); color:#000;">
+        Cast (${sp.cc} CC)
+      </button>`;
+    }
+
+    html += `</div></div>
+      <div style="font-size:0.72rem; color:var(--muted); margin-top:3px;">
+        AP ${sp.ap}${sp.cc ? ` · CC ${sp.cc}` : ''} · ${sp.time} · ${sp.range} · ${sp.duration} · ${sp.comp}
+      </div>`;
+
+    if (sp.desc) {
+      html += `<div style="font-size:0.75rem; color:var(--text); margin-top:4px;">${sp.desc}</div>`;
+    }
+
+    html += `</div>`;
+  });
+
+  box.innerHTML = html;
+
+  // Bind events
+  box.querySelectorAll('.btn-add-river').forEach(btn => {
+    btn.onclick = () => addSpellToRiver(btn.dataset.path, btn.dataset.name);
+  });
+  box.querySelectorAll('.btn-remove-river').forEach(btn => {
+    btn.onclick = () => removeSpellFromRiver(btn.dataset.path, btn.dataset.name);
+  });
+  box.querySelectorAll('.btn-cast-ritual').forEach(btn => {
+    btn.onclick = () => castRitual(btn.dataset.path, btn.dataset.name);
+  });
+  box.querySelectorAll('.btn-cast-collective').forEach(btn => {
+    btn.onclick = () => castCollective(btn.dataset.name);
+  });
+}
+
+function addSpellToRiver(pathKey, name) {
+  const c = getActiveChar();
+  if (!c) return;
+  if (!c.riverSpells) c.riverSpells = [];
+  const riverMax = parseInt($('m-river-max')?.textContent, 10) || 0;
+  if (c.riverSpells.length >= riverMax) {
+    alert('River is full.');
+    return;
+  }
+  if (c.riverSpells.some(r => r.pathKey === pathKey && r.name === name)) return;
+  c.riverSpells.push({ pathKey, name });
+  saveStorage();
+  renderMagic();
+}
+
+function removeSpellFromRiver(pathKey, name) {
+  const c = getActiveChar();
+  if (!c || !c.riverSpells) return;
+  c.riverSpells = c.riverSpells.filter(r => !(r.pathKey === pathKey && r.name === name));
+  saveStorage();
+  renderMagic();
+}
+
+function castRitual(pathKey, name) {
+  const path = MAGIC_PATHS[pathKey];
+  const sp = path?.spells.find(x => x.name === name);
+  if (!sp) return;
+  alert(`Casting ritual: ${sp.name}\n\nTime: ${sp.time}\nSacrifice may apply (see description).\n\nNo Vessel cost.`);
+}
+
+function castCollective(name) {
+  if (typeof COLLECTIVE_SPELLS === 'undefined') return;
+  const sp = COLLECTIVE_SPELLS.find(x => x.name === name);
+  if (!sp) return;
+  if (sp.ritual) {
+    alert(`Casting ritual: ${sp.name}`);
+    return;
+  }
+  const cur = getVesselCur();
+  const cost = sp.cc || 0;
+  if (cur < cost) {
+    alert(`Not enough Vessel to cast ${sp.name} (needs ${cost}, you have ${cur}).`);
+    return;
+  }
+  if (!confirm(`Cast ${sp.name} for ${cost} Vessel?`)) return;
+  setVesselCur(cur - cost);
+  renderMagic();
+}
+
+/* ---- RIVER SLOTS ---- */
+
+function renderRiverSlots(riverMax) {
+  const box = $('river-slots-container');
+  if (!box) return;
+
+  const c = getActiveChar();
+  if (!c) { box.innerHTML = ''; return; }
+  if (!c.riverSpells) c.riverSpells = [];
+
+  // Prune invalid/removed river spells
+  c.riverSpells = c.riverSpells.filter(r => {
+    const path = MAGIC_PATHS[r.pathKey];
+    if (!path) return false;
+    const sp = path.spells.find(x => x.name === r.name);
+    if (!sp) return false;
+    if (sp.ritual) return false;
+    if (!characterKnowsSpell(c, r.pathKey, r.name)) return false;
+    return true;
+  });
+  // Clamp to current river max
+  if (c.riverSpells.length > riverMax) c.riverSpells = c.riverSpells.slice(0, riverMax);
+
+  if ($('m-river-count')) $('m-river-count').textContent = c.riverSpells.length;
+
+  if (riverMax <= 0) {
+    box.innerHTML = '<p style="font-size:0.8rem;color:var(--muted);">Vigor modifier is 0 or lower. No River slots available.</p>';
+    return;
+  }
+
+  let html = '';
+  for (let i = 0; i < riverMax; i++) {
+    const slot = c.riverSpells[i];
+    if (slot) {
+      const path = MAGIC_PATHS[slot.pathKey];
+      const sp = path?.spells.find(x => x.name === slot.name);
+      const cost = sp?.cc || 0;
+      const curVessel = getVesselCur();
+      const canCast = curVessel >= cost;
+
+      html += `<div style="border:2px solid var(--accent); border-radius:6px; padding:10px; background:rgba(0,242,254,0.08);">
+        <div style="font-size:0.8rem; font-weight:700; color:var(--accent); margin-bottom:4px;">${sp?.name || slot.name}</div>
+        <div style="font-size:0.68rem; color:var(--muted); margin-bottom:6px;">
+          ${path?.name || ''} · T${sp?.tier ?? '?'}<br>
+          CC ${cost} · ${sp?.time || ''} · ${sp?.range || ''}
+        </div>
+        <div style="display:flex; gap:4px; flex-wrap:wrap;">
+          <button type="button" class="btn btn-sm btn-cast-river"
+            data-path="${slot.pathKey}" data-name="${slot.name}"
+            ${canCast ? '' : 'disabled'}
+            style="font-size:0.7rem; padding:4px 8px; background:var(--accent); color:#000; flex:1;">
+            Cast (${cost} CC)
+          </button>
+          <button type="button" class="btn btn-sm btn-river-remove"
+            data-path="${slot.pathKey}" data-name="${slot.name}"
+            style="font-size:0.7rem; padding:4px 8px; background:var(--danger); color:#fff;">
+            ✕
+          </button>
+        </div>
+      </div>`;
+    } else {
+      html += `<div style="border:1px dashed var(--border); border-radius:6px; padding:10px; text-align:center; background:rgba(0,0,0,0.2); min-height:80px; display:flex; flex-direction:column; justify-content:center;">
+        <small style="color:var(--muted); font-size:0.75rem;">River Slot ${i + 1}</small>
+        <span style="font-size:0.8rem; font-style:italic; color:var(--muted);">Empty</span>
+      </div>`;
+    }
+  }
+
+  box.innerHTML = html;
+
+  box.querySelectorAll('.btn-cast-river').forEach(btn => {
+    btn.onclick = () => castFromRiver(btn.dataset.path, btn.dataset.name);
+  });
+  box.querySelectorAll('.btn-river-remove').forEach(btn => {
+    btn.onclick = () => removeSpellFromRiver(btn.dataset.path, btn.dataset.name);
+  });
+}
+
+function castFromRiver(pathKey, name) {
+  const c = getActiveChar();
+  if (!c) return;
+  const path = MAGIC_PATHS[pathKey];
+  const sp = path?.spells.find(x => x.name === name);
+  if (!sp) return;
+
+  const cur = getVesselCur();
+  const cost = sp.cc || 0;
+  if (cur < cost) {
+    alert(`Not enough Vessel to cast ${sp.name} (needs ${cost}, you have ${cur}).`);
+    return;
+  }
+  if (!confirm(`Cast ${sp.name} from River for ${cost} Vessel?`)) return;
+  setVesselCur(cur - cost);
+  renderMagic();
+}
