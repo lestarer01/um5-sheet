@@ -105,13 +105,38 @@ function buildSkillsUI() {
     <div class="skill-row">
       <span style="font-size:0.85rem; flex:1;">${sk.name}</span>
       <span style="font-size:0.65rem; color:var(--muted); width:34px; text-transform:uppercase;">${sk.stat}</span>
-      <span class="skill-bonus" id="sk-bonus-${i}">+0</span>
+      
+      <!-- Changed from span to input -->
+      <input type="number" class="skill-bonus-input" id="sk-bonus-${i}" data-idx="${i}" onchange="handleSkillEdit(this)" style="width:45px; background:transparent; border:none; border-bottom:1px solid var(--accent); color:var(--text); text-align:center; font-weight:bold; font-size:1rem;" />
+      
       <div class="skill-checks">
         <label><input type="checkbox" id="sk-p-${i}" /> Prof</label>
         <label><input type="checkbox" id="sk-e-${i}" /> Exp</label>
       </div>
     </div>
   `).join('');
+}
+
+function handleSkillEdit(el) {
+  const idx = parseInt(el.dataset.idx, 10);
+  const c = getActiveChar();
+  if (!c) return;
+  
+  const typedVal = parseInt(el.value, 10) || 0;
+  
+  // Calculate what the base SHOULD be right now
+  const statMod = mod(val('s-' + UM5_SKILLS[idx].stat));
+  const pb = profBonus(val('c-lvl'));
+  let base = statMod;
+  if (val('sk-p-' + idx)) base += pb;
+  if (val('sk-e-' + idx)) base += pb;
+  
+  // Save the difference as a manual modifier
+  if (!c.skillMods) c.skillMods = {};
+  c.skillMods[idx] = typedVal - base;
+  
+  saveStorage();
+  recalc();
 }
 
 /* --- WEAPONS SYSTEM --- */
@@ -280,17 +305,28 @@ function recalc() {
     if ($('sv-' + s)) $('sv-' + s).textContent = fmtMod(saveTotal);
   });
 
+    const cActive = chars.find(x => x.id === activeId);
+  
   UM5_SKILLS.forEach((sk, i) => {
     const statMod = mod(val('s-' + sk.stat));
     let total = statMod;
     if (val('sk-p-' + i)) total += pb;
     if (val('sk-e-' + i)) total += pb;
-    if ($('sk-bonus-' + i)) $('sk-bonus-' + i).textContent = fmtMod(total);
+    
+    // Apply manual modifier if one exists
+    if (cActive && cActive.skillMods && cActive.skillMods[i]) {
+      total += cActive.skillMods[i];
+    }
+    
+    // Apply to the new input value
+    if ($('sk-bonus-' + i)) {
+      $('sk-bonus-' + i).value = total;
+    }
   });
 
-  // Automatically update Magic UI when stats change (e.g. Vigor change updates River slots)
+  // Automatically update Magic UI when stats change
   renderMagic();
-}
+} // End of recalc
 
 /* --- MAGIC CALCULATIONS --- */
 function renderMagic() {
@@ -734,8 +770,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if ($('armor-preset')) $('armor-preset').addEventListener('change', applyArmor);
   if ($('armor-type')) $('armor-type').addEventListener('change', (e) => populateArmorPresets(e.target.value));
 
-  // Global listener for ALL inputs to automatically trigger saveCurrent() & recalc()
-  document.querySelectorAll('input, select, textarea').forEach(el => {
+  // Global listener for ALL inputs (ignore skill bonus inputs to prevent overwrite loops)
+  document.querySelectorAll('input:not(.skill-bonus-input), select, textarea').forEach(el => {
     el.addEventListener('input', saveCurrent);
     el.addEventListener('change', saveCurrent);
   });
