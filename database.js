@@ -1102,203 +1102,265 @@ const MAGIC_RULES = {
 
 // Collective spells available to any spellcaster
 const COLLECTIVE_SPELLS = [
-  { 
-    name: 'Dispel', 
-    ap: 2, 
-    cc: 3, 
-    time: "1 minute", 
-    range: "60 ft.", 
-    duration: "Inst.", 
-    comp: "", 
-    ritual: false,
-    desc: "Choose one creature or object or magical effect within range affected by or casting a spell. Make a Vigor check. The DC equals 10 + (the spell's tier x 2). Root spells = tier 0. On a successful check, the spell ends.<br><br><b>Note:</b> If you place this spell in your river, its spell cost can be reduced to a reaction if the target is within 60 feet."
-  },
-  { 
-    name: 'Parlor Tricks', 
-    ap: 1, 
-    cc: null, 
-    time: "1 action", 
-    range: "30 ft.", 
-    duration: "Conc. up to 1 hour", 
-    comp: "V, S", 
-    ritual: true,
-    desc: "These are minor magical effects like booming your voice, causing lights to change color or flicker, or generating slight tremors in the ground. Mild telekinesis is available up to 1 pound. You can alter your appearance in minor ways without actually disguising yourself. You can reduce or increase brightness without making it dark or blinding anyone. You can concentrate on multiple instances of this spell at once."
-  }
+  { name: "Dispel", ap: 2, cc: 3, time: "1 minute", range: "60 ft.", duration: "Inst.", comp: "", ritual: false,
+    desc: "End one spell on a creature/object/effect in range. Vigor check DC 10 + (tier × 2); roots = tier 0.<br><b>River note:</b> cost drops to a reaction if target ≤ 60 ft." },
+  { name: "Parlor Tricks", ap: 1, cc: null, time: "1 action", range: "30 ft.", duration: "Conc. up to 1 hour", comp: "V, S", ritual: true,
+    desc: "Minor effects: boom voice, flicker lights, tiny tremors, telekinesis ≤ 1 lb, slight appearance tweaks, dim/brighten lights. Can concentrate on multiple at once." }
 ];
 
 // Full Paths list
 const MAGIC_PATHS = {
-    air: {
+      air: {
     name: "Path of Air",
     cost: 2,
     synergy: "movement",
-    benefit: "When falling, you always land on your feet, and you reduce 20 feet from every fall.",
-    traits: "Air spells all involve hand movements, often the exhaling of air from your own lungs. Very seldom are actual words spoken in your casting.",
+    benefit: "Always land on your feet; reduce fall distance by 20 ft.",
+    traits: "Hand movements and exhaled air; rarely spoken words.",
     spells: [
-      { tier: 0, name: "Wave", ap: 2, cc: 2, time: "1 minute", range: "10 ft.", duration: "Inst.", comp: "S", ritual: false, desc: "Make a ranged spell attack; on a hit, the target is pushed 10 feet. For every 1 additional dark spent before casting, increase the push distance by 5 feet (max +20 feet).<br><br><b>Boost (DC 15).</b> Reduce the cost of this spell to an action." },
-      { tier: 0, name: "Jump", ap: 2, cc: 3, time: "1 action", range: "Touch", duration: "1 minute", comp: "V, S, M", ritual: false, desc: "Target one creature; the target's jump distance is tripled until the spell ends. For every 1 additional dark spent before casting, increase the number of targets by 1 (max +4)." },
-      { tier: 1, name: "Feather Fall", ap: 4, cc: 4, time: "1 bonus", range: "60 ft.", duration: "Conc. up to 5 minutes", comp: "V, S", ritual: false, desc: "Up to five falling creatures within range reduce their fall speed to 60 feet/round until the spell ends. If the creature lands before the spell ends, it takes no falling damage and can land on its feet, and the spell ends for that creature. For every 1 additional dark spent before casting, target one additional creature (max +4).<br><br><b>Boost (DC 20).</b> Double the number of targets." },
-      { tier: 1, name: "Levitate", ap: 4, cc: 4, time: "1 minute", range: "60 ft.", duration: "Conc. up to 1 hour", comp: "V, S", ritual: false, desc: "One creature or an object up to 500 pounds that you can see within range rises vertically and/or horizontally, up to 20 feet, and remains suspended there for the duration. An unwilling creature that succeeds on a Constitution or Vigor saving throw is unaffected. You can change the target's direction up to 20 feet on your turn (either movement if cast on yourself, or an action if on another target). When the spell ends, the target floats gently to the ground if it is still aloft. For every 1 additional dark spent before casting, increase the target's weight by 100 lb.<br><br><b>Boost (DC 15).</b> Double the target's weight.<br><b>Boost (DC 20).</b> Quadruple the target's weight." },
-      { tier: 2, name: "God's Breath", ap: 6, cc: 6, time: "1 minute", range: "Self", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false, desc: "Create a line 20 feet in each direction from you; all creatures within 20 feet of that line and in front of you must succeed on a Strength saving throw or be pushed 20 feet away from you and knocked prone. The wind disperses gas or vapor, and it extinguishes candles, torches, and similar unprotected flames in the area. It causes protected flames, such as those of lanterns, to dance wildly and has a 50 percent chance to extinguish them. Any creature in the area must spend 2 feet of movement for every 1 foot it moves when moving closer to you. As part of your move, you can change the orientation of the wall, and if you move, the wall moves with you. For every 1 additional dark spent before casting, increase the line on each side by 5 feet (max +20 feet).<br><br><b>Boost (DC 20).</b> Area of effect increases to 30 feet." },
-      { tier: 2, name: "Storm Wall", ap: 6, cc: 6, time: "1 minute", range: "120 ft.", duration: "Conc. up to 1 minute", comp: "V, S, M", ritual: false, desc: "You create a solid wall of swirling translucent air up to 60 feet long, 20 feet high, and 5 feet thick with its furthest point no further than 120 ft. You can bend this wall in any configuration, even enclosed shapes like cubes, cylinders, or domes. Each creature within its area or entering its area must make a Strength saving throw. A creature takes 4d8 + Vigor modifier bludgeoning damage on a failed save, or half as much damage on a successful one. Any creature passing into the wall after it is cast fails automatically. Small or smaller flying creatures or objects can't pass through the wall. All ordinary projectiles, including rounds from one- and two-handed small arms launched at targets behind the wall automatically miss. Larger weapons are unaffected. For every additional 1 dark spent before casting, increase the length of the wall by 10 feet.<br><br><b>Boost (DC 15).</b> When the duration expires, make a Vigor (Induce) check to extend the effect for another minute. The DC increases by 1 each time it is attempted." },
-      { tier: 2, name: "Fly", ap: 6, cc: 6, time: "1 action", range: "Touch", duration: "Conc. up to 10 minutes", comp: "V, S", ritual: false, desc: "One target gains a flying speed of 60 feet for the duration. When the spell ends, the target falls if it is still aloft, unless it can stop the fall. For every additional 2 dark spent before casting, target 1 additional creature.<br><br><b>Boost (DC 15).</b> While in effect, make a Vigor (Induce) check to increase speed to 80 feet until the end of your next turn." },
-      { tier: 3, name: "Freedom", ap: 8, cc: 8, time: "1 minute", range: "Touch", duration: "Conc. up to 1 hour", comp: "V, S, M", ritual: false, desc: "One willing creature is unaffected by difficult terrain and spells and other magical effects that can either reduce the target's speed or cause the target to be paralyzed or restrained. The target can also spend 5 feet of movement to automatically escape from nonmagical restraints. Being underwater imposes no penalties on the target's movement or attacks. The target can stand up for free on its turn and gains a swim, crawl, and climb speed equal to its normal speed. The target suffers no adverse effects from squeezing. For every additional 2 dark spent before casting, target 1 additional creature." },
-      { tier: 3, name: "Wind Road", ap: 8, cc: null, time: "1 minute", range: "Self", duration: "Conc. up to 8 hours", comp: "V, S, M", ritual: true, desc: "You create a platform of air 60 feet in radius centered on you. It feels like solid ground, allowing a group to traverse across like a bridge. All ground movement on the platform is doubled, though any target moving beyond 60 feet of you falls. As you move, the platform moves you, giving the illusion the wind road is dozens if not hundreds of miles across.<br><br><b>Sacrifice.</b> 2 hit dice, +1 for every additional 10 feet (max +40 feet)." },
-      { tier: 4, name: "Weather Master", ap: 10, cc: 11, time: "1 minute", range: "Self", duration: "Conc. up to 8 hours", comp: "V, S", ritual: false, desc: "You control the weather within 5 miles of you for the duration. You must be outdoors or see the outdoors to cast this spell. If you cannot see the sky, the spell ends early. When the spell ends, the weather gradually returns to normal. You can dissipate a tornado or create torrential rain. You can adjust the temperature from blistering heat to below freezing. You can increase the wind to near gale force. You can blacken the sky or clear away the clouds. You can recreate any natural temperature that can occur on the planet. For every additional 3 dark spent before casting, increase the range by 1 mile (max +6 miles).<br><br><b>Boost (DC 20).</b> Double the area of effect." }
-    ]
-  },
-    attraction: {
-    name: "Path of Attraction",
-    cost: 2,
-    synergy: "knowledge",
-    benefit: "You gain proficiency in one Charisma skill of your choice.",
-    traits: "Attraction spells are about alluring subjects using magic, thus making it necessary to make your spells not look like magic. You conceal the spells in your words and graceful nonchalant hand movements. As the effects are often subtle, it can sometimes be difficult to notice you casting a spell at all.",
-    spells: [
-      // ROOT
-      { tier: 0, name: "Command", ap: 2, cc: 4, time: "1 action", range: "30 ft.", duration: "1 round", comp: "V", ritual: false, desc: "You speak a one-word command to a creature you can see within range. The target must succeed on a Wisdom or Vigor saving throw or follow the command on its next turn. The spell has no effect if the target is undead, if it doesn't understand your language, or if your command is directly harmful to it. A target that succeeds at the save is immune to it for 8 hours. For every additional 1 dark spent before casting, you can increase the range by 10 feet." },
-
-      // TIER 1
-      { tier: 1, name: "Charm", ap: 4, cc: 4, time: "1 minute", range: "30 ft.", duration: "1 hour", comp: "V", ritual: false, desc: "The target must make a Wisdom or Vigor saving throw, with advantage if you or your companions are fighting it. If it fails, it is charmed by you until the spell ends or until you or your companions do anything harmful to it. The charmed creature regards you as a friendly acquaintance. Once a creature succeeds at this save, it is immune to the spell for 8 hours. For every additional 2 dark spent before casting, you can include one additional target (max +3 targets) in range." },
-      { tier: 1, name: "Sleep", ap: 4, cc: 5, time: "1 minute", range: "60 ft.", duration: "10 minutes", comp: "V, S, M", ritual: false, desc: "You can target a number of creatures in range with 30 total hit points. Each creature affected falls unconscious until the spell ends, the sleeper takes damage, or someone uses an action wake the sleeper. Subtract each creature's hit points from the total before moving on to the creature. A creature's hit points must be equal to or less than the remaining total for that creature to be affected. Undead and creatures immune to being charmed aren't affected by this spell. For every additional 1 dark spent before casting, you can increase the amount of hit points by 5.<br><br><b>Boost (DC 20).</b> If a creature cannot be included entirely with your remaining hit point allotment, you can attempt this check to include it. Unlike regular targets, this one gets a Wisdom or Vigor saving throw." },
-
-      // TIER 2
-      { tier: 2, name: "Captivation", ap: 6, cc: 6, time: "1 minute", range: "30 ft.", duration: "Conc. up to 5 minutes", comp: "V", ritual: false, desc: "All creatures in range that can see and hear you must make a Wisdom or Vigor saving throw. Any creature that can't be charmed succeeds on this saving throw automatically, and if you or your companions are fighting a creature, it has advantage on the save. Creatures with fewer hit points than your maximum automatically fail at this save. On a failed save, the target has disadvantage on ability checks, attack rolls, and saving throws. Its speed is halved and must always use its movement to move closer to you. This lasts until the spell ends, the target can no longer hear you, or the target suffers damage. The spell ends if you are incapacitated or can no longer speak. For every additional 1 dark spent before casting, you can increase the range by 10 feet (max +60 feet)." },
-      { tier: 2, name: "Suggestion", ap: 6, cc: 6, time: "1 minute", range: "30 ft.", duration: "1 minute", comp: "V", ritual: false, desc: "You suggest a course of activity and influence a creature you can see within range that can hear and understand you. Creatures that can't be charmed are immune. The suggestion can be anything that does not cause obvious physical harm to itself or others. The target must make a Wisdom or Vigor saving throw. On a failed save, it pursues the course of action you described to the best of its ability. You can only make one suggestion per spell, and if the spell expires before the target can complete the task, the spell expires. For every additional 2 dark spent before casting, you can include one additional target (max +3 targets).<br><br><b>Boost (DC 15).</b> Double the range of this spell." },
-      { tier: 2, name: "Terror", ap: 6, cc: 7, time: "1 minute", range: "Self", duration: "Conc. up to 1 minute", comp: "V", ritual: false, desc: "Each creature in a 20-foot radius must succeed on a Wisdom or Vigor saving throw or drop whatever it is holding and become frightened for the duration. While frightened, a creature must take the Dash action and move away from you by the safest available route on each of its turns, unless there is nowhere to move. If the creature ends its turn in a location where it doesn't have line of sight to you, the creature can make a Wisdom saving throw. On a successful save, the spell ends for that creature. For every additional 1 dark spent before casting, you can increase the range by 5 feet (max +30 feet)." },
-
-      // TIER 3
-      { tier: 3, name: "Compulsion", ap: 8, cc: 9, time: "1 minute", range: "30 ft.", duration: "1 minute", comp: "V", ritual: false, desc: "This functions identically to suggestion, except you can now give it a violent action, like inflicting harm on itself or others. It still must be a single command. For every additional 2 dark spent before casting, you can include one additional target (max +3 targets)." },
-      { tier: 3, name: "Dominate", ap: 8, cc: 9, time: "1 minute", range: "30 ft.", duration: "Conc. up to 1 hour", comp: "V", ritual: false, desc: "You attempt to beguile a creature with hit points equal or less than you (your maximum) that you can see within range. It must succeed on a Wisdom or Vigor saving throw or be charmed by you for the duration. If you or creatures that are friendly to you are fighting it, it has advantage on the saving throw. You two possess a telepathic link while the target is charmed that you can use to issue commands to while you are conscious (no action required), which it does its best to obey. You can use your action to take total and precise control of the target. Until the end of your next turn, the creature takes only the actions you choose and doesn't do anything that you don't allow it to do. During this time, you can also cause the creature to use a reaction, but this requires you to use your own reaction as well. Each time the target takes damage, it makes a new Wisdom saving throw against the spell. If the saving throw succeeds, the spell ends. For every additional 1 dark spent before casting, increase the hit points of the creature you want to dominate by 10 (+50 max).<br><br><b>Boost (DC 25).</b> Double the number of hit points of the creature you want to dominate." },
-
-      // TIER 4
-      { tier: 4, name: "Memory Writer", ap: 10, cc: 10, time: "1 minute", range: "30 ft.", duration: "Conc. up to 1 hour", comp: "V, S", ritual: false, desc: "One creature that you can see within range must make a Wisdom or Vigor saving throw. If you are fighting the creature, it has advantage on the saving throw. On a failed save, the target becomes charmed by you for the duration. The charmed target is incapacitated and unaware of its surroundings, though it can still hear you. If it takes any damage, this spell ends prematurely. While this charm lasts, you can alter the target's memory of an event within the last 24 hours that lasted no more than 10 minutes. This includes permanently eliminating that memory. The creature must be able to understand you. If a modified memory is too nonsensical to affect a creature in a meaningful manner (GM's decision), it is disregarded as a dream. For every additional 2 dark spent before casting, you can go back further and modify more (2—7 days, 1 hour; 4—30 days, 1 day; 6—1 year, 1 week; 8—lifetime, 1 year)." },
-      { tier: 4, name: "Mob Rule", ap: 10, cc: 12, time: "1 minute", range: "30 ft.", duration: "5 minutes", comp: "V, S", ritual: false, desc: "This operates the same as suggestion, except that it affects all creatures you wish within range. It still must be a single action. For every additional 2 dark spent before casting, you can extend the range by 10 feet (max +60 ft).<br><br><b>Boost (DC 25).</b> When you give the command, you can provide a violent action, per dominate." }
+      { tier: 0, name: "Wave", ap: 2, cc: 2, time: "1 minute", range: "10 ft.", duration: "Inst.", comp: "S", ritual: false,
+        desc: "Ranged spell attack; push target 10 ft. +5 ft push per 1 dark (max +20).<br><b>Boost (DC 15):</b> cost becomes 1 action." },
+      { tier: 0, name: "Jump", ap: 2, cc: 3, time: "1 action", range: "Touch", duration: "1 minute", comp: "V, S, M", ritual: false,
+        desc: "Triple jump distance. +1 target per 1 dark (max +4)." },
+      { tier: 1, name: "Feather Fall", ap: 4, cc: 4, time: "1 bonus", range: "60 ft.", duration: "Conc. up to 5 minutes", comp: "V, S", ritual: false,
+        desc: "Up to 5 creatures fall at 60 ft/round, take no fall damage, land on feet. +1 target per 1 dark (max +4).<br><b>Boost (DC 20):</b> double targets." },
+      { tier: 1, name: "Levitate", ap: 4, cc: 4, time: "1 minute", range: "60 ft.", duration: "Conc. up to 1 hour", comp: "V, S", ritual: false,
+        desc: "One creature/object ≤ 500 lb rises 20 ft and stays. Unwilling gets Con/Vig save. Move 20 ft/turn. +100 lb per 1 dark.<br><b>Boost (DC 15):</b> double weight. <b>(DC 20):</b> quadruple." },
+      { tier: 2, name: "God's Breath", ap: 6, cc: 6, time: "1 minute", range: "Self", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false,
+        desc: "20-ft line both ways; creatures in/near line Str save or pushed 20 ft + prone. Disperses gas, snuffs flames. Hard to move toward you. +5 ft line per 1 dark (max +20).<br><b>Boost (DC 20):</b> area 30 ft." },
+      { tier: 2, name: "Storm Wall", ap: 6, cc: 6, time: "1 minute", range: "120 ft.", duration: "Conc. up to 1 minute", comp: "V, S, M", ritual: false,
+        desc: "Wall of air ≤ 60×20×5 ft. Str save: 4d8 + Vig mod bludgeoning (half on success). Blocks small flyers & normal projectiles. +10 ft length per 1 dark.<br><b>Boost (DC 15):</b> extend 1 min on Vig check (DC +1 each time)." },
+      { tier: 2, name: "Fly", ap: 6, cc: 6, time: "1 action", range: "Touch", duration: "Conc. up to 10 minutes", comp: "V, S", ritual: false,
+        desc: "Fly speed 60 ft. Falls if aloft when spell ends. +1 target per 2 dark.<br><b>Boost (DC 15):</b> speed 80 ft until end of next turn." },
+      { tier: 3, name: "Freedom", ap: 8, cc: 8, time: "1 minute", range: "Touch", duration: "Conc. up to 1 hour", comp: "V, S, M", ritual: false,
+        desc: "Ignore difficult terrain, paralysis, restraint, underwater penalties. Auto-escape nonmagical bonds for 5 ft move. Free stand-up; swim/climb/crawl = speed. +1 target per 2 dark." },
+      { tier: 3, name: "Wind Road", ap: 8, cc: null, time: "1 minute", range: "Self", duration: "Conc. up to 8 hours", comp: "V, S, M", ritual: true,
+        desc: "60-ft radius air platform; double ground speed on it; moves with you. Fall if you leave range.<br><b>Sacrifice:</b> 2 HD, +1 HD per +10 ft radius (max +40 ft)." },
+      { tier: 4, name: "Weather Master", ap: 10, cc: 11, time: "1 minute", range: "Self", duration: "Conc. up to 8 hours", comp: "V, S", ritual: false,
+        desc: "Control weather in 5 miles (must see sky). Rain, wind, temp, clear/storm. +1 mile per 3 dark (max +6).<br><b>Boost (DC 20):</b> double area." }
     ]
   },
   
-    creation: {
+      attraction: {
+    name: "Path of Attraction",
+    cost: 2,
+    synergy: "knowledge",
+    benefit: "Proficiency in one Charisma skill of your choice.",
+    traits: "Subtle words and gestures; spells often look non-magical.",
+    spells: [
+      { tier: 0, name: "Command", ap: 2, cc: 4, time: "1 action", range: "30 ft.", duration: "1 round", comp: "V", ritual: false,
+        desc: "One-word command; Wis/Vig save or obey next turn. No effect if undead, doesn't understand, or command is directly harmful. Success = immune 8 hrs. +10 ft range per 1 dark." },
+      { tier: 1, name: "Charm", ap: 4, cc: 4, time: "1 minute", range: "30 ft.", duration: "1 hour", comp: "V", ritual: false,
+        desc: "Wis/Vig save (adv if fighting you). Fail: charmed, friendly acquaintance. Harm ends it. Success = immune 8 hrs. +1 target per 2 dark (max +3)." },
+      { tier: 1, name: "Sleep", ap: 4, cc: 5, time: "1 minute", range: "60 ft.", duration: "10 minutes", comp: "V, S, M", ritual: false,
+        desc: "Unconscious pool of 30 HP (subtract per creature). Wakes on damage/action. No undead/charm-immune. +5 HP pool per 1 dark.<br><b>Boost (DC 20):</b> force-include a partial creature (it gets a save)." },
+      { tier: 2, name: "Captivation", ap: 6, cc: 6, time: "1 minute", range: "30 ft.", duration: "Conc. up to 5 minutes", comp: "V", ritual: false,
+        desc: "All who see/hear you: Wis/Vig save. Fail: disadv on checks/attacks/saves, half speed, must move closer. Ends on damage/silence/incapacitated. Auto-fail if HP < your max. +10 ft per 1 dark (max +60)." },
+      { tier: 2, name: "Suggestion", ap: 6, cc: 6, time: "1 minute", range: "30 ft.", duration: "1 minute", comp: "V", ritual: false,
+        desc: "Suggest a non-harmful course of action; Wis/Vig save or pursue it. +1 target per 2 dark (max +3).<br><b>Boost (DC 15):</b> double range." },
+      { tier: 2, name: "Terror", ap: 6, cc: 7, time: "1 minute", range: "Self", duration: "Conc. up to 1 minute", comp: "V", ritual: false,
+        desc: "20-ft radius; Wis/Vig save or drop items + frightened (Dash away each turn). Save again out of sight. +5 ft radius per 1 dark (max +30)." },
+      { tier: 3, name: "Compulsion", ap: 8, cc: 9, time: "1 minute", range: "30 ft.", duration: "1 minute", comp: "V", ritual: false,
+        desc: "As Suggestion, but can order violent/harmful acts. Still one command. +1 target per 2 dark (max +3)." },
+      { tier: 3, name: "Dominate", ap: 8, cc: 9, time: "1 minute", range: "30 ft.", duration: "Conc. up to 1 hour", comp: "V", ritual: false,
+        desc: "Charm creature with HP ≤ your max; telepathic commands. Action = total control 1 turn. New save each time it takes damage. +10 HP limit per 1 dark (max +50).<br><b>Boost (DC 25):</b> double HP limit." },
+      { tier: 4, name: "Memory Writer", ap: 10, cc: 10, time: "1 minute", range: "30 ft.", duration: "Conc. up to 1 hour", comp: "V, S", ritual: false,
+        desc: "Wis/Vig save or charmed + incapacitated. Rewrite/erase one ≤ 10-min memory from last 24 hrs. Extra dark unlocks older memories (7 days → lifetime)." },
+      { tier: 4, name: "Mob Rule", ap: 10, cc: 12, time: "1 minute", range: "30 ft.", duration: "5 minutes", comp: "V, S", ritual: false,
+        desc: "Suggestion on all chosen creatures in range (one shared action). +10 ft range per 2 dark (max +60).<br><b>Boost (DC 25):</b> allow violent order." }
+    ]
+  },
+  
+      creation: {
     name: "Path of Creation",
     cost: 2,
     synergy: "technology",
-    benefit: "You gain a +2 bonus to your vessel.",
-    traits: "With creation spells, hand movements are modest and don't account more than a hand passing over a subject. A few words spoken may be confused as an unrecognized prayer.",
+    benefit: "+2 bonus to your vessel.",
+    traits: "Modest hand motions; few spoken words.",
     spells: [
-      { tier: 0, name: "Mending", ap: 2, cc: null, time: "1 minute", range: "Touch", duration: "Inst.", comp: "V, S", ritual: true, desc: "This spell makes necessary repairs on objects, and each minute in use further aids in the mending. The spell leaves no trace of damage. This spell can physically repair a magic item or construct but can't restore magic to such an object. Each minute will also recover 1d4 hit points to an object without requiring widgets or a skill check.<br><br><b>Sacrifice.</b> Spend 1 hit point." },
-      { tier: 0, name: "Purify", ap: 2, cc: null, time: "1 minute", range: "10 ft.", duration: "Inst.", comp: "V, S", ritual: true, desc: "All food and drink within range is purified and rendered free of poison and disease.<br><br><b>Sacrifice.</b> Spend 1 hit point." },
-      { tier: 1, name: "Chef", ap: 4, cc: null, time: "1 minute", range: "20 ft.", duration: "Inst.", comp: "V, S", ritual: true, desc: "You create appetizing food and clean water for five people in range. The meals takes an hour to enjoy and to have any effect. The food vanishes if not eaten after an hour, though the water remains.<br><br><b>Sacrifice.</b> Spend 2 hit points." },
-      { tier: 1, name: "Create Elemental", ap: 4, cc: 6, time: "1 minute", range: "90 ft.", duration: "10 minutes", comp: "V, S, M", ritual: false, desc: "You gather natural elements and inject them with a modicum of intelligence. You create an elemental of challenge rating 2 or lower. An elemental created by this spell disappears when it drops to 0 hit points or when the spell ends. The elemental is friendly to you and your companions. It obeys verbal commands that you issue (no action required by you). For every 3 additional dark spent before casting, increase the challenge rating of the created elemental by 1 (Max CR 5).<br><br><b>Boost (DC 15).</b> Double the range you can create the elemental." },
-      { tier: 2, name: "Fabricate", ap: 6, cc: null, time: "10 minutes", range: "120 ft.", duration: "Inst.", comp: "V, S", ritual: true, desc: "You convert raw materials into products of the same material. You can gather what you can see within range to fabricate a Large or smaller object (contained within a 10-foot cube, or eight connected 5-foot cubes), given a sufficient quantity of raw material. Creatures or magic items can't be created or transmuted by this spell. You also can't use it to create complicated items like technology.<br><br><b>Sacrifice.</b> Spend 2 hit dice." },
-      { tier: 3, name: "Bag of Anything", ap: 8, cc: null, time: "1 minute", range: "Touch", duration: "5 minutes", comp: "V, S", ritual: true, desc: "You have constructed a backpack or satchel from which you can remove nearly anything you need. The object is created as you remove it from the bag. The object cannot be chemical or mechanical (no firearms or explosives), but rather standard gear. Only one item can be removed per use of the spell, and the object lasts 5 minutes before disintegrating.<br><br><b>Sacrifice.</b> Spend 2 hit dice." },
-      { tier: 4, name: "Create Beast", ap: 10, cc: 12, time: "1 minute", range: "Touch", duration: "Conc. up to 5 minutes", comp: "V, S, M", ritual: false, desc: "You create any beast with a challenge rating 4 or lower, which appears in an unoccupied space next to you. The beast disappears when it drops to 0 hit points or when the spell ends. The beast is friendly to you and your companions for the duration. Roll initiative for the beast, which has its own turns. It obeys any verbal commands that you issue to it (no action required by you). If you don't issue any commands, it defends itself from hostile creatures but otherwise takes no actions. A beast is defined as any creature native to this setting or a \"Giant\" version of one. This beast is not real, only an imitation, and it vanishes after the spell expires. For every 3 additional dark spent before casting, increase the challenge rating of the created beast by 1 (Max CR = your level).<br><br><b>Boost (DC 25).</b> The maximum CR increases by 2 (you must still spend dark)." }
+      { tier: 0, name: "Mending", ap: 2, cc: null, time: "1 minute", range: "Touch", duration: "Inst.", comp: "V, S", ritual: true,
+        desc: "Repair objects (no trace). Can fix magic items/constructs but not restore their magic. 1d4 HP to objects per minute.<br><b>Sacrifice:</b> 1 HP." },
+      { tier: 0, name: "Purify", ap: 2, cc: null, time: "1 minute", range: "10 ft.", duration: "Inst.", comp: "V, S", ritual: true,
+        desc: "Purify all food & drink in range (no poison/disease).<br><b>Sacrifice:</b> 1 HP." },
+      { tier: 1, name: "Chef", ap: 4, cc: null, time: "1 minute", range: "20 ft.", duration: "Inst.", comp: "V, S", ritual: true,
+        desc: "Create food & water for 5 people. Food vanishes after 1 hour if uneaten.<br><b>Sacrifice:</b> 2 HP." },
+      { tier: 1, name: "Create Elemental", ap: 4, cc: 6, time: "1 minute", range: "90 ft.", duration: "10 minutes", comp: "V, S, M", ritual: false,
+        desc: "Summon elemental CR ≤ 2, friendly, obeys verbal commands. +1 CR per 3 dark (max CR 5).<br><b>Boost (DC 15):</b> double range." },
+      { tier: 2, name: "Fabricate", ap: 6, cc: null, time: "10 minutes", range: "120 ft.", duration: "Inst.", comp: "V, S", ritual: true,
+        desc: "Convert raw materials into finished goods (Large or smaller / 10-ft cube). No creatures, magic items, or complex tech.<br><b>Sacrifice:</b> 2 HD." },
+      { tier: 3, name: "Bag of Anything", ap: 8, cc: null, time: "1 minute", range: "Touch", duration: "5 minutes", comp: "V, S", ritual: true,
+        desc: "Pull one mundane gear item from a satchel; lasts 5 min then disintegrates. No chemicals/firearms/explosives.<br><b>Sacrifice:</b> 2 HD." },
+      { tier: 4, name: "Create Beast", ap: 10, cc: 12, time: "1 minute", range: "Touch", duration: "Conc. up to 5 minutes", comp: "V, S, M", ritual: false,
+        desc: "Summon beast CR ≤ 4, friendly, own initiative, obeys commands. +1 CR per 3 dark (max = your level).<br><b>Boost (DC 25):</b> max CR +2." }
     ]
   },
-
-    death: {
+  
+      death: {
     name: "Path of Death",
     cost: 2,
     synergy: "decay",
-    benefit: "When you recover hit points through spells, you can recover vessel instead at a rate of 1 dark:5 HP. This occurs for free.",
-    traits: "Death spells involve dark incantations, and when materials are required, it is often always blood or ash…or both blood and ash, often used to construct a magic circle. It's not a subtle method of magic. Blood should be fresh, often with a recent animal sacrifice (in the past 5 minutes).",
+    benefit: "When spells heal you, may take vessel instead (1 dark : 5 HP), free.",
+    traits: "Dark incantations; blood/ash materials; obvious magic.",
     spells: [
-      { tier: 0, name: "Drain Touch", ap: 2, cc: 3, time: "1 minute", range: "Touch", duration: "Inst.", comp: "S", ritual: false, desc: "Make a melee spell attack against a creature, inflicting 1d6 + Vigor modifier necrotic damage, and you regain 1 hit point. For every 2 additional dark spent before casting, increase dice by 1 and recovery by 1 (max +3 each).<br><br><b>Boost (DC 15).</b> Reduce the cost of this spell to an action." },
-      { tier: 0, name: "Dead Life", ap: 2, cc: 5, time: "1 minute", range: "Self", duration: "5 minutes", comp: "S", ritual: false, desc: "You gain your Vigor modifier in temporary hit points, which are lost after the spell expires. For every 1 additional dark spent before casting, increase gain 1 additional temporary hit point (Max +10)." },
-      { tier: 1, name: "Death Curse", ap: 4, cc: 4, time: "1 minute", range: "Touch", duration: "Conc. up to 1 hour", comp: "S, M", ritual: false, desc: "Make a melee spell attack against a creature; on a hit, the creature suffers disadvantage on all ability checks on Constitution saving throws until the spell ends. You also deal 1d6 additional necrotic damage whenever you hit with any non-spell attack.<br><br><b>Boost (DC 15).</b> Make a drain touch attack (regardless if it's selected as your spell) as part of the same spell." },
-      { tier: 1, name: "Animate", ap: 4, cc: 5, time: "1 minute", range: "30 ft.", duration: "Inst.", comp: "V, S, M", ritual: false, desc: "A Medium or smaller-sized corpse in any state of decay (even bones) becomes any undead creature with a CR of 2 or less. On your turn, you can use a bonus action to mentally command any creature you made with this spell that you can see (you can command any or all of them at the same time). If you issue no commands, the creature only defends itself against hostile creatures. The creature is under your control for 24 hours, after which it stops obeying until you cast this spell on it again. For every 3 additional dark spent before casting, you can raise or sustain two undead.<br><br><b>Boost (DC 20).</b> You can create undead at CR 3 or less." },
-      { tier: 2, name: "Perish", ap: 6, cc: 7, time: "1 minute", range: "Touch", duration: "Inst.", comp: "S", ritual: false, desc: "The target you touch must make a Constitution saving throw, taking 7d6 + Vigor modifier necrotic damage on a failed save, or half as much damage on a successful one. This spell has no effect on undead or constructs. For every 2 additional dark spent before casting, you can increase the number of dice by 1 (Max +5 dice).<br><br><b>Boost (DC 20).</b> Increase damage dice to d8." },
-      { tier: 2, name: "Line of Death", ap: 6, cc: 7, time: "1 minute", range: "120 ft.", duration: "Conc. up to 1 minute", comp: "V, S, M", ritual: false, desc: "You create an invisible wall of necrotic energy up to 60 feet long, 20 feet high, and 5 feet thick with its furthest point no further than 120 ft. You can bend this wall in any configuration, even enclosed shapes like cubes, cylinders, or domes. Each creature within its area upon creation or within 5 feet while it is in effect must make a Dexterity saving throw. On a failed save, a creature takes 7d6 + Vigor modifier necrotic damage, or half as much damage on a successful save. Any creature passing into the wall after it is cast fails automatically. For every additional 1 dark spent before casting, increase the length of the wall by 10 feet. This wall is invisible, with the only evidence of its existence being the inevitable corpses.<br><br><b>Boost (DC 13).</b> When the duration expires, make a Vigor (Induce) check to extend the effect for another minute. The DC increases by 1 each time it is attempted." },
-      { tier: 3, name: "Greater Animate", ap: 8, cc: 9, time: "1 minute", range: "30 ft.", duration: "Inst.", comp: "V, S, M", ritual: false, desc: "This operates the same as animate, except the maximum CR of the undead creature is now 5. For every 3 additional dark spent before casting, you can raise or sustain two undead.<br><br><b>Boost (DC 20).</b> You can create undead at CR 6 or less." },
-      { tier: 3, name: "Lifeforce", ap: 8, cc: 9, time: "1 minute", range: "Touch", duration: "Inst.", comp: "S", ritual: false, desc: "The target must make a Constitution saving throw. On a failed save, it takes 7d6 + Vigor modifier necrotic damage, or half as much damage on a successful save; you recover hit points equal to 25% of the damage dealt. The damage can't reduce the target's hit points below 1. For every 2 additional dark spent before casting, you can increase the number of dice by 1 (Max +5 dice).<br><br><b>Boost (DC 20).</b> Increase damage dice to d8." },
-      { tier: 4, name: "Hand of Death", ap: 10, cc: 11, time: "1 minute", range: "Touch", duration: "Inst.", comp: "S", ritual: false, desc: "The target must make a Constitution saving throw. It takes 9d6 + Vigor modifier necrotic damage on a failed save, or half as much damage on a successful one. A humanoid killed by this spell rises at the start of your next turn as an undead of CR 3 or less that is permanently under your command, following your verbal orders to the best of its ability. For every 2 additional dark spent before casting, you can increase the number of dice by 1 (Max +5 dice).<br><br><b>Boost (DC 20).</b> Increase damage dice to d8." },
-      { tier: 4, name: "Resurrection", ap: 12, cc: null, time: "1 hour", range: "Touch", duration: "Inst.", comp: "V, S, M", ritual: true, desc: "You touch a creature that has been dead for no more than 5 years that didn't die of old age, and that isn't undead. If its soul is free and willing, the target returns to life with all its hit points. This spell neutralizes any poisons and cures all diseases afflicting the creature when it died. This spell closes all mortal wounds and restores any missing body parts. Coming back from the dead is an ordeal. The target is at level 4 exhaustion.<br><br><b>Boost (DC 15).</b> You can increase the age of the corpse by 5 years. Increase the DC by 1, increasing the age by 5 years each (no Max).<br><br><b>Sacrifice.</b> After casting, you gain four levels of exhaustion." }
+      { tier: 0, name: "Drain Touch", ap: 2, cc: 3, time: "1 minute", range: "Touch", duration: "Inst.", comp: "S", ritual: false,
+        desc: "Melee spell attack: 1d6 + Vig mod necrotic + heal 1 HP. +1 die & +1 heal per 2 dark (max +3).<br><b>Boost (DC 15):</b> cost becomes 1 action." },
+      { tier: 0, name: "Dead Life", ap: 2, cc: 5, time: "1 minute", range: "Self", duration: "5 minutes", comp: "S", ritual: false,
+        desc: "Gain temp HP = Vig mod. +1 temp HP per 1 dark (max +10)." },
+      { tier: 1, name: "Death Curse", ap: 4, cc: 4, time: "1 minute", range: "Touch", duration: "Conc. up to 1 hour", comp: "S, M", ritual: false,
+        desc: "Melee spell attack: disadv on ability checks & Con saves; +1d6 necrotic on your non-spell hits.<br><b>Boost (DC 15):</b> also make a Drain Touch as part of cast." },
+      { tier: 1, name: "Animate", ap: 4, cc: 5, time: "1 minute", range: "30 ft.", duration: "Inst.", comp: "V, S, M", ritual: false,
+        desc: "Turn Medium-or-smaller corpse into undead CR ≤ 2 for 24 hrs. Bonus action to command. +2 undead per 3 dark.<br><b>Boost (DC 20):</b> CR ≤ 3." },
+      { tier: 2, name: "Perish", ap: 6, cc: 7, time: "1 minute", range: "Touch", duration: "Inst.", comp: "S", ritual: false,
+        desc: "Con save: 7d6 + Vig mod necrotic (half on success). No undead/constructs. +1 die per 2 dark (max +5).<br><b>Boost (DC 20):</b> dice to d8." },
+      { tier: 2, name: "Line of Death", ap: 6, cc: 7, time: "1 minute", range: "120 ft.", duration: "Conc. up to 1 minute", comp: "V, S, M", ritual: false,
+        desc: "Invisible necrotic wall ≤ 60×20×5 ft. Dex save: 7d6 + Vig mod (half on success). +10 ft length per 1 dark.<br><b>Boost (DC 13):</b> extend 1 min on Vig check (DC +1 each)." },
+      { tier: 3, name: "Greater Animate", ap: 8, cc: 9, time: "1 minute", range: "30 ft.", duration: "Inst.", comp: "V, S, M", ritual: false,
+        desc: "As Animate, but CR ≤ 5. +2 undead per 3 dark.<br><b>Boost (DC 20):</b> CR ≤ 6." },
+      { tier: 3, name: "Lifeforce", ap: 8, cc: 9, time: "1 minute", range: "Touch", duration: "Inst.", comp: "S", ritual: false,
+        desc: "Con save: 7d6 + Vig mod necrotic (half on success); you heal 25% of damage dealt (can't drop target below 1). +1 die per 2 dark (max +5).<br><b>Boost (DC 20):</b> dice to d8." },
+      { tier: 4, name: "Hand of Death", ap: 10, cc: 11, time: "1 minute", range: "Touch", duration: "Inst.", comp: "S", ritual: false,
+        desc: "Con save: 9d6 + Vig mod necrotic (half on success). Humanoid killed rises next turn as CR ≤ 3 undead under your permanent command. +1 die per 2 dark (max +5).<br><b>Boost (DC 20):</b> dice to d8." },
+      { tier: 4, name: "Resurrection", ap: 12, cc: null, time: "1 hour", range: "Touch", duration: "Inst.", comp: "V, S, M", ritual: true,
+        desc: "Restore creature dead ≤ 5 years (not old age/undead) to full HP; cures poisons/diseases/wounds/missing parts. Target at exhaustion 4.<br><b>Boost (DC 15):</b> +5 years per +1 DC.<br><b>Sacrifice:</b> gain 4 exhaustion." }
     ]
   },
-
-    decay: {
+  
+      decay: {
     name: "Path of Decay",
     cost: 2,
     synergy: "death",
-    benefit: "You have resistance to poison and acid damage.",
-    traits: "Necromancy's red-headed stepchild, decay spells are often confused with the former given its use of audible incantations. The only notable difference is the lack of blood in many of the spells.",
+    benefit: "Resistance to poison and acid damage.",
+    traits: "Audible incantations; little/no blood.",
     spells: [
-      { tier: 0, name: "Acidic Touch", ap: 2, cc: 3, time: "1 action", range: "Touch", duration: "Inst.", comp: "S", ritual: false, desc: "Make a melee spell attack. On a hit, the target takes 1d8 + Vigor modifier acid damage. For every 3 additional dark spent before casting, increase dice by 1 (max +3 dice)." },
-      { tier: 0, name: "Acid Ball", ap: 2, cc: 4, time: "1 minute", range: "30 ft.", duration: "Inst.", comp: "S", ritual: false, desc: "You hurl a bubble of acid. Choose one creature within range, or choose two creatures within range that are within 5 feet of each other. A target must succeed on a Dexterity saving throw or take 1d4 + Vigor modifier acid damage. For every 2 additional dark spent before casting, increase dice by 1 (max +3 dice).<br><br><b>Boost (DC 15).</b> Reduce the cost of this spell to an action." },
-      { tier: 1, name: "Acid Spray", ap: 3, cc: 6, time: "1 minute", range: "15 ft. cone", duration: "Inst.", comp: "V, S", ritual: false, desc: "You produce a 15-foot cone of acid; targets make a Dexterity saving throw, inflicting 3d6 + Vigor modifier damage on a failed save, or half as much on a successful one. A target that fails takes additional damage equal to half the initial damage. For every 3 additional dark spent before casting, increase dice by 1 (max +3 dice).<br><br><b>Boost (DC 20).</b> Increase damage dice to d8." },
-      { tier: 1, name: "Poison Puff", ap: 3, cc: 6, time: "1 minute", range: "10 ft.", duration: "Inst.", comp: "V, S", ritual: false, desc: "A target able to inhale your attack must make a Constitution saving throw, inflicting 4d6 + Vigor modifier damage on a failed save, or half as much on a successful one. A target that fails is also poisoned for 1 minute. For every 3 additional dark spent before casting, increase dice by 1 (max +3 dice).<br><br><b>Boost (DC 20).</b> Increase damage dice to d8." },
-      { tier: 2, name: "Acid/Poison Spit", ap: 4, cc: 7, time: "1 minute", range: "20 ft.", duration: "Inst.", comp: "S", ritual: false, desc: "One target in range must make a Dexterity saving throw, suffering 7d6 + Vigor modifier damage on a failed save, or half as much on a successful one. If you spit acid, a target that fails takes additional damage equal to half the initial damage. If you spit poison, a target that fails is poisoned for 1 minute. For every 2 additional dark spent before casting, increase dice by 1 (max +3 dice).<br><br><b>Boost (DC 20).</b> Increase damage dice to d8." },
-      { tier: 2, name: "Condition", ap: 4, cc: 7, time: "1 minute", range: "60 ft.", duration: "5 minutes", comp: "V, S", ritual: false, desc: "Choose one creature that you can see within range to make two Constitution saving throws. For each saving throw failed, the target gains a level of exhaustion. Unlike standard exhaustion, these levels are lost after the spell's duration. This spell cannot inflict level 6 exhaustion, although the target can still reach it normally. For every 3 additional dark spent before casting, add one additional saving throw (max 5 = 5 levels of exhaustion)." },
-      { tier: 3, name: "Decomposition", ap: 6, cc: 9, time: "1 minute", range: "90 ft.", duration: "Inst. (+10 rounds)", comp: "V, S", ritual: false, desc: "Make a ranged spell attack against one target in range; on a hit, the target takes 7d6 + Vigor modifier damage immediately, and 2d6 + Vigor modifier damage every additional round for 10 rounds. On a miss, the attack splashes the target with acid for half as much of the initial damage and no subsequent damage. For every 2 additional dark spent before casting, increase dice by 1 (max +5 dice).<br><br><b>Boost (DC 20).</b> Increase damage dice to d8." },
-      { tier: 3, name: "Contagion", ap: 6, cc: 9, time: "1 minute", range: "Touch", duration: "Until cured", comp: "V, S", ritual: false, desc: "Make a melee spell attack. On a hit, you afflict the creature with any disease of your choice. At the end of each of the target's turns, it must make a Constitution saving throw. After failing three of these saving throws, the disease's effects last for the duration, and the creature stops making these saves. After succeeding on three of these saving throws, the creature recovers from the disease, and the spell ends." },
-      { tier: 4, name: "Plague", ap: 8, cc: 12, time: "1 minute", range: "60 ft.", duration: "Until cured", comp: "V, S", ritual: false, desc: "This operates the same as contagion, except now you can make a ranged spell attack against any number of targets you can see in range. For every 2 additional dark spent before casting, increase the range by 10 ft. (max +60 ft.)." }
+      { tier: 0, name: "Acidic Touch", ap: 2, cc: 3, time: "1 action", range: "Touch", duration: "Inst.", comp: "S", ritual: false,
+        desc: "Melee spell attack: 1d8 + Vig mod acid. +1 die per 3 dark (max +3)." },
+      { tier: 0, name: "Acid Ball", ap: 2, cc: 4, time: "1 minute", range: "30 ft.", duration: "Inst.", comp: "S", ritual: false,
+        desc: "1–2 targets (within 5 ft of each other); Dex save or 1d4 + Vig mod acid. +1 die per 2 dark (max +3).<br><b>Boost (DC 15):</b> cost becomes 1 action." },
+      { tier: 1, name: "Acid Spray", ap: 3, cc: 6, time: "1 minute", range: "15 ft. cone", duration: "Inst.", comp: "V, S", ritual: false,
+        desc: "15-ft cone; Dex save 3d6 + Vig mod (half on success). Fail also takes half again. +1 die per 3 dark (max +3).<br><b>Boost (DC 20):</b> dice to d8." },
+      { tier: 1, name: "Poison Puff", ap: 3, cc: 6, time: "1 minute", range: "10 ft.", duration: "Inst.", comp: "V, S", ritual: false,
+        desc: "Con save: 4d6 + Vig mod (half on success); fail = poisoned 1 min. +1 die per 3 dark (max +3).<br><b>Boost (DC 20):</b> dice to d8." },
+      { tier: 2, name: "Acid/Poison Spit", ap: 4, cc: 7, time: "1 minute", range: "20 ft.", duration: "Inst.", comp: "S", ritual: false,
+        desc: "Dex save: 7d6 + Vig mod (half on success). Acid: fail takes half again. Poison: fail = poisoned 1 min. +1 die per 2 dark (max +3).<br><b>Boost (DC 20):</b> dice to d8." },
+      { tier: 2, name: "Condition", ap: 4, cc: 7, time: "1 minute", range: "60 ft.", duration: "5 minutes", comp: "V, S", ritual: false,
+        desc: "Target makes 2 Con saves; each fail = 1 exhaustion (fades when spell ends; can't give level 6). +1 save per 3 dark (max 5)." },
+      { tier: 3, name: "Decomposition", ap: 6, cc: 9, time: "1 minute", range: "90 ft.", duration: "Inst. (+10 rounds)", comp: "V, S", ritual: false,
+        desc: "Ranged spell attack: 7d6 + Vig mod, then 2d6 + Vig mod / round for 10 rounds. Miss = half initial, no ongoing. +1 die per 2 dark (max +5).<br><b>Boost (DC 20):</b> dice to d8." },
+      { tier: 3, name: "Contagion", ap: 6, cc: 9, time: "1 minute", range: "Touch", duration: "Until cured", comp: "V, S", ritual: false,
+        desc: "Melee spell attack: inflict any disease. Target Con saves each turn; 3 fails = disease locks, 3 successes = cured." },
+      { tier: 4, name: "Plague", ap: 8, cc: 12, time: "1 minute", range: "60 ft.", duration: "Until cured", comp: "V, S", ritual: false,
+        desc: "As Contagion, but ranged against any number of targets you can see. +10 ft range per 2 dark (max +60)." }
     ]
   },
 
-    earth: {
+      earth: {
     name: "Path of Earth",
     cost: 2,
     synergy: "water",
-    benefit: "You have advantage with Intelligence (Nature) checks.",
-    traits: "Spells focused on Earth employ what appears to be dirt in nearly all of its spellcraft. Hand movements, akin to acting as puppeteering to nature, are prevalent.",
+    benefit: "Advantage on Intelligence (Nature) checks.",
+    traits: "Dirt and puppeteering gestures.",
     spells: [
-      { tier: 0, name: "Snap", ap: 2, cc: 3, time: "1 action", range: "10 ft.", duration: "Inst.", comp: "S", ritual: false, desc: "You make a ranged spell attack against one creature in range. On a hit, you inflict 1d6 + Vigor modifier thunder damage, and the target is deafened until the beginning of your next turn. For every 3 additional dark spent before casting, increase dice by 1 (max +3 dice)." },
-      { tier: 0, name: "Clap", ap: 2, cc: 4, time: "1 minute", range: "10 ft.", duration: "Inst.", comp: "S", ritual: false, desc: "This spell requires two free hands. Each creature you select in range must make a Constitution saving throw or be knocked prone. Flying creatures are immune. For every 2 additional dark spent before casting, increase the range by 5 feet (max +15 feet)." },
-      { tier: 1, name: "Entangle", ap: 4, cc: 6, time: "1 minute", range: "30 ft. cone", duration: "Conc. up to 5 minutes", comp: "S", ritual: false, desc: "Vines sprout in a 30-foot cone radiating from you. For the duration, this area counts as difficult terrain. A creature in the area when you cast the spell must succeed on a Strength saving throw or be restrained until the spell ends. A restrained creature can use its action to make a Strength check against your spell save DC. On a success, it frees itself. When the spell ends, the plants wilt away. For every 2 additional dark spent before casting, increase the range by 10 feet (max +30 feet)." },
-      { tier: 1, name: "Animal Kinship", ap: 4, cc: null, time: "1 minute", range: "30 ft.", duration: "24 hours", comp: "V, S, M", ritual: true, desc: "Select a beast with an Intelligence of 4 or less; it must succeed on a Wisdom saving throw or be charmed by you for the spell's duration. If you or one of your companions harms the target, the spells ends. Instead of controlling it, you can give it a single instruction and a message to deliver. When you do, specify a location, which you must have visited, and a recipient who matches a general description. You can speak a message of up to twenty-five words. The target beast travels for the duration of the spell toward the specified location, covering about 50 miles per 24 hours for a flying messenger, or 25 miles for other animals.<br><br><b>Sacrifice.</b> You suffer disadvantage to ability checks for 1 hour. You can gain one level of exhaustion and target 2 beasts instead of 1." },
-      { tier: 2, name: "Thunderwave", ap: 6, cc: 7, time: "1 minute", range: "15 ft. cube", duration: "Inst.", comp: "V, S", ritual: false, desc: "Each creature in a 15-foot cube originating from you must make a Constitution saving throw. On a failed save, a creature takes 1d6 + Vigor modifier thunder damage and is pushed 10 feet away from you. On a successful save, the creature takes half as much damage and isn't pushed. Unsecured objects entirely within the area are counted as having failed. The spell emits a thunderous boom audible out to 300 feet. For every 2 additional dark spent before casting, increase dice by 1 (max +5 dice).<br><br><b>Boost (DC 20).</b> Increase damage dice to d8." },
-      { tier: 2, name: "Spines", ap: 6, cc: 7, time: "1 minute", range: "10 ft.", duration: "Conc. up to 1 minute", comp: "V, S, M", ritual: false, desc: "Each creature in range centered on you must make a Dexterity saving throw. A creature takes 3d6 + Vigor modifier piercing damage on a failed save, or half as much damage on a successful one. A failed creature is also restrained until the spell ends. A restrained creature can use its action to make a Strength check against your spell save DC. On a success, it frees itself. When the spell ends, the plants wilt away. Creatures entering the spells effect must make the same saving throw or suffer equal damage and effect. For every 2 additional dark spent before casting, increase the range by 10 feet and the damage by 1 die (max +30 feet and +3 dice).<br><br><b>Boost (DC 20).</b> Increase damage dice to d8." },
-      { tier: 3, name: "Wall of Earth", ap: 8, cc: 8, time: "1 minute", range: "120 ft.", duration: "Conc. up to 10 minutes", comp: "V, S, M", ritual: false, desc: "A nonmagical wall of earth rises 80 feet long, 30 feet high, and 5 feet thick with its furthest point not further than 120 feet. You can bend this wall in any configuration, even enclosed shapes like cubes, cylinders, or domes. If a creature would be surrounded on all sides by the wall (or the wall and another solid surface), that creature can make a Dexterity saving throw. On a success, it can use its reaction to move up to its speed so that it is no longer enclosed by the wall. You can use this spell to bridge a chasm, create a ramp, erect crenellations, battlements, and so on. If you maintain your concentration on this spell for its whole duration, the wall becomes permanent and can't be dispelled. Otherwise, the wall disappears when the spell ends." },
-      { tier: 3, name: "Terraform", ap: 8, cc: 9, time: "1 minute", range: "100 ft.", duration: "Conc. up to 2 hours", comp: "V, S, M", ritual: false, desc: "You can reshape the terrain in the area in any manner you choose for the duration. You can change elevation, create or fill in a trench, erect or flatten a wall, or form a pillar (GM's discretion on the limits given present terrain). At the end of every 10 minutes you spend concentrating on the spell, you can choose a new area of terrain to affect. Because the terrain's transformation occurs slowly, creatures in the area can't usually be trapped or injured by the ground's movement. This spell can't manipulate construction or technology. If the way you shape the terrain would make a structure unstable, it might collapse. This spell doesn't directly affect plant growth. The moved earth carries any plants along with it. For every 2 additional dark spent before casting, increase the range by 50 feet (max +200 feet).<br><br><b>Boost (DC 25).</b> Double the spell's range." },
-      { tier: 4, name: "Earthquake", ap: 10, cc: 12, time: "1 minute", range: "500 ft.", duration: "Conc. up to 1 minute", comp: "V, S, M", ritual: false, desc: "You create an intense tremor in a 100-foot-radius circle centered on a point in range. The ground in the area becomes difficult terrain. Each creature on the ground that is concentrating must make a Constitution saving throw. On a failed save, the creature's concentration is broken. When you cast this spell, and at the end of each turn you spend concentrating on it, each creature on the ground in the area must make a Dexterity saving throw. On a failed save, the creature is knocked prone.<br><br>Spend 4 additional dark to open up 1d6 fissures. Each is 1d10 × 10 feet deep, 10 feet wide, and extends from one edge of the spell's area to the opposite side. A creature standing on a spot where a fissure opens must succeed on a Dexterity saving throw or fall in. A creature that successfully saves moves with the fissure's edge as it opens. A fissure that opens beneath a structure causes it to automatically collapse (see below).<br><br>Spend 3 additional dark to inflict 50 bludgeoning damage to any structure in contact with the ground in the area when you cast the spell and at the start of each of your turns until the spell ends. If a structure drops to 0 hit points, it collapses and potentially damages nearby creatures. A creature within half the distance of a structure's height must make a Dexterity saving throw. On a failed save, the creature takes 4d6 + Vigor modifier bludgeoning damage, is knocked prone, and is buried in the rubble, requiring a DC 20 Strength (Athletics) check as an action to escape. The GM can adjust the DC higher or lower, depending on the nature of the rubble. On a successful save, the creature takes half as much damage and doesn't fall prone or become buried." }
+      { tier: 0, name: "Snap", ap: 2, cc: 3, time: "1 action", range: "10 ft.", duration: "Inst.", comp: "S", ritual: false,
+        desc: "Ranged spell attack: 1d6 + Vig mod thunder + deafened until your next turn. +1 die per 3 dark (max +3)." },
+      { tier: 0, name: "Clap", ap: 2, cc: 4, time: "1 minute", range: "10 ft.", duration: "Inst.", comp: "S", ritual: false,
+        desc: "Needs 2 free hands. Con save or prone (flyers immune). +5 ft range per 2 dark (max +15)." },
+      { tier: 1, name: "Entangle", ap: 4, cc: 6, time: "1 minute", range: "30 ft. cone", duration: "Conc. up to 5 minutes", comp: "S", ritual: false,
+        desc: "30-ft cone of vines = difficult terrain. Str save or restrained (Str check vs DC to break). +10 ft per 2 dark (max +30)." },
+      { tier: 1, name: "Animal Kinship", ap: 4, cc: null, time: "1 minute", range: "30 ft.", duration: "24 hours", comp: "V, S, M", ritual: true,
+        desc: "Charm beast Int ≤ 4 (Wis save) or give it a 25-word message delivery (~50 mi fly / 25 mi walk per day).<br><b>Sacrifice:</b> disadv on checks 1 hour — or 1 exhaustion to target 2 beasts." },
+      { tier: 2, name: "Thunderwave", ap: 6, cc: 7, time: "1 minute", range: "15 ft. cube", duration: "Inst.", comp: "V, S", ritual: false,
+        desc: "15-ft cube; Con save: 1d6 + Vig mod thunder + push 10 ft (half dmg, no push on success). +1 die per 2 dark (max +5).<br><b>Boost (DC 20):</b> dice to d8." },
+      { tier: 2, name: "Spines", ap: 6, cc: 7, time: "1 minute", range: "10 ft.", duration: "Conc. up to 1 minute", comp: "V, S, M", ritual: false,
+        desc: "Dex save: 3d6 + Vig mod piercing (half on success); fail = restrained. +10 ft & +1 die per 2 dark (max +30 ft / +3 dice).<br><b>Boost (DC 20):</b> dice to d8." },
+      { tier: 3, name: "Wall of Earth", ap: 8, cc: 8, time: "1 minute", range: "120 ft.", duration: "Conc. up to 10 minutes", comp: "V, S, M", ritual: false,
+        desc: "Nonmagical wall 80×30×5 ft, shapeable. Full-duration concentration makes it permanent." },
+      { tier: 3, name: "Terraform", ap: 8, cc: 9, time: "1 minute", range: "100 ft.", duration: "Conc. up to 2 hours", comp: "V, S, M", ritual: false,
+        desc: "Reshape terrain slowly (elevation, trenches, pillars). New area every 10 min. No buildings/tech. +50 ft range per 2 dark (max +200).<br><b>Boost (DC 25):</b> double range." },
+      { tier: 4, name: "Earthquake", ap: 10, cc: 12, time: "1 minute", range: "500 ft.", duration: "Conc. up to 1 minute", comp: "V, S, M", ritual: false,
+        desc: "100-ft radius tremor; difficult terrain, concentration Con saves, prone Dex saves. Spend 4 dark: 1d6 fissures. Spend 3 dark: 50 dmg/turn to structures." }
     ]
   },
 
-  flame: {
-    name: "Path of Flame", cost: 2, synergy: "self",
-    benefit: "Resistance to fire damage; immune to your own magical fire.",
-    traits: "Flame spells require vocal shouts and sweeping gestures.",
+      flame: {
+    name: "Path of Flame",
+    cost: 2,
+    synergy: "self",
+    benefit: "Resistance to fire; immunity to magical fire you create.",
+    traits: "Hand/mouth movements; flammable material components.",
     spells: [
-      { tier: 0, name: "Fire Bolt", ap: 2, cc: 3, time: "1 action", range: "120 ft.", duration: "Inst.", comp: "V, S", ritual: false },
-      { tier: 0, name: "Enchant Flame", ap: 2, cc: null, time: "1 action", range: "Touch", duration: "1 hour", comp: "V, S", ritual: false },
-      { tier: 1, name: "Flamethrower", ap: 3, cc: 4, time: "1 action", range: "Self (15-ft cone)", duration: "Inst.", comp: "V, S", ritual: false },
-      { tier: 1, name: "Forever Flame", ap: 3, cc: null, time: "1 action", range: "Touch", duration: "Until dismissed", comp: "V, S", ritual: true },
-      { tier: 1, name: "Flame Ball", ap: 3, cc: 4, time: "1 action", range: "150 ft.", duration: "Inst.", comp: "V, S, M", ritual: false },
-      { tier: 2, name: "Pillars of Fire", ap: 5, cc: 6, time: "1 action", range: "60 ft.", duration: "Inst.", comp: "V, S", ritual: false },
-      { tier: 2, name: "Blazing Barrier", ap: 5, cc: 6, time: "1 action", range: "120 ft.", duration: "Conc. up to 10 minutes", comp: "V, S", ritual: false },
-      { tier: 3, name: "Artillery Flare", ap: 7, cc: 8, time: "1 action", range: "500 ft.", duration: "Inst.", comp: "V, S", ritual: false },
-      { tier: 3, name: "Fire Storm", ap: 7, cc: 8, time: "1 action", range: "150 ft.", duration: "Inst.", comp: "V, S", ritual: false },
-      { tier: 4, name: "Incendiary Bomb", ap: 10, cc: 11, time: "1 action", range: "1500 ft.", duration: "Inst.", comp: "V, S", ritual: false }
+      { tier: 0, name: "Fire Bolt", ap: 2, cc: 2, time: "1 action", range: "100 ft.", duration: "Conc. up to 1 hour or until fired", comp: "V, S", ritual: false,
+        desc: "Ranged spell attack: 1d6 + Vig mod fire. Can hold as torch (bright 10 / dim 10). +1 die per 2 dark (max +3)." },
+      { tier: 0, name: "Enchant Flame", ap: 2, cc: 5, time: "1 minute", range: "—", duration: "Conc. up to 1 minute", comp: "V, S, M", ritual: false,
+        desc: "Weapon deals +2 fire (guns: 1 clip). Not on energy weapons." },
+      { tier: 1, name: "Flamethrower", ap: 4, cc: 6, time: "1 minute", range: "15-ft. cone", duration: "Inst.", comp: "V, S", ritual: false,
+        desc: "15-ft cone; Dex save 3d6 + Vig mod fire (half on success). Ignites flammables.<br><b>Boost (DC 15):</b> dice to d8." },
+      { tier: 1, name: "Forever Flame", ap: 4, cc: null, time: "1 minute", range: "Touch", duration: "Until disp.", comp: "V, S, M", ritual: true,
+        desc: "Permanent torch flame on object; no heat, no oxygen, can't be smothered (can be covered)." },
+      { tier: 1, name: "Flame Ball", ap: 4, cc: 5, time: "1 minute", range: "5 ft.", duration: "Conc. up to 1 hour", comp: "V, S, M", ritual: false,
+        desc: "5-ft fire sphere. Bonus action: move 30 ft or detonate (20-ft radius, double dice). Adjacent creatures take 1d6 + Vig mod (Dex half). +1 die per dark (max 6).<br><b>Boost (DC 15):</b> dice to d8." },
+      { tier: 2, name: "Pillars of Fire", ap: 6, cc: 7, time: "1 minute", range: "120 ft.", duration: "Inst.", comp: "V, S", ritual: false,
+        desc: "3 pillars (5 ft wide). Dex save 2d6 + Vig mod (half on success). +1 pillar per 3 dark (max +2).<br><b>Boost (DC 20):</b> dice to d8." },
+      { tier: 2, name: "Blazing Barrier", ap: 6, cc: 7, time: "1 minute", range: "120 ft.", duration: "Conc. up to 1 minute", comp: "V, S, M", ritual: false,
+        desc: "Fire wall ≤ 60×20×5 ft. Dex save: 4d8 + Vig mod (half on success). +10 ft length per 1 dark.<br><b>Boost (DC 10):</b> extend 1 min on Vig check (DC +1 each)." },
+      { tier: 3, name: "Artillery Flare", ap: 8, cc: 9, time: "1 minute", range: "600 ft.", duration: "Inst.", comp: "V, S, M", ritual: false,
+        desc: "40-ft radius blast. Dex save: 6d8 + Vig mod fire (half on success). +5 ft radius per dark (max +20).<br><b>Boost (DC 20):</b> range 1,200 ft." },
+      { tier: 3, name: "Fire Storm", ap: 8, cc: 9, time: "1 minute", range: "150 ft.", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false,
+        desc: "Up to ten 10-ft cubes. Dex save: 5d8 + Vig mod fire (half on success). +1 cube per 3 dark (max +2).<br><b>Boost (DC 20):</b> dice to d10." },
+      { tier: 4, name: "Incendiary Bomb", ap: 10, cc: 12, time: "1 minute", range: "Self", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false,
+        desc: "30-ft radius around you. Dex save: 9d8 + Vig mod fire (half on success); save on enter/end turn. +5 ft radius per 2 dark.<br><b>Boost (DC 25):</b> dice to d10." }
     ]
   },
 
-  illusion: {
-    name: "Path of Illusion", cost: 2, synergy: "power",
-    benefit: "+2 bonus to your Vessel maximum.",
-    traits: "Illusion spells use theatrical gestures and whispered words.",
+    illusion: {
+    name: "Path of Illusion",
+    cost: 2,
+    synergy: "power",
+    benefit: "+2 bonus to your vessel.",
+    traits: "Subtle gestures; rituals use deep trance.",
     spells: [
-      { tier: 0, name: "Artifice", ap: 2, cc: 3, time: "1 action", range: "30 ft.", duration: "1 minute", comp: "V, S", ritual: false },
-      { tier: 0, name: "Pose", ap: 2, cc: 3, time: "1 action", range: "Self", duration: "1 hour", comp: "V, S", ritual: false },
-      { tier: 1, name: "Mirror", ap: 3, cc: 4, time: "1 action", range: "Self", duration: "1 minute", comp: "V, S", ritual: false },
-      { tier: 1, name: "Hallucination", ap: 3, cc: 4, time: "1 action", range: "60 ft.", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false },
-      { tier: 2, name: "Dreamscape", ap: 5, cc: null, time: "1 minute", range: "Special", duration: "8 hours", comp: "V, S, M", ritual: true },
-      { tier: 2, name: "Masquerade", ap: 5, cc: null, time: "1 action", range: "Self", duration: "1 hour", comp: "V, S", ritual: true },
-      { tier: 3, name: "Program", ap: 7, cc: null, time: "10 minutes", range: "120 ft.", duration: "Until dispelled", comp: "V, S, M", ritual: true },
-      { tier: 3, name: "Mirage", ap: 7, cc: null, time: "10 minutes", range: "Sight", duration: "24 hours", comp: "V, S", ritual: true },
-      { tier: 4, name: "Projection", ap: 10, cc: 11, time: "1 action", range: "500 ft.", duration: "Conc. up to 10 minutes", comp: "V, S", ritual: false }
+      { tier: 0, name: "Artifice", ap: 2, cc: 2, time: "1 action", range: "30 ft.", duration: "Conc. up to 1 minute", comp: "S", ritual: false,
+        desc: "Sound or image ≤ 5-ft cube. Physical touch reveals illusion; Int (Inv) vs DC. +1 DC per 1 dark." },
+      { tier: 0, name: "Pose", ap: 2, cc: 3, time: "1 action", range: "Self", duration: "Conc. up to 1 hour", comp: "S", ritual: false,
+        desc: "Alter your appearance (same body type). Int (Inv) vs DC to see through. +1 DC per 2 dark." },
+      { tier: 1, name: "Mirror", ap: 4, cc: 5, time: "1 minute", range: "Self", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false,
+        desc: "2 duplicates; attacks may hit a dupe (1d6 ≤ dupe count). +1 dupe per 3 dark (max +4)." },
+      { tier: 1, name: "Hallucination", ap: 4, cc: 6, time: "1 minute", range: "120 ft.", duration: "Conc. up to 10 minutes", comp: "V, S, M", ritual: false,
+        desc: "Image + sound/smell ≤ 20-ft cube. Touch reveals; Int (Inv) vs DC. +1 DC per 1 dark.<br><b>Boost (DC 25):</b> 40-ft cube." },
+      { tier: 2, name: "Dreamscape", ap: 5, cc: null, time: "1 minute", range: "300 ft.", duration: "24 hours", comp: "V, S, M", ritual: true,
+        desc: "Reskin 150-ft cube of natural terrain (look/sound/smell). Int (Inv) to disbelieve.<br><b>Boost (DC 20):</b> double range.<br><b>Sacrifice:</b> 3 HD." },
+      { tier: 2, name: "Masquerade", ap: 5, cc: null, time: "1 minute", range: "30 ft.", duration: "Conc. up to 8 hours", comp: "V, S", ritual: true,
+        desc: "Pose on any number of creatures (each can look different). Unwilling Cha save.<br><b>Boost (DC 20):</b> double range.<br><b>Sacrifice:</b> 3 HD." },
+      { tier: 3, name: "Program", ap: 7, cc: null, time: "1 minute", range: "200 ft.", duration: "Until dispelled", comp: "V, S, M", ritual: true,
+        desc: "As Hallucination but 40-ft cube, pre-scripted actions (up to 5 min), can start invisible.<br><b>Boost (DC 25):</b> 80-ft cube.<br><b>Sacrifice:</b> 5 HD." },
+      { tier: 3, name: "Mirage", ap: 7, cc: null, time: "10 minutes", range: "Sight", duration: "10 days", comp: "V, S, M", ritual: true,
+        desc: "As Dreamscape but 1-mile terrain; can add/alter structures; full senses including touch (difficult terrain etc.).<br><b>Boost (DC 20):</b> double range.<br><b>Sacrifice:</b> 5 HD." },
+      { tier: 4, name: "Projection", ap: 9, cc: 10, time: "1 minute", range: "500 miles", duration: "Conc. up to 1 day", comp: "V, S, M", ritual: false,
+        desc: "Illusory copy of you at a place you've seen. See/hear through it; your body blind/deaf while switched. +1 DC per 1 dark.<br><b>Boost (DC 20):</b> ×10 range." }
     ]
   },
 
-  knowledge: {
-    name: "Path of Knowledge", cost: 2, synergy: "attraction",
-    benefit: "You may use your Vigor score instead of Intelligence for skill checks.",
-    traits: "Knowledge spells rarely require components beyond concentration.",
+    knowledge: {
+    name: "Path of Knowledge",
+    cost: 2,
+    synergy: "attraction",
+    benefit: "Use Vigor for any Intelligence-based skill checks.",
+    traits: "Chanting, prayer-like gestures, magic circles.",
     spells: [
-      { tier: 0, name: "Comprehension", ap: 2, cc: null, time: "1 minute", range: "Self", duration: "1 hour", comp: "V, S", ritual: false },
-      { tier: 1, name: "Communication", ap: 3, cc: 4, time: "1 action", range: "500 ft.", duration: "1 minute", comp: "V", ritual: false },
-      { tier: 1, name: "Locate", ap: 3, cc: null, time: "1 minute", range: "Self", duration: "Conc. up to 10 minutes", comp: "V, S, M", ritual: true },
-      { tier: 2, name: "Clairvoyance", ap: 5, cc: null, time: "10 minutes", range: "1 mile", duration: "Conc. up to 10 minutes", comp: "V, S, M", ritual: true },
-      { tier: 2, name: "Premonition", ap: 5, cc: 6, time: "1 action", range: "Self", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false },
-      { tier: 3, name: "Dreamwalker", ap: 7, cc: 8, time: "1 minute", range: "Special", duration: "8 hours", comp: "V, S, M", ritual: false },
-      { tier: 3, name: "Predestination", ap: 7, cc: 8, time: "1 minute", range: "Touch", duration: "8 hours", comp: "V, S", ritual: false },
-      { tier: 4, name: "Anticipation", ap: 10, cc: 11, time: "1 action", range: "Self", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false }
+      { tier: 0, name: "Comprehension", ap: 2, cc: 3, time: "1 minute", range: "Self", duration: "Conc. up to 1 hour", comp: "V, S, M", ritual: false,
+        desc: "Understand any spoken/written language (not codes/glyphs)." },
+      { tier: 1, name: "Communication", ap: 2, cc: 4, time: "1 minute", range: "Self", duration: "Conc. up to 1 hour", comp: "V, S, M", ritual: false,
+        desc: "Speak with plants, beasts, and creatures dead ≤ 24 hrs. Limited by their Int; small favors possible." },
+      { tier: 1, name: "Locate", ap: 3, cc: null, time: "5 minutes", range: "Self", duration: "Conc. up to 10 minutes", comp: "V, S, M", ritual: true,
+        desc: "Sense direction to known object/person within 1,000 ft.<br><b>Sacrifice:</b> 1 exhaustion. +1,000 ft per HD spent (max +5,000)." },
+      { tier: 2, name: "Clairvoyance", ap: 4, cc: null, time: "10 minutes", range: "1 mile", duration: "Conc. up to 10 minutes", comp: "V, S, M", ritual: true,
+        desc: "Invisible sensor at a familiar or obvious place; see/hear through it.<br><b>Sacrifice:</b> 1 exhaustion after. +1 mile per HD (max +6).<br><b>Boost (DC 20):</b> darkvision." },
+      { tier: 2, name: "Premonition", ap: 4, cc: null, time: "10 minutes", range: "Self", duration: "Inst.", comp: "V, S, M", ritual: true,
+        desc: "Ask spirits one question about a goal/event within 7 days; cryptic truthful reply.<br><b>Boost (DC 20):</b> second question.<br><b>Sacrifice:</b> 1 exhaustion after." },
+      { tier: 3, name: "Dreamwalker", ap: 5, cc: null, time: "10 minutes", range: "Unlimited", duration: "Conc. up to 1 hour", comp: "V, S, M", ritual: false,
+        desc: "Enter target's dream (or send willing messenger). Shape dream; converse. Can scare for 3d6 + Vig mod psychic on wake (Wis save).<br><b>Boost (DC 20):</b> d8 dice OR wrest control.<br><b>Sacrifice:</b> 1 exhaustion after; +1 DC & die per HD (max +5)." },
+      { tier: 3, name: "Predestination", ap: 6, cc: null, time: "10 minutes", range: "Self", duration: "Inst.", comp: "V, S, M", ritual: false,
+        desc: "Ask how to reach a specific future within 1 month. GM gives concrete steps (may reveal later)." },
+      { tier: 4, name: "Anticipation", ap: 8, cc: 12, time: "1 minute", range: "Self", duration: "Conc. up to 5 minutes", comp: "V, S, M", ritual: false,
+        desc: "Can't be surprised; adv on attacks/checks/saves; enemies have disadv on attacks against you." }
     ]
   },
 
