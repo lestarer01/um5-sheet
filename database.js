@@ -1364,170 +1364,265 @@ const MAGIC_PATHS = {
     ]
   },
 
-  life: {
-    name: "Path of Life", cost: 2, synergy: "light",
-    benefit: "+2 max HP for each Life spell you know.",
-    traits: "Life spells use laying-on-hands and soft vocalizations.",
+    life: {
+    name: "Path of Life",
+    cost: 2,
+    synergy: "light",
+    benefit: "Max HP +2 each time you acquire a life spell.",
+    traits: "Prayer-like; physical contact; ash circles.",
     spells: [
-      { tier: 0, name: "Touch of Life", ap: 2, cc: 3, time: "1 action", range: "Touch", duration: "Inst.", comp: "V, S", ritual: false },
-      { tier: 0, name: "Alleviate", ap: 2, cc: 3, time: "1 action", range: "Touch", duration: "Inst.", comp: "V, S", ritual: false },
-      { tier: 1, name: "Revivify", ap: 3, cc: 4, time: "1 action", range: "Touch", duration: "Inst.", comp: "V, S, M", ritual: false },
-      { tier: 1, name: "Minor Exorcism", ap: 3, cc: null, time: "1 minute", range: "Touch", duration: "Inst.", comp: "V, S", ritual: true },
-      { tier: 2, name: "Healing Wave", ap: 5, cc: 6, time: "1 action", range: "60 ft.", duration: "Inst.", comp: "V, S", ritual: false },
-      { tier: 2, name: "Death Ward", ap: 5, cc: null, time: "1 action", range: "Touch", duration: "8 hours", comp: "V, S", ritual: true },
-      { tier: 3, name: "Cleanse", ap: 7, cc: null, time: "1 action", range: "Touch", duration: "Inst.", comp: "V, S", ritual: true },
-      { tier: 3, name: "Restore", ap: 7, cc: 8, time: "1 action", range: "Touch", duration: "Inst.", comp: "V, S", ritual: false },
-      { tier: 4, name: "Regenerate", ap: 10, cc: null, time: "1 minute", range: "Touch", duration: "1 hour", comp: "V, S", ritual: true },
-      { tier: 4, name: "Healing Aura", ap: 10, cc: 11, time: "1 action", range: "Self (30-ft radius)", duration: "Conc. up to 10 minutes", comp: "V, S", ritual: false }
+      { tier: 0, name: "Touch of Life", ap: 2, cc: 3, time: "1 action", range: "Touch", duration: "Inst.", comp: "S", ritual: false,
+        desc: "Heal 2 HP (target must have ≥ 1 HP). +1 HP per 1 dark (max +5)." },
+      { tier: 0, name: "Alleviate", ap: 2, cc: 3, time: "1 minute", range: "Touch", duration: "Inst.", comp: "V, S", ritual: false,
+        desc: "Heal 1d6 + Vig mod. No undead/constructs. +1 die per 2 dark (max +5).<br><b>Boost (DC 20):</b> dice to d8." },
+      { tier: 1, name: "Revivify", ap: 4, cc: 20, time: "1 minute", range: "Touch", duration: "Inst.", comp: "V, S, M", ritual: false,
+        desc: "Restore creature dead ≤ 1 minute to 1 HP. No old age, no missing parts.<br><b>Boost (DC 20):</b> cost 15. <b>(DC 25):</b> cost 10." },
+      { tier: 1, name: "Minor Exorcism", ap: 4, cc: null, time: "1 minute", range: "Touch", duration: "Inst.", comp: "V, S, M", ritual: true,
+        desc: "End all curses on one creature/object. Cursed items stay cursed but attunement breaks.<br><b>Sacrifice:</b> take 3 damage." },
+      { tier: 2, name: "Healing Wave", ap: 6, cc: 6, time: "1 minute", range: "60 ft.", duration: "Inst.", comp: "V, S", ritual: false,
+        desc: "Up to 4 creatures heal 1d4 + Vig mod. No undead/constructs. +1 die per 2 dark (max +5).<br><b>Boost (DC 20):</b> dice to d6." },
+      { tier: 2, name: "Death Ward", ap: 6, cc: null, time: "1 minute", range: "Touch", duration: "8 hours", comp: "V, S, M", ritual: true,
+        desc: "First time target would drop to 0 HP, drops to 1 HP instead. Instant-kill effects are negated and spell ends.<br><b>Sacrifice:</b> 1 HD per target. +1 target per 1 HD (max +3)." },
+      { tier: 3, name: "Cleanse", ap: 8, cc: null, time: "1 minute", range: "Touch", duration: "Inst.", comp: "V, S, M", ritual: true,
+        desc: "Neutralize poison and cure nonmagical diseases.<br><b>Sacrifice:</b> 3 HD. +1 target per 3 HD (max +3)." },
+      { tier: 3, name: "Restore", ap: 8, cc: 9, time: "1 minute", range: "Touch", duration: "Inst.", comp: "V, S", ritual: false,
+        desc: "Heal 7d8 + Vig mod; also ends blindness, deafness, and diseases. No constructs/undead. +1 die per 2 dark (max +5).<br><b>Boost (DC 20):</b> dice to d10." },
+      { tier: 4, name: "Regenerate", ap: 10, cc: null, time: "1 minute", range: "Touch", duration: "5 minutes", comp: "V, S, M", ritual: true,
+        desc: "Target regains 1d6 + Vig mod HP at the start of each of its turns. Severed limbs regrow after 2 minutes (or instantly if held to stump).<br><b>Boost (DC 15):</b> that turn heals 2d8 + Vig instead.<br><b>Sacrifice:</b> 5 HD or lose half your HP when spell ends." },
+      { tier: 4, name: "Healing Aura", ap: 10, cc: 13, time: "1 minute", range: "30 ft.", duration: "Inst.", comp: "V, S", ritual: false,
+        desc: "As Restore, but all chosen creatures within 30 ft. +1 die per 2 dark (max +5).<br><b>Boost (DC 20):</b> dice to d10." }
     ]
   },
 
-  light: {
-    name: "Path of Light", cost: 2, synergy: "life",
+    light: {
+    name: "Path of Light",
+    cost: 2,
+    synergy: "life",
     benefit: "You cannot be blinded.",
-    traits: "Light spells shed bright illumination and use luminous gestures.",
+    traits: "Obvious casting; components burn brightly; often uses a focus (wand/staff/sword).",
     spells: [
-      { tier: 0, name: "Radiant Strike", ap: 2, cc: 3, time: "1 action", range: "Touch", duration: "Inst.", comp: "V, S", ritual: false },
-      { tier: 0, name: "Light", ap: 2, cc: null, time: "1 action", range: "Touch", duration: "1 hour", comp: "V, S", ritual: true },
-      { tier: 1, name: "Bolt of Heaven", ap: 3, cc: 4, time: "1 action", range: "120 ft.", duration: "Inst.", comp: "V, S", ritual: false },
-      { tier: 1, name: "Starburst", ap: 3, cc: 4, time: "1 action", range: "60 ft.", duration: "Inst.", comp: "V, S", ritual: false },
-      { tier: 2, name: "Sunsphere", ap: 5, cc: null, time: "1 action", range: "60 ft.", duration: "Conc. up to 10 minutes", comp: "V, S", ritual: true },
-      { tier: 2, name: "Extradite", ap: 5, cc: 6, time: "1 action", range: "60 ft.", duration: "Inst.", comp: "V, S", ritual: false },
-      { tier: 3, name: "Sunbeam", ap: 7, cc: 8, time: "1 action", range: "Self (60-ft line)", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false },
-      { tier: 3, name: "Nova", ap: 7, cc: 8, time: "1 action", range: "150 ft.", duration: "Inst.", comp: "V, S", ritual: false },
-      { tier: 4, name: "Sunrise", ap: 10, cc: null, time: "1 minute", range: "Sight", duration: "1 hour", comp: "V, S", ritual: true }
+      { tier: 0, name: "Radiant Strike", ap: 2, cc: 3, time: "1 bonus action", range: "Self", duration: "Conc. up to 1 minute", comp: "S, M", ritual: false,
+        desc: "Next hit deals +1d6 radiant (+2d6 vs fiends/undead). +1 die per 2 dark (max +3).<br><b>Boost (DC 20):</b> dice to d8." },
+      { tier: 0, name: "Light", ap: 2, cc: null, time: "1 minute", range: "Touch", duration: "1 hour", comp: "S, M", ritual: true,
+        desc: "Touch a focus/nonmechanical item; bright 20 ft / dim 20 ft.<br><b>Sacrifice:</b> 2 HP. +10 ft both ranges per 1 HP (max +30)." },
+      { tier: 1, name: "Bolt of Heaven", ap: 3, cc: 5, time: "1 minute", range: "120 ft.", duration: "Inst.", comp: "S, M", ritual: false,
+        desc: "Ranged spell attack: 3d6 + Vig mod radiant (4d6 vs fiends/undead) + Con/Vig save or blind until your next turn (fiends/undead disadv). +1 die per 2 dark (max +3).<br><b>Boost (DC 20):</b> dice to d8." },
+      { tier: 1, name: "Starburst", ap: 3, cc: 5, time: "1 minute", range: "5 ft.", duration: "Inst.", comp: "S, M", ritual: false,
+        desc: "Con/Vig save: 3d6 + Vig mod fire (half on success; fiends/undead disadv). Fail = blind until your next turn. +5 ft range per 2 dark (max +20).<br><b>Boost (DC 20):</b> dice to d8." },
+      { tier: 2, name: "Sunsphere", ap: 4, cc: null, time: "1 minute", range: "30 ft.", duration: "Conc. up to 1 hour", comp: "S, M", ritual: true,
+        desc: "5-ft light sphere (AC 18, 1 HP), speed 30, bright 30 / dim 30. Bonus action move 30 ft. Ram: 2d8 + Vig mod radiant (4d8 vs fiends/undead, half on save). Vanishes after 5 hits.<br><b>Sacrifice:</b> 2 HD. +5 ft range & +1 die per 1 HD (max +20 ft / +4 dice)." },
+      { tier: 2, name: "Extradite", ap: 4, cc: 7, time: "1 minute", range: "Touch", duration: "Inst.", comp: "S, M", ritual: false,
+        desc: "Melee spell attack: 6d8 + Vig mod radiant (double vs fiend/undead) + push 20 ft. +1 die per 2 dark (max +3).<br><b>Boost (DC 25):</b> auto-hit." },
+      { tier: 3, name: "Sunbeam", ap: 5, cc: 9, time: "1 minute", range: "60 ft.", duration: "Inst.", comp: "S, M", ritual: false,
+        desc: "5×60 ft beam. Con/Vig save: 6d8 radiant + blind until your next turn (half dmg, no blind on success; fiends/undead disadv)." },
+      { tier: 3, name: "Nova", ap: 6, cc: 10, time: "1 minute", range: "Self", duration: "Inst.", comp: "S, M", ritual: false,
+        desc: "60-ft radius flash. Chosen creatures Con/Vig save: 10d6 radiant + blind 1 min (half dmg, no blind on success; fiends/undead disadv). Blinded save each turn to end. +1 die & +5 ft per 3 dark (max +4 / +20)." },
+      { tier: 4, name: "Sunrise", ap: 7, cc: null, time: "5 minutes", range: "1 mile", duration: "8 hours", comp: "S, M", ritual: true,
+        desc: "Daylight orb in sky; bright 1 mile / dim +1 mile. Action: slam into a point ≤ 1 mile — 70-ft radius Con/Vig save: 10d6 + Vig mod radiant + blind 1 min (half/no blind on success; fiends/undead disadv).<br><b>Sacrifice:</b> all HD (min 12)." }
     ]
   },
 
-  might: {
-    name: "Path of Might", cost: 2, synergy: "protection",
+    might: {
+    name: "Path of Might",
+    cost: 2,
+    synergy: "protection",
     benefit: "Proficiency with all melee weapons.",
-    traits: "Might spells enhance physical capabilities with brief gestures.",
+    traits: "Subtle combat motions; looks like weapon flourishes.",
     spells: [
-      { tier: 0, name: "Pinpoint", ap: 2, cc: 3, time: "1 bonus action", range: "Self", duration: "1 round", comp: "V, S", ritual: false },
-      { tier: 1, name: "Paranormal Aim", ap: 3, cc: 4, time: "1 bonus action", range: "Self", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false },
-      { tier: 1, name: "Compression", ap: 3, cc: 4, time: "1 action", range: "Touch", duration: "1 hour", comp: "V, S", ritual: false },
-      { tier: 2, name: "Wrath", ap: 5, cc: 6, time: "1 bonus action", range: "Self", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false },
-      { tier: 2, name: "Magic Weapon (T2)", ap: 5, cc: null, time: "1 bonus action", range: "Touch", duration: "Conc. up to 1 hour", comp: "V, S", ritual: true,
-        desc: "Target weapon becomes magical with +1 to attack and damage rolls. Sacrifice: disadvantage on Wis checks until long rest." },
-      { tier: 3, name: "Crack", ap: 7, cc: 8, time: "1 action", range: "Touch", duration: "Inst.", comp: "V, S", ritual: false },
-      { tier: 3, name: "Magic Weapon (T3)", ap: 7, cc: null, time: "1 bonus action", range: "Touch", duration: "Conc. up to 1 hour", comp: "V, S", ritual: true,
-        desc: "As T2, but +2 (does not stack with T2 or T4). Sacrifice: disadvantage on Wis checks until long rest." },
-      { tier: 4, name: "Disintegrate", ap: 10, cc: 11, time: "1 action", range: "60 ft.", duration: "Inst.", comp: "V, S", ritual: false },
-      { tier: 4, name: "Magic Weapon (T4)", ap: 10, cc: null, time: "1 bonus action", range: "Touch", duration: "Conc. up to 1 hour", comp: "V, S", ritual: true,
-        desc: "As T3, but +3 (does not stack with T1 or T2). Sacrifice: disadvantage on Wis checks until long rest." }
+      { tier: 0, name: "Pinpoint", ap: 2, cc: 2, time: "1 bonus action", range: "Self", duration: "End of turn", comp: "S", ritual: false,
+        desc: "Advantage on your first attack roll this turn.<br><b>Boost (DC 15):</b> use again this turn (DC +2 each extra, max DC 21)." },
+      { tier: 1, name: "Paranormal Aim", ap: 3, cc: 3, time: "1 bonus action", range: "Self", duration: "End of turn", comp: "S", ritual: false,
+        desc: "Your next attack this turn auto-hits.<br><b>Boost (DC 15):</b> use again this turn (DC +2 each extra, max DC 21)." },
+      { tier: 1, name: "Compression", ap: 3, cc: 4, time: "1 bonus action", range: "Self", duration: "End of turn", comp: "S", ritual: false,
+        desc: "Make one extra ranged or melee attack as part of this spell.<br><b>Boost (DC 25):</b> one more extra attack (once per turn)." },
+      { tier: 2, name: "Wrath", ap: 5, cc: 6, time: "1 action", range: "Self", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false,
+        desc: "Next weapon hit: +1d4 + Vig mod psychic; creature Wis/Vig save or frightened of you. Action each turn to re-save. +1 die per 2 dark (max +3).<br><b>Boost (DC 20):</b> dice to d8." },
+      { tier: 2, name: "Magic Weapon", ap: 5, cc: null, time: "1 minute", range: "Self", duration: "Conc. up to 10 minutes", comp: "V, S", ritual: true,
+        desc: "Touch nonmagical weapon; while you wield it, +1 attack & damage.<br><b>Sacrifice:</b> disadv on Wis checks until long rest." },
+      { tier: 3, name: "Crack", ap: 7, cc: 8, time: "1 bonus action", range: "Self", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false,
+        desc: "Next hit on a lock/door/chest/manacles opens it (loud crack 300 ft; one lock if many). Arcane lock suppressed 10 min. Hit creature: +3d6 + Vig mod thunder + push 10 ft; Medium or smaller also prone." },
+      { tier: 3, name: "Magic Weapon +2", ap: 8, cc: null, time: "1 minute", range: "Self", duration: "Conc. up to 10 minutes", comp: "V, S", ritual: true,
+        desc: "As Magic Weapon, but +2 attack & damage (does not stack with lower tiers).<br><b>Sacrifice:</b> disadv on Wis checks until long rest." },
+      { tier: 4, name: "Disintegrate", ap: 12, cc: 13, time: "1 minute", range: "Self", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false,
+        desc: "Next hit: Con/Vig save 12d6 + Vig mod force (half on success). 0 HP = disintegrated (gear too, except magic items). Also disintegrates Large-or-smaller nonmagical objects (10-ft cube of Huge+). +1 die per 3 dark (max +6).<br><b>Boost (DC 25):</b> dice to d8." },
+      { tier: 4, name: "Magic Weapon +3", ap: 9, cc: null, time: "1 minute", range: "Self", duration: "Conc. up to 10 minutes", comp: "V, S", ritual: true,
+        desc: "As Magic Weapon, but +3 attack & damage (does not stack with lower tiers).<br><b>Sacrifice:</b> disadv on Wis checks until long rest." }
     ]
   },
 
-  movement: {
-    name: "Path of Movement", cost: 2, synergy: "air",
-    benefit: "You can use Vigor instead of Dexterity for Dex saving throws against spells.",
-    traits: "Movement spells employ magic circles and hand movements with little vocalization.",
+    movement: {
+    name: "Path of Movement",
+    cost: 2,
+    synergy: "air",
+    benefit: "Use Vigor instead of Dexterity for Dex saves against spells.",
+    traits: "Magic circles + hand motions; little/no speech.",
     spells: [
-      { tier: 0, name: "Runner", ap: 2, cc: null, time: "1 action", range: "Touch", duration: "1 hour", comp: "S, M", ritual: true },
-      { tier: 1, name: "Swiftness", ap: 4, cc: 5, time: "1 minute", range: "Touch", duration: "Conc. up to 1 minute", comp: "S, M", ritual: false },
-      { tier: 1, name: "Passthrough", ap: 4, cc: null, time: "1 minute", range: "30 ft.", duration: "Conc. up to 5 minutes", comp: "S, M", ritual: true },
-      { tier: 2, name: "Jumper", ap: 6, cc: 7, time: "1 minute", range: "400 ft.", duration: "Inst.", comp: "S, M", ritual: false },
-      { tier: 2, name: "Portal", ap: 6, cc: null, time: "1 minute", range: "Special", duration: "Inst. / Conc. up to 1 minute", comp: "S, M", ritual: true },
-      { tier: 3, name: "Gateway", ap: 8, cc: null, time: "1 minute", range: "500 ft.", duration: "Conc. up to 1 minute", comp: "S, M", ritual: true },
-      { tier: 3, name: "Recall", ap: 8, cc: 9, time: "1 action", range: "500 ft.", duration: "Inst.", comp: "S, M", ritual: false },
-      { tier: 4, name: "Dimension Circle", ap: 12, cc: null, time: "5 minutes", range: "Special", duration: "8 hours", comp: "S, M", ritual: true }
+      { tier: 0, name: "Runner", ap: 2, cc: null, time: "1 action", range: "Touch", duration: "1 hour", comp: "S, M", ritual: true,
+        desc: "Target speed +10 ft.<br><b>Sacrifice:</b> 1 HD. +1 target per 1 HD (max +3)." },
+      { tier: 1, name: "Swiftness", ap: 4, cc: 5, time: "1 minute", range: "Touch", duration: "Conc. up to 1 minute", comp: "S, M", ritual: false,
+        desc: "Double speed, +2 AC, adv on Dex saves, extra action (Attack [1 weapon only] / Dash / Disengage / Hide / Use Object). +1 target per 3 dark (max +3)." },
+      { tier: 1, name: "Passthrough", ap: 4, cc: null, time: "1 minute", range: "30 ft.", duration: "Conc. up to 5 minutes", comp: "S, M", ritual: true,
+        desc: "5-ft portal through floor/wall; Medium or smaller can pass. Needs an opening on the other side.<br><b>Sacrifice:</b> 1 HD." },
+      { tier: 2, name: "Jumper", ap: 6, cc: 7, time: "1 minute", range: "400 ft.", duration: "Inst.", comp: "S, M", ritual: false,
+        desc: "Teleport yourself to a spot you can see or have been. Bring willing creature your size or smaller + gear. +100 ft per 1 dark (max +600)." },
+      { tier: 2, name: "Portal", ap: 6, cc: null, time: "1 minute", range: "Special", duration: "Inst. / Conc. up to 1 minute", comp: "S, M", ritual: true,
+        desc: "10-ft circle on wall/floor; action to open and link to another portal you know. Both sides can look through. Sigil-locked (you hold keys).<br><b>Boost (Special):</b> Vig (Induce) vs caster DC to break a known lock.<br><b>Sacrifice:</b> 1 exhaustion." },
+      { tier: 3, name: "Gateway", ap: 8, cc: null, time: "1 minute", range: "500 ft.", duration: "Conc. up to 1 minute", comp: "S, M", ritual: true,
+        desc: "As Portal, but can hang mid-air, no need to link to another portal, one-way visible passage to a point in range.<br><b>Boost (DC 12):</b> ×2 range (raise DC +2 per extra multiple).<br><b>Sacrifice:</b> 1 exhaustion." },
+      { tier: 3, name: "Recall", ap: 8, cc: 9, time: "1 action", range: "500 ft.", duration: "Inst.", comp: "S, M", ritual: false,
+        desc: "You + up to 5 willing creatures within 5 ft teleport to a place you've been since your last long rest. +100 ft per 1 dark (max +500)." },
+      { tier: 4, name: "Dimension Circle", ap: 12, cc: null, time: "5 minutes", range: "Special", duration: "8 hours", comp: "S, M", ritual: true,
+        desc: "Two-way doorway from a portal you create to any point on the planet within 30 ft of destination.<br><b>Sacrifice:</b> 2 exhaustion. Spend 4 HD: any location in the universe. Extra 4 HD: alternate realities." }
     ]
   },
 
+  // Finish Path of Power (Replace the previous partial entry)
   power: {
-    name: "Path of Power", cost: 2, synergy: "illusion",
-    benefit: "Your river increases by 1.",
-    traits: "Power spells are flashy, colorful, flamboyant gestures with vocal screaming.",
-    spells: [
-      { tier: 0, name: "Electric Arc", ap: 2, cc: 3, time: "1 minute", range: "120 ft.", duration: "Inst.", comp: "V, S", ritual: false },
-      { tier: 0, name: "Shock Strike", ap: 3, cc: 2, time: "1 bonus action", range: "Self", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false },
-      { tier: 1, name: "Shocking Fist", ap: 4, cc: 4, time: "1 minute", range: "60 ft.", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false },
-      { tier: 1, name: "Lightning Bolt", ap: 4, cc: 6, time: "1 minute", range: "120 ft.", duration: "Inst.", comp: "V, S", ritual: false },
-      { tier: 2, name: "Electrified Weapon", ap: 6, cc: 7, time: "1 minute", range: "Touch", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false },
-      { tier: 2, name: "Storm", ap: 6, cc: 7, time: "1 minute", range: "120 ft.", duration: "Inst.", comp: "V, S", ritual: false },
-      { tier: 3, name: "Electrovolt", ap: 8, cc: 9, time: "1 minute", range: "Varies", duration: "Varies", comp: "V, S", ritual: false },
-      { tier: 4, name: "Lightning Sequence", ap: 10, cc: 13, time: "1 minute", range: "120 ft.", duration: "Inst.", comp: "V, S", ritual: false }
-    ]
+    name: "Path of Power",
+    cost: 2,
+    synergy: "illusion",
+    benefit: "Increase your maximum River slots by 1.",
+    spells: {
+      roots: [
+        { name: "Electric Arc", ap: 2, cc: 3, desc: "Ranged spell attack; 1d10 + Vig mod lightning. +1 die per 2 dark spent (max +4)." },
+        { name: "Shock Strike", ap: 3, cc: 2, desc: "Melee spell attack; 2d6 + Vig mod lightning. Target can't take reactions until its next turn." }
+      ],
+      tier1: [
+        { name: "Shocking Fist", ap: 4, cc: 4, desc: "Ranged spell attack; 1d8 + Vig mod lightning. Adv on lightning spell attacks vs target. +1 die per 2 dark (max +4).<br><b>Boost (DC 20):</b> dice to d10." },
+        { name: "Lightning Bolt", ap: 4, cc: 6, desc: "100ft line; 6d6 + Vig mod lightning (Dex save half). +1 die per 2 dark (max +4).<br><b>Boost (DC 20):</b> dice to d8." }
+      ],
+      tier2: [
+        { name: "Electrified Weapon", ap: 6, cc: 7, desc: "Touched weapon deals +1d8 lightning. If hit, previous target within 60ft takes 1d8 lightning if hit last round." },
+        { name: "Storm", ap: 6, cc: 7, desc: "Ranged spell attack; 3d8 + Vig mod lightning. Make secondary attack on another within 60ft for same damage. +1 die per 2 dark (max +4).<br><b>Boost (DC 20):</b> dice to d10." }
+      ],
+      tier3: [
+        { name: "Electrovolt", ap: 8, cc: 9, desc: "Ranged spell attack; 4d8 + Vig mod lightning (half on miss). All within 10ft of target take 1d8 + Vig lightning (Dex save half). +1 die per 2 dark (max +4).<br><b>Boost (DC 20):</b> dice to d10." }
+      ],
+      tier4: [
+        { name: "Lightning Sequence", ap: 10, cc: 13, desc: "Release 2 bolts; each leaps to 2 more (max 6 targets). 7d6 + Vig mod lightning (Dex save half). +1 die per 2 dark (max +3).<br><b>Boost (DC 25):</b> 1 extra leap bolt." }
+      ]
+    }
   },
 
   protection: {
-    name: "Path of Protection", cost: 2, synergy: "might",
-    benefit: "If an opponent scores a critical hit on you, your vessel regains 2.",
-    traits: "Protection spells use defensive gestures with little expression.",
-    spells: [
-      { tier: 0, name: "Reprisal", ap: 2, cc: 3, time: "1 action", range: "Self", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false },
-      { tier: 0, name: "Magic Armor", ap: 2, cc: 3, time: "1 minute", range: "Self", duration: "Conc. up to 5 minutes", comp: "V, S", ritual: false },
-      { tier: 1, name: "Shield", ap: 4, cc: 5, time: "1 bonus action", range: "Self", duration: "Conc. up to 1 minute", comp: "V, S", ritual: false,
-        desc: "+2 bonus to AC. If placed in your river, use as a reaction against an incoming hit." },
-      { tier: 1, name: "Hush", ap: 4, cc: 5, time: "1 minute", range: "Self", duration: "Conc. up to 5 minutes", comp: "S, M", ritual: false },
-      { tier: 2, name: "Blur", ap: 6, cc: 6, time: "1 minute", range: "Self", duration: "Conc. up to 5 minutes", comp: "V, S", ritual: false },
-      { tier: 2, name: "Alienation", ap: 6, cc: null, time: "1 minute", range: "Self", duration: "Conc. up to 1 hour", comp: "V, M", ritual: true },
-      { tier: 3, name: "Colossus", ap: 7, cc: 7, time: "1 minute", range: "Self", duration: "Conc. up to 5 minutes", comp: "V, S", ritual: false },
-      { tier: 3, name: "Blender Barrier", ap: 8, cc: null, time: "1 minute", range: "Self", duration: "Conc. up to 1 hour", comp: "V, M", ritual: true },
-      { tier: 4, name: "Invulnerability", ap: 10, cc: 10, time: "1 bonus action", range: "Self", duration: "1 round", comp: "V, M", ritual: false,
-        desc: "Immune to all damage until end of next turn. If in river, use as a reaction." },
-      { tier: 4, name: "Impenetrable", ap: 10, cc: null, time: "1 minute", range: "Self", duration: "Conc. up to 1 hour", comp: "V, M", ritual: true }
-    ]
+    name: "Path of Protection",
+    cost: 2,
+    synergy: "might",
+    benefit: "If an opponent crits you, you gain advantage on your next attack and your vessel regains 2.",
+    spells: {
+      roots: [
+        { name: "Reprisal", ap: 2, cc: 3, desc: "Reaction to melee hit: Target takes Vig mod force damage. Adv on next attack vs them. +1 dmg per 2 dark (max +5)." },
+        { name: "Magic Armor", ap: 2, cc: 3, desc: "Base AC 13 + Vig mod (max +2). Ends if you don armor. Spend 6 dark to increase base AC to 16." }
+      ],
+      tier1: [
+        { name: "Shield", ap: 4, cc: 5, desc: "+2 AC. If in river, cast as reaction. +1 AC per 3 dark (max +4).<br><b>Boost (DC 20):</b> Reaction to gain +2 vs one attack." },
+        { name: "Hush", ap: 4, cc: 5, desc: "20ft sphere; no sound enters/leaves. Creatures inside are deafened; verbal casting impossible." }
+      ],
+      tier2: [
+        { name: "Blur", ap: 6, cc: 6, desc: "Disadvantage on attack rolls against you. +5ft speed. Attackers with truesight/blindsight immune." },
+        { name: "Alienation", ap: 6, ritual: true, desc: "20ft circle; specified creature type cannot enter/exit. Protection from charm/possession.<br><b>Sacrifice:</b> 1 dmg/turn. <b>Boost (DC 20):</b> +50 HP to field." }
+      ],
+      tier3: [
+        { name: "Colossus", ap: 7, cc: 7, desc: "Gain resistance to nonmagical bludgeoning, piercing, and slashing damage." },
+        { name: "Blender Barrier", ap: 8, ritual: true, desc: "Alienation upgrade: Storm of sharp objects deals 3d10 + Vig mod slashing to those touching barrier.<br><b>Sacrifice:</b> 3 dmg/turn. <b>Boost (DC 20):</b> +50 HP to field." }
+      ],
+      tier4: [
+        { name: "Invulnerability", ap: 10, cc: 10, desc: "Immune to all damage until end of next turn. If in river, cast as reaction.<br><b>Boost (DC 20):</b> Extend 1 round (max 5 times)." },
+        { name: "Impenetrable", ap: 10, ritual: true, desc: "60ft sphere; move sphere as action. AC 10, 200 HP. Sacrifice: 2 dmg/turn. <b>Boost (DC 20):</b> +50 HP to field." }
+      ]
+    }
   },
 
   self: {
-    name: "Path of Self", cost: 2, synergy: "flame",
+    name: "Path of Self",
+    cost: 2,
+    synergy: "flame",
     benefit: "+2 bonus to your Vessel.",
-    traits: "Self spells have little outward expression beyond minor hand movements.",
-    spells: [
-      { tier: 0, name: "Darkvision", ap: 2, cc: null, time: "1 action", range: "Self", duration: "1 hour", comp: "S", ritual: true },
-      { tier: 0, name: "Channel Bear", ap: 3, cc: 4, time: "1 action", range: "Self", duration: "Conc. up to 5 minutes", comp: "S", ritual: false },
-      { tier: 0, name: "Channel Ape", ap: 3, cc: 4, time: "1 action", range: "Self", duration: "Conc. up to 5 minutes", comp: "S", ritual: false },
-      { tier: 0, name: "Channel Wolf", ap: 3, cc: 4, time: "1 action", range: "Self", duration: "Conc. up to 5 minutes", comp: "S", ritual: false },
-      { tier: 0, name: "Channel Tiger", ap: 3, cc: 4, time: "1 action", range: "Self", duration: "Conc. up to 5 minutes", comp: "S", ritual: false },
-      { tier: 0, name: "Channel Falcon", ap: 3, cc: 4, time: "1 action", range: "Self", duration: "Conc. up to 5 minutes", comp: "S", ritual: false },
-      { tier: 1, name: "Gravity Shifter", ap: 4, cc: 5, time: "1 action", range: "Self", duration: "Conc. up to 5 minutes", comp: "S", ritual: false },
-      { tier: 1, name: "Invisibility", ap: 4, cc: 5, time: "1 minute", range: "Self", duration: "Conc. up to 1 hour", comp: "S", ritual: false },
-      { tier: 2, name: "Sizing", ap: 6, cc: 7, time: "1 minute", range: "Self", duration: "Conc. up to 5 minutes", comp: "S", ritual: false },
-      { tier: 2, name: "Ultravision", ap: 6, cc: null, time: "1 action", range: "Self", duration: "1 hour", comp: "", ritual: true },
-      { tier: 3, name: "Renew", ap: 8, cc: null, time: "1 minute", range: "Self", duration: "Inst.", comp: "S", ritual: true },
-      { tier: 3, name: "Truesight", ap: 8, cc: null, time: "1 minute", range: "Self", duration: "1 hour", comp: "S", ritual: true },
-      { tier: 4, name: "Ghost", ap: 10, cc: null, time: "1 minute", range: "Self", duration: "1 hour", comp: "S", ritual: true }
-    ]
+    spells: {
+      roots: [
+        { name: "Darkvision", ap: 2, ritual: true, desc: "60ft Darkvision. <b>Sacrifice:</b> Spend 1 hit die." },
+        { name: "Channel Bear", ap: 3, cc: 4, desc: "Adv on Con checks and 2d6 + Vig mod temp HP." },
+        { name: "Channel Ape", ap: 3, cc: 4, desc: "Adv on Str checks and +2 bonus to Str-based melee damage." },
+        { name: "Channel Wolf", ap: 3, cc: 4, desc: "Adv on Dex checks and +5ft speed." },
+        { name: "Channel Tiger", ap: 3, cc: 4, desc: "Adv on Cha and Int checks." },
+        { name: "Channel Falcon", ap: 3, cc: 4, desc: "Adv on Wis checks and +5 Passive Perception." }
+      ],
+      tier1: [
+        { name: "Gravity Shifter", ap: 4, cc: 5, desc: "Walk on walls/ceilings as ground. Climb speed equals walking speed." },
+        { name: "Invisibility", ap: 4, cc: 5, desc: "Invisible until you attack or cast a spell." }
+      ],
+      tier2: [
+        { name: "Sizing", ap: 6, cc: 7, desc: "Increase/Decrease size 1 category. Large: Adv on Str checks/saves, +1d4 dmg. Small: Adv on Dex checks/saves, Disadv on Str.<br><b>Boost (DC 20):</b> Change extra category." },
+        { name: "Ultravision", ap: 6, ritual: true, desc: "90ft: Darkvision, Adv on Perception (sight), see invisible/ethereal. <b>Sacrifice:</b> Spend 2 hit dice." }
+      ],
+      tier3: [
+        { name: "Renew", ap: 8, ritual: true, desc: "Regain 1d4 exhaustion, cleanse curses, heal HP equal to Vigor score. <b>Sacrifice:</b> Spend 4 hit dice." },
+        { name: "Truesight", ap: 8, ritual: true, desc: "120ft Truesight; see secret doors and into Ethereal Plane." }
+      ],
+      tier4: [
+        { name: "Ghost", ap: 10, ritual: true, desc: "Become ethereal; move through objects. Ends early if you return to reality. <b>Sacrifice:</b> Gain 2 exhaustion when spell ends." }
+      ]
+    }
   },
 
   technology: {
-    name: "Path of Technology", cost: 2, synergy: "creation",
-    benefit: "Proficient with Engineering; use Vigor instead of Intelligence for tech checks.",
-    traits: "Technology spells access technology magically through various techniques.",
-    spells: [
-      { tier: 0, name: "Construction", ap: 3, cc: null, time: "1 hour", range: "120 ft.", duration: "Inst.", comp: "V, S, M", ritual: true },
-      { tier: 0, name: "Refurbishment", ap: 2, cc: null, time: "1 minute", range: "Touch", duration: "Inst.", comp: "V, S, M", ritual: true },
-      { tier: 1, name: "Magic Firearm", ap: 4, cc: null, time: "1 minute", range: "Touch", duration: "Conc. up to 5 minutes", comp: "V, S", ritual: true },
-      { tier: 1, name: "EMP", ap: 4, cc: 5, time: "1 minute", range: "30 ft.", duration: "Inst.", comp: "V, S, M", ritual: false },
-      { tier: 1, name: "Access", ap: 4, cc: null, time: "1 action", range: "Touch", duration: "Inst.", comp: "V, S", ritual: true },
-      { tier: 1, name: "Eyes of SOL", ap: 5, cc: null, time: "1 minute", range: "Self", duration: "Conc. up to 1 hour", comp: "V, S", ritual: true },
-      { tier: 2, name: "Hijack", ap: 5, cc: 6, time: "1 minute", range: "30 ft.", duration: "Conc. up to 1 hour", comp: "V, S", ritual: false },
-      { tier: 2, name: "Presence of SOL", ap: 5, cc: null, time: "1 minute", range: "Self", duration: "Conc. up to 5 minutes", comp: "V, S", ritual: true },
-      { tier: 3, name: "Wireless", ap: 7, cc: null, time: "1 action", range: "Self", duration: "Conc. up to 1 hour", comp: "V, S", ritual: true },
-      { tier: 3, name: "Radial Access", ap: 7, cc: null, time: "1 minute", range: "60 ft.", duration: "Conc. up to 5 minutes", comp: "V, S", ritual: true },
-      { tier: 3, name: "Will of SOL", ap: 7, cc: null, time: "1 minute", range: "Self", duration: "Conc. up to 8 hours", comp: "V, S", ritual: true },
-      { tier: 4, name: "Hammer of SOL", ap: 12, cc: 13, time: "1 minute", range: "1 mile", duration: "Inst.", comp: "V, S, M", ritual: false }
-    ]
+    name: "Path of Technology",
+    cost: 2,
+    synergy: "creation",
+    benefit: "Proficient in Engineering; use Vigor instead of Intelligence for technology checks.",
+    spells: {
+      roots: [
+        { name: "Construction", ap: 3, ritual: true, desc: "Aid crafting: +3 effective level, advance schedule, save 20% money. <b>Sacrifice:</b> 1 hit die." },
+        { name: "Refurbishment", ap: 2, ritual: true, desc: "Vigor (Engineering) check to recover HP to an object. <b>Sacrifice:</b> 1 hit die." }
+      ],
+      tier1: [
+        { name: "Magic Firearm", ap: 4, ritual: true, desc: "Touched firearm gains Armor Piercing (AP) and counts as magic. <b>Sacrifice:</b> 1 hit die." },
+        { name: "EMP", ap: 4, cc: 5, desc: "30ft pulse disables electronics/batteries. +5ft per 2 dark (max +20ft)." },
+        { name: "Access", ap: 4, ritual: true, desc: "Control/read electronic device via touch (no password override). <b>Boost (DC 20):</b> 60ft range. <b>Sacrifice:</b> 1 hit die." },
+        { name: "Eyes of SOL", ap: 5, ritual: true, desc: "Bird's eye view from satellite; darkvision and see invisible. <b>Sacrifice:</b> 2 hit dice." }
+      ],
+      tier2: [
+        { name: "Hijack", ap: 5, cc: 6, desc: "Control robot (Wis save). +1 robot per 3 dark (max 3).<br><b>Boost (DC 20):</b> Double range." },
+        { name: "Presence of SOL", ap: 5, ritual: true, desc: "Transmit holographic image and audio of self/creature to any location. <b>Sacrifice:</b> 2 hit dice." }
+      ],
+      tier3: [
+        { name: "Wireless", ap: 7, ritual: true, desc: "Access networks as a computer; unlimited range if cell/sat access exists. <b>Sacrifice:</b> 1 hit die." },
+        { name: "Radial Access", ap: 7, ritual: true, desc: "As Access, but 60ft range and target any device. <b>Boost (DC 20):</b> 120ft range. <b>Sacrifice:</b> 1 hit die." },
+        { name: "Will of SOL", ap: 7, ritual: true, desc: "Satellite alerts you to all movement/living things within 500ft. <b>Sacrifice:</b> 2 hit dice." }
+      ],
+      tier4: [
+        { name: "Hammer of SOL", ap: 12, cc: 13, desc: "40ft cylinder; 20d6 fire + 20d6 radiant (nuclear, counts as AP). Dex save half. <b>Sacrifice:</b> Ignore cover. +1 beam per 4 dark (max 3)." }
+      ]
+    }
   },
 
   water: {
-    name: "Path of Water", cost: 2, synergy: "earth",
-    benefit: "Swim speed equal to your ground speed.",
-    traits: "Water spells involve boisterous hand movements and little to no vocalization.",
-    spells: [
-      { tier: 0, name: "Endothermic Ray", ap: 2, cc: 3, time: "1 minute", range: "60 ft.", duration: "Inst.", comp: "S", ritual: false },
-      { tier: 0, name: "Alter Temperature", ap: 2, cc: null, time: "1 action", range: "Touch", duration: "Inst.", comp: "S", ritual: true },
-      { tier: 1, name: "Water Breathing", ap: 3, cc: null, time: "1 action", range: "Self", duration: "Conc. up to 8 hours", comp: "S", ritual: true },
-      { tier: 1, name: "Water Walk", ap: 3, cc: null, time: "1 action", range: "Self", duration: "Conc. up to 8 hours", comp: "S", ritual: true },
-      { tier: 2, name: "Control Water", ap: 4, cc: null, time: "1 action", range: "500 ft.", duration: "Conc. up to 1 hour", comp: "S", ritual: true },
-      { tier: 2, name: "Shard Thrower", ap: 4, cc: 7, time: "1 minute", range: "120 ft.", duration: "Inst.", comp: "S", ritual: false },
-      { tier: 3, name: "Storm", ap: 5, cc: 9, time: "1 minute", range: "500 ft.", duration: "Inst.", comp: "S", ritual: false },
-      { tier: 3, name: "Breath of Cold", ap: 5, cc: 9, time: "1 minute", range: "60 ft.", duration: "Inst.", comp: "S", ritual: false },
-      { tier: 3, name: "Frozen Barrier", ap: 5, cc: 9, time: "1 minute", range: "120 ft.", duration: "Conc. up to 1 minute", comp: "S", ritual: false },
-      { tier: 4, name: "Tsunami", ap: 7, cc: 12, time: "1 minute", range: "Sight", duration: "Conc. up to 1 minute", comp: "S", ritual: false }
-    ]
+    name: "Path of Water",
+    cost: 2,
+    synergy: "earth",
+    benefit: "Gain a swim speed equal to your ground speed.",
+    spells: {
+      roots: [
+        { name: "Endothermic Ray", ap: 2, cc: 3, desc: "Ranged spell attack; 1d6 + Vig mod cold. Target speed -5ft. +1 die per 3 dark.<br><b>Boost (DC 20):</b> dice to d8." },
+        { name: "Alter Temperature", ap: 2, ritual: true, desc: "Freeze or boil 5 gallons of pure water. <b>Sacrifice:</b> 1 point of damage." }
+      ],
+      tier1: [
+        { name: "Water Breathing", ap: 3, ritual: true, desc: "Breathe underwater. <b>Sacrifice:</b> 2 HP + 1 HP per extra creature." },
+        { name: "Water Walk", ap: 3, ritual: true, desc: "Walk on liquid; rise to surface at 60ft/round. <b>Sacrifice:</b> 2 HP + 1 HP per extra creature." }
+      ],
+      tier2: [
+        { name: "Control Water", ap: 4, ritual: true, desc: "500ft cube: Rise, Trench, or Whirlpool. Str save or 1d8 + Vig bludgeoning. <b>Sacrifice:</b> 2 hit dice." },
+        { name: "Shard Thrower", ap: 4, cc: 7, desc: "Ranged spell attack; 5d6 + Vig mod cold. +1 die per 2 dark (max +4).<br><b>Boost (DC 20):</b> dice to d8." }
+      ],
+      tier3: [
+        { name: "Storm", ap: 5, cc: 9, desc: "20ft radius hail; 1d8 + Vig bludgeoning and 3d6 + Vig cold (Dex save half). +1 die per 2 dark (max +4).<br><b>Boost (DC 20):</b> dice to d10." },
+        { name: "Breath of Cold", ap: 5, cc: 9, desc: "60ft cone; 7d6 + Vig mod cold (Con save half). Killed targets freeze. +1 die per 2 dark (max +4).<br><b>Boost (DC 20):</b> dice to d8." },
+        { name: "Frozen Barrier", ap: 5, cc: 9, desc: "Wall 60x20x5ft; 6d8 + Vig cold to those in area (Dex save half). AC 15, 40 HP per 10ft. +10ft length per 1 dark.<br><b>Boost (DC 10):</b> Vigor check to extend 1 min." }
+      ],
+      tier4: [
+        { name: "Tsunami", ap: 7, cc: 12, desc: "Wall 300x300x50ft; 5d8 + Vig bludgeoning (Str save half). Moves 50ft/turn. 4d8 bludgeoning/round to those caught. +1 die per 2 dark (max +4).<br><b>Boost (DC 25):</b> dice to d10." }
+      ]
+    }
   }
 };
 
