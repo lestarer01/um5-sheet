@@ -213,7 +213,19 @@ function renderWeapons() {
 }
 
 function bindWeaponEvents() {
-function bindWeaponEvents() {
+querySelectorAll('.btn-remove-wpn').forEach(btn => {
+    btn.onclick = (e) => {
+      const idx = parseInt(e.target.dataset.idx, 10);
+      const c = chars.find(x => x.id === activeId);
+      if (c && c.weapons && c.weapons.length > 1) {
+        c.weapons.splice(idx, 1);
+        saveStorage();
+        renderWeapons();
+      }
+    };
+  });
+
+  function bindWeaponEvents() {
   const box = $('weapons-container');
   if (!box) return;
 
