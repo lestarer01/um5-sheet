@@ -142,7 +142,7 @@ function handleSkillEdit(el) {
 /* --- WEAPONS SYSTEM --- */
 
 function emptyWeapon() {
-  return { preset: '__custom__', name: '', dmg: '', range: '', props: '', max: 0, cur: 0 };
+  return { type: '', preset: '__custom__', name: '', atk: '', dmg: '', range: '', props: '', max: 0, cur: 0, notes: '' };
 }
 
 function renderWeapons() {
@@ -167,18 +167,26 @@ function renderWeapons() {
         <h4 style="color:var(--accent2); margin:0;">Weapon ${i + 1}</h4>
         ${c.weapons.length > 1 ? `<button type="button" class="btn btn-danger btn-remove-wpn" data-idx="${i}">Remove</button>` : ''}
       </div>
-      <div class="field-group">
-        <label>Weapon Preset</label>
-        <select class="wpn-preset-select" data-idx="${i}">${wOpts}</select>
-      </div>
+      
       <div class="grid-2">
-        <div class="field-group"><label>Name</label><input type="text" class="wpn-input-name" data-idx="${i}" value="${w.name || ''}" /></div>
-        <div class="field-group"><label>Damage</label><input type="text" class="wpn-input-dmg" data-idx="${i}" value="${w.dmg || ''}" /></div>
+        <div class="field-group"><label>Weapon Type</label><input type="text" class="wpn-input-type" data-idx="${i}" value="${w.type || ''}" /></div>
+        <div class="field-group">
+          <label>Weapon Preset</label>
+          <select class="wpn-preset-select" data-idx="${i}">${wOpts}</select>
+        </div>
       </div>
+      
+      <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:10px; margin-bottom:10px;">
+        <div class="field-group" style="margin:0;"><label>Name</label><input type="text" class="wpn-input-name" data-idx="${i}" value="${w.name || ''}" /></div>
+        <div class="field-group" style="margin:0;"><label>Attack</label><input type="text" class="wpn-input-atk" data-idx="${i}" value="${w.atk || ''}" style="text-align:center;" /></div>
+        <div class="field-group" style="margin:0;"><label>Damage</label><input type="text" class="wpn-input-dmg" data-idx="${i}" value="${w.dmg || ''}" style="text-align:center;" /></div>
+      </div>
+      
       <div class="grid-2">
         <div class="field-group"><label>Range</label><input type="text" class="wpn-input-range" data-idx="${i}" value="${w.range || ''}" /></div>
         <div class="field-group"><label>Properties</label><input type="text" class="wpn-input-props" data-idx="${i}" value="${w.props || ''}" /></div>
       </div>
+      
       <div class="ammo-row">
         <span>Ammo: <strong id="wpn-cur-display-${i}">${w.cur || 0}</strong> / 
           <input type="number" class="wpn-input-max" data-idx="${i}" value="${w.max || 0}" style="width:50px; display:inline-block; padding:4px;" />
@@ -187,6 +195,11 @@ function renderWeapons() {
           <button type="button" class="btn btn-shoot btn-fire-wpn" data-idx="${i}">SHOOT</button>
           <button type="button" class="btn btn-reload btn-reload-wpn" data-idx="${i}">RELOAD</button>
         </div>
+      </div>
+      
+      <div class="field-group" style="margin-top:8px;">
+        <label>Notes</label>
+        <input type="text" class="wpn-input-notes" data-idx="${i}" value="${w.notes || ''}" placeholder="Attachments, special ammo, etc." />
       </div>
     </div>
   `).join('');
@@ -200,6 +213,7 @@ function renderWeapons() {
 }
 
 function bindWeaponEvents() {
+function bindWeaponEvents() {
   const box = $('weapons-container');
   if (!box) return;
 
@@ -212,8 +226,29 @@ function bindWeaponEvents() {
 
       if (key !== '__custom__' && typeof WEAPON_DATA !== 'undefined' && WEAPON_DATA[key]) {
         const data = WEAPON_DATA[key];
+        
+        // Calculate Attack and Damage based on Dex + Proficiency
+        const dexMod = mod(val('s-dex'));
+        const pb = profBonus(val('c-lvl'));
+        const atkBonus = fmtMod(dexMod + pb);
+        
+        // Format damage: e.g., "1d10" -> "1d10+4"
+        let dmgStr = data.damage || '';
+        if (dexMod !== 0 && dmgStr) {
+          dmgStr += (dexMod > 0 ? '+' : '') + dexMod;
+        }
+
         c.weapons[idx] = {
-          preset: key, name: key, dmg: data.damage, range: data.range, props: data.properties, max: data.magSize, cur: data.magSize
+          type: data.type || '',
+          preset: key, 
+          name: key, 
+          atk: atkBonus,
+          dmg: dmgStr,
+          range: data.range, 
+          props: data.properties, 
+          max: data.magSize, 
+          cur: data.magSize,
+          notes: c.weapons[idx].notes || ''
         };
       } else {
         c.weapons[idx].preset = '__custom__';
@@ -267,11 +302,14 @@ function bindWeaponEvents() {
       const c = chars.find(x => x.id === activeId);
       if (!c || !c.weapons[idx]) return;
 
+      if (e.target.classList.contains('wpn-input-type')) c.weapons[idx].type = e.target.value;
       if (e.target.classList.contains('wpn-input-name')) c.weapons[idx].name = e.target.value;
+      if (e.target.classList.contains('wpn-input-atk')) c.weapons[idx].atk = e.target.value;
       if (e.target.classList.contains('wpn-input-dmg')) c.weapons[idx].dmg = e.target.value;
       if (e.target.classList.contains('wpn-input-range')) c.weapons[idx].range = e.target.value;
       if (e.target.classList.contains('wpn-input-props')) c.weapons[idx].props = e.target.value;
       if (e.target.classList.contains('wpn-input-max')) c.weapons[idx].max = parseInt(e.target.value, 10) || 0;
+      if (e.target.classList.contains('wpn-input-notes')) c.weapons[idx].notes = e.target.value;
 
       saveStorage();
     };
