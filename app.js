@@ -145,6 +145,14 @@ function emptyWeapon() {
   return { type: '', preset: '__custom__', name: '', atk: '', dmg: '', range: '', props: '', max: 0, cur: 0, notes: '' };
 }
 
+// Helper: Extract distinct weapon types from WEAPON_DATA
+function getWeaponTypes() {
+  if (typeof WEAPON_DATA === 'undefined') return [];
+  const types = new Set();
+  Object.values(WEAPON_DATA).forEach(w => { if (w.type) types.add(w.type); });
+  return Array.from(types).sort();
+}
+
 function renderWeapons() {
   const box = $('weapons-container');
   if (!box) return;
@@ -156,58 +164,76 @@ function renderWeapons() {
     c.weapons = [emptyWeapon()];
   }
 
-  const wOpts = '<option value="__custom__">Custom / Manual</option>' +
-    (typeof WEAPON_DATA !== 'undefined'
-      ? Object.keys(WEAPON_DATA).map(k => `<option value="${k}">${k} (${WEAPON_DATA[k].type})</option>`).join('')
-      : '');
+  const allTypes = getWeaponTypes();
 
-  box.innerHTML = c.weapons.map((w, i) => `
-    <div class="weapon-block" data-wpn-idx="${i}">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-        <h4 style="color:var(--accent2); margin:0;">Weapon ${i + 1}</h4>
-        ${c.weapons.length > 1 ? `<button type="button" class="btn btn-danger btn-remove-wpn" data-idx="${i}">Remove</button>` : ''}
-      </div>
-      
-      <div class="grid-2">
-        <div class="field-group"><label>Weapon Type</label><input type="text" class="wpn-input-type" data-idx="${i}" value="${w.type || ''}" /></div>
-        <div class="field-group">
-          <label>Weapon Preset</label>
-          <select class="wpn-preset-select" data-idx="${i}">${wOpts}</select>
+  box.innerHTML = c.weapons.map((w, i) => {
+    // 1. Build Type Dropdown options
+    const typeOpts = '<option value="">-- All Types --</option>' +
+      allTypes.map(t => `<option value="${t}">${t}</option>`).join('');
+
+    // 2. Filter Presets based on selected weapon type
+    const filteredPresets = (typeof WEAPON_DATA !== 'undefined')
+      ? Object.keys(WEAPON_DATA).filter(k => !w.type || WEAPON_DATA[k].type === w.type)
+      : [];
+
+    const wOpts = '<option value="__custom__">Custom / Manual</option>' +
+      filteredPresets.map(k => `<option value="${k}">${k}</option>`).join('');
+
+    return `
+      <div class="weapon-block" data-wpn-idx="${i}">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <h4 style="color:var(--accent2); margin:0;">Weapon ${i + 1}</h4>
+          ${c.weapons.length > 1 ? `<button type="button" class="btn btn-danger btn-remove-wpn" data-idx="${i}">Remove</button>` : ''}
+        </div>
+        
+        <div class="grid-2">
+          <div class="field-group">
+            <label>Weapon Type</label>
+            <select class="wpn-type-select" data-idx="${i}">${typeOpts}</select>
+          </div>
+          <div class="field-group">
+            <label>Weapon Preset</label>
+            <select class="wpn-preset-select" data-idx="${i}">${wOpts}</select>
+          </div>
+        </div>
+        
+        <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:10px; margin-bottom:10px;">
+          <div class="field-group" style="margin:0;"><label>Name</label><input type="text" class="wpn-input-name" data-idx="${i}" value="${w.name || ''}" /></div>
+          <div class="field-group" style="margin:0;"><label>Attack</label><input type="text" class="wpn-input-atk" data-idx="${i}" value="${w.atk || ''}" style="text-align:center;" /></div>
+          <div class="field-group" style="margin:0;"><label>Damage</label><input type="text" class="wpn-input-dmg" data-idx="${i}" value="${w.dmg || ''}" style="text-align:center;" /></div>
+        </div>
+        
+        <div class="grid-2">
+          <div class="field-group"><label>Range</label><input type="text" class="wpn-input-range" data-idx="${i}" value="${w.range || ''}" /></div>
+          <div class="field-group"><label>Properties</label><input type="text" class="wpn-input-props" data-idx="${i}" value="${w.props || ''}" /></div>
+        </div>
+        
+        <div class="ammo-row">
+          <span>Ammo: <strong id="wpn-cur-display-${i}">${w.cur || 0}</strong> / 
+            <input type="number" class="wpn-input-max" data-idx="${i}" value="${w.max || 0}" style="width:50px; display:inline-block; padding:4px;" />
+          </span>
+          <div>
+            <button type="button" class="btn btn-shoot btn-fire-wpn" data-idx="${i}">SHOOT</button>
+            <button type="button" class="btn btn-reload btn-reload-wpn" data-idx="${i}">RELOAD</button>
+          </div>
+        </div>
+        <div class="field-group" style="margin-top:8px;">
+          <label>Notes</label>
+          <textarea class="wpn-input-notes" data-idx="${i}" rows="2"
+            style="width:100%; min-height:40px; resize:vertical; background:var(--input); color:var(--text); border:1px solid var(--border); border-radius:4px; padding:6px; font-family:inherit; font-size:0.85rem;"
+            placeholder="Attachments, special ammo, etc.">${w.notes || ''}</textarea>
         </div>
       </div>
-      
-      <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:10px; margin-bottom:10px;">
-        <div class="field-group" style="margin:0;"><label>Name</label><input type="text" class="wpn-input-name" data-idx="${i}" value="${w.name || ''}" /></div>
-        <div class="field-group" style="margin:0;"><label>Attack</label><input type="text" class="wpn-input-atk" data-idx="${i}" value="${w.atk || ''}" style="text-align:center;" /></div>
-        <div class="field-group" style="margin:0;"><label>Damage</label><input type="text" class="wpn-input-dmg" data-idx="${i}" value="${w.dmg || ''}" style="text-align:center;" /></div>
-      </div>
-      
-      <div class="grid-2">
-        <div class="field-group"><label>Range</label><input type="text" class="wpn-input-range" data-idx="${i}" value="${w.range || ''}" /></div>
-        <div class="field-group"><label>Properties</label><input type="text" class="wpn-input-props" data-idx="${i}" value="${w.props || ''}" /></div>
-      </div>
-      
-      <div class="ammo-row">
-        <span>Ammo: <strong id="wpn-cur-display-${i}">${w.cur || 0}</strong> / 
-          <input type="number" class="wpn-input-max" data-idx="${i}" value="${w.max || 0}" style="width:50px; display:inline-block; padding:4px;" />
-        </span>
-        <div>
-          <button type="button" class="btn btn-shoot btn-fire-wpn" data-idx="${i}">SHOOT</button>
-          <button type="button" class="btn btn-reload btn-reload-wpn" data-idx="${i}">RELOAD</button>
-        </div>
-      </div>
-            <div class="field-group" style="margin-top:8px;">
-        <label>Notes</label>
-        <textarea class="wpn-input-notes" data-idx="${i}" rows="2"
-          style="width:100%; min-height:40px; resize:vertical; background:var(--input); color:var(--text); border:1px solid var(--border); border-radius:4px; padding:6px; font-family:inherit; font-size:0.85rem;"
-          placeholder="Attachments, special ammo, etc.">${w.notes || ''}</textarea>
-      </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 
+  // Set dropdown values after HTML insertion
   c.weapons.forEach((w, i) => {
-    const sel = box.querySelector(`.wpn-preset-select[data-idx="${i}"]`);
-    if (sel) sel.value = w.preset || '__custom__';
+    const typeSel = box.querySelector(`.wpn-type-select[data-idx="${i}"]`);
+    if (typeSel) typeSel.value = w.type || '';
+
+    const presetSel = box.querySelector(`.wpn-preset-select[data-idx="${i}"]`);
+    if (presetSel) presetSel.value = w.preset || '__custom__';
   });
 
   bindWeaponEvents();
@@ -217,6 +243,29 @@ function bindWeaponEvents() {
   const box = $('weapons-container');
   if (!box) return;
 
+  // 1. TYPE SELECT CHANGED
+  box.querySelectorAll('.wpn-type-select').forEach(sel => {
+    sel.onchange = (e) => {
+      const idx = parseInt(e.target.dataset.idx, 10);
+      const key = e.target.value;
+      const c = chars.find(x => x.id === activeId);
+      if (!c || !c.weapons[idx]) return;
+
+      c.weapons[idx].type = key;
+
+      // Reset preset if current preset doesn't match the new selected type
+      if (c.weapons[idx].preset && c.weapons[idx].preset !== '__custom__' && typeof WEAPON_DATA !== 'undefined' && WEAPON_DATA[c.weapons[idx].preset]) {
+        if (WEAPON_DATA[c.weapons[idx].preset].type !== key) {
+          c.weapons[idx].preset = '__custom__';
+        }
+      }
+
+      saveStorage();
+      renderWeapons();
+    };
+  });
+
+  // 2. PRESET SELECT CHANGED
   box.querySelectorAll('.wpn-preset-select').forEach(sel => {
     sel.onchange = (e) => {
       const idx = parseInt(e.target.dataset.idx, 10);
@@ -244,10 +293,10 @@ function bindWeaponEvents() {
           name: key, 
           atk: atkBonus,
           dmg: dmgStr,
-          range: data.range, 
-          props: data.properties, 
-          max: data.magSize, 
-          cur: data.magSize,
+          range: data.range || '', 
+          props: data.properties || '', 
+          max: data.magSize || 0, 
+          cur: data.magSize || 0,
           notes: c.weapons[idx].notes || ''
         };
       } else {
@@ -258,6 +307,7 @@ function bindWeaponEvents() {
     };
   });
 
+  // 3. SHOOT BUTTON
   box.querySelectorAll('.btn-fire-wpn').forEach(btn => {
     btn.onclick = (e) => {
       const idx = parseInt(e.target.dataset.idx, 10);
@@ -271,6 +321,7 @@ function bindWeaponEvents() {
     };
   });
 
+  // 4. RELOAD BUTTON
   box.querySelectorAll('.btn-reload-wpn').forEach(btn => {
     btn.onclick = (e) => {
       const idx = parseInt(e.target.dataset.idx, 10);
@@ -284,6 +335,7 @@ function bindWeaponEvents() {
     };
   });
 
+  // 5. REMOVE BUTTON
   box.querySelectorAll('.btn-remove-wpn').forEach(btn => {
     btn.onclick = (e) => {
       const idx = parseInt(e.target.dataset.idx, 10);
@@ -296,13 +348,13 @@ function bindWeaponEvents() {
     };
   });
 
-  box.querySelectorAll('input').forEach(inp => {
+  // 6. INPUT & TEXTAREA LISTENERS
+  box.querySelectorAll('input, textarea').forEach(inp => {
     inp.oninput = (e) => {
       const idx = parseInt(e.target.dataset.idx, 10);
       const c = chars.find(x => x.id === activeId);
       if (!c || !c.weapons[idx]) return;
 
-      if (e.target.classList.contains('wpn-input-type')) c.weapons[idx].type = e.target.value;
       if (e.target.classList.contains('wpn-input-name')) c.weapons[idx].name = e.target.value;
       if (e.target.classList.contains('wpn-input-atk')) c.weapons[idx].atk = e.target.value;
       if (e.target.classList.contains('wpn-input-dmg')) c.weapons[idx].dmg = e.target.value;
@@ -316,8 +368,6 @@ function bindWeaponEvents() {
   });
 }
 
-  
-
 function addWeapon() {
   const c = chars.find(x => x.id === activeId);
   if (!c) return;
@@ -327,6 +377,7 @@ function addWeapon() {
   renderWeapons();
 }
 
+  
 /* --- CORE CALCULATIONS & RECALC --- */
 
 function recalc() {
