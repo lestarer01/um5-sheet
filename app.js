@@ -406,13 +406,49 @@ function renderMagic() {
 
 function applyArmor() {
   const key = val('armor-preset');
-  if (!key || key === '__custom__' || typeof ARMOR_DATA === 'undefined' || !ARMOR_DATA[key]) return;
-  const a = ARMOR_DATA[key];
-  let dex = mod(val('s-dex'));
-  if (dex > a.maxDex) dex = a.maxDex;
-  val('ac-val', a.baseAc + dex);
-  val('armor-name', key);
-  val('armor-props', a.props || a.type);
+  const dexMod = mod(val('s-dex'));
+
+  // If "Custom / Manual" is selected, don't overwrite so manual edits stay
+  if (key === '__custom__') return;
+
+  let baseAc = 10;
+  let effectiveDex = dexMod;
+
+  if (typeof ARMOR_DATA !== 'undefined' && key && ARMOR_DATA[key]) {
+    const a = ARMOR_DATA[key];
+    baseAc = a.baseAc;
+
+    // Determine Max Dex Cap (check explicit property or armor type name)
+    let maxDex = a.maxDex;
+    if (maxDex === undefined && a.type) {
+      const typeLower = a.type.toLowerCase();
+      if (typeLower.includes('medium')) maxDex = 2;
+      else if (typeLower.includes('heavy')) maxDex = 0;
+    }
+
+    // Apply Dex Cap rules
+    if (maxDex !== undefined) {
+      if (maxDex === 0) {
+        effectiveDex = 0; // Heavy armor ignores Dex
+      } else {
+        effectiveDex = Math.min(dexMod, maxDex); // Medium armor caps Dex at +2
+      }
+    }
+
+    val('armor-name', key);
+    val('armor-props', a.props || a.type || '');
+  } else {
+    // Unarmored / No armor selected -> 10 + full Dex
+    val('armor-name', 'Unarmored');
+    val('armor-props', 'None');
+  }
+
+  const totalAc = baseAc + effectiveDex;
+
+  // Update AC display & character memory
+  val('ac-val', totalAc);
+  const c = getActiveChar();
+  if (c) c.ac = totalAc;
 }
 
 function blankChar() {
