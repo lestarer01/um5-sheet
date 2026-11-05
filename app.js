@@ -196,10 +196,11 @@ function renderWeapons() {
           <button type="button" class="btn btn-reload btn-reload-wpn" data-idx="${i}">RELOAD</button>
         </div>
       </div>
-      
-      <div class="field-group" style="margin-top:8px;">
+            <div class="field-group" style="margin-top:8px;">
         <label>Notes</label>
-        <input type="text" class="wpn-input-notes" data-idx="${i}" value="${w.notes || ''}" placeholder="Attachments, special ammo, etc." />
+        <textarea class="wpn-input-notes" data-idx="${i}" rows="2"
+          style="width:100%; min-height:40px; resize:vertical; background:var(--input); color:var(--text); border:1px solid var(--border); border-radius:4px; padding:6px; font-family:inherit; font-size:0.85rem;"
+          placeholder="Attachments, special ammo, etc.">${w.notes || ''}</textarea>
       </div>
     </div>
   `).join('');
