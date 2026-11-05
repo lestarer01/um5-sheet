@@ -324,7 +324,10 @@ function recalc() {
     }
   });
 
-  // Automatically update Magic UI when stats change
+  // ADD THIS LINE: Automatically updates AC when Dexterity changes
+  applyArmor();
+
+  // update Magic UI when stats change
   renderMagic();
 } // End of recalc
 
@@ -410,7 +413,6 @@ function applyArmor() {
   val('ac-val', a.baseAc + dex);
   val('armor-name', key);
   val('armor-props', a.props || a.type);
-  saveCurrent();
 }
 
 function blankChar() {
