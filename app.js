@@ -281,10 +281,19 @@ function bindWeaponEvents() {
         const pb = profBonus(val('c-lvl'));
         const atkBonus = fmtMod(dexMod + pb);
         
-        // Format damage: e.g., "1d10" -> "1d10+4"
-        let dmgStr = data.damage || '';
-        if (dexMod !== 0 && dmgStr) {
+                // Separate dice (1d10) and damage type (Piercing)
+        let rawDmg = data.damage || '';
+        let parts = rawDmg.trim().split(/\s+/);
+        let dice = parts[0] || '';
+        let dmgType = parts.slice(1).join(' ');
+
+        // Construct formatted damage: e.g., "1d10+4 Piercing"
+        let dmgStr = dice;
+        if (dexMod !== 0 && dice) {
           dmgStr += (dexMod > 0 ? '+' : '') + dexMod;
+        }
+        if (dmgType) {
+          dmgStr += ' ' + dmgType;
         }
 
         c.weapons[idx] = {
