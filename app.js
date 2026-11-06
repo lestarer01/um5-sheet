@@ -1197,22 +1197,101 @@ function buySpell(pathKey, name) {
   c.knownSpells.push({ pathKey, name: sp.name });
   setAssets(assets - sp.ap);
 
-  // SYNERGY RULE (Matches page 229)
+    // SYNERGY RULE: choose 1 free spell from lowest available tier on synergy path
   if (sp.tier > 0 && path.synergy && MAGIC_PATHS[path.synergy] && characterHasPath(c, path.synergy)) {
-    const synPath = MAGIC_PATHS[path.synergy];
-    const sorted = [...synPath.spells].sort((a, b) => a.tier - b.tier);
-    const freeSpell = sorted.find(s => !characterKnowsSpell(c, path.synergy, s.name));
-    if (freeSpell) {
-      c.knownSpells.push({ pathKey: path.synergy, name: freeSpell.name });
-      alert(`Synergy bonus! You gained "${freeSpell.name}" from ${synPath.name} for free.`);
-    }
+    grantSynergySpellChoice(c, path.synergy);
   }
 
   saveStorage();
   renderMagic();
 }
 
+/* ---- SYNERGY FREE SPELL CHOICE ---- */
 
+// Lowest tier on synergy path the character can access
+function getLowestAccessibleTierSpells(c, pathKey) {
+  const path = MAGIC_PATHS[pathKey];
+  if (!c || !path) return [];
+
+  // What is the highest tier they currently qualify for?
+  // Tier 0 always accessible. Higher tiers need ≥1 spell in every lower tier.
+  let maxAccess = 0;
+  const tiers = [...new Set(path.spells.map(s => s.tier))].sort((a, b) => a - b);
+
+  for (const t of tiers) {
+    if (t === 0) {
+      maxAccess = 0;
+      continue;
+    }
+    let ok = true;
+    for (let prev = 0; prev < t; prev++) {
+      const hasPrev = c.knownSpells.some(s => {
+        if (s.pathKey !== pathKey) return false;
+        const known = path.spells.find(x => x.name === s.name);
+        return known && known.tier === prev;
+      });
+      if (!hasPrev) { ok = false; break; }
+    }
+    if (ok) maxAccess = t;
+    else break;
+  }
+
+  // Among accessible tiers, pick the LOWEST tier that still has unowned spells
+  const accessible = path.spells.filter(s => s.tier <= maxAccess);
+  const unowned = accessible.filter(s => !characterKnowsSpell(c, pathKey, s.name));
+  if (unowned.length === 0) return [];
+
+  const lowestTier = Math.min(...unowned.map(s => s.tier));
+  return unowned.filter(s => s.tier === lowestTier);
+}
+
+function grantSynergySpellChoice(c, synPathKey) {
+  const synPath = MAGIC_PATHS[synPathKey];
+  if (!c || !synPath) return;
+
+  const choices = getLowestAccessibleTierSpells(c, synPathKey);
+  if (choices.length === 0) {
+    // Nothing left to gain
+    return;
+  }
+
+  // Only one option → auto-grant
+  if (choices.length === 1) {
+    const only = choices[0];
+    c.knownSpells.push({ pathKey: synPathKey, name: only.name });
+    alert(`Synergy bonus! You gained "${only.name}" from ${synPath.name} for free.`);
+    return;
+  }
+
+  // Multiple options → let player choose
+  const lines = choices.map((s, i) => `${i + 1}. ${s.name} (Tier ${s.tier}${s.ritual ? ', Ritual' : ''})`).join('\n');
+  let picked = null;
+
+  while (!picked) {
+    const raw = prompt(
+      `Synergy bonus from ${synPath.name}!\n` +
+      `Choose 1 free spell from Tier ${choices[0].tier}:\n\n` +
+      `${lines}\n\n` +
+      `Enter a number (1-${choices.length}):`
+    );
+
+    // Cancel = skip free spell? Better force a choice; if cancel, abort without granting
+    if (raw === null) {
+      alert('Synergy spell selection cancelled. No free spell was added.');
+      return;
+    }
+
+    const n = parseInt(raw, 10);
+    if (n >= 1 && n <= choices.length) {
+      picked = choices[n - 1];
+    } else {
+      alert(`Please enter a number from 1 to ${choices.length}.`);
+    }
+  }
+
+  c.knownSpells.push({ pathKey: synPathKey, name: picked.name });
+  alert(`Synergy bonus! You gained "${picked.name}" from ${synPath.name} for free.`);
+}
     
 
 function unlockPath(pathKey) {
