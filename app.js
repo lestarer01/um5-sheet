@@ -1236,6 +1236,7 @@ function unlockPath(pathKey) {
 
 let knownSpellsFilter = 'all'; // 'all' | 'river' | 'rituals'
 
+
 function renderKnownSpells() {
   const box = $('known-spells-list');
   if (!box) return;
@@ -1266,15 +1267,8 @@ function renderKnownSpells() {
     });
   }
 
-  // Collect spells: collective + known
+  // Only spells the character has purchased
   const list = [];
-
-  if (typeof COLLECTIVE_SPELLS !== 'undefined') {
-    COLLECTIVE_SPELLS.forEach(sp => {
-      list.push({ ...sp, pathKey: 'collective', pathName: 'Collective', tier: 0 });
-    });
-  }
-
   if (c.knownSpells) {
     c.knownSpells.forEach(entry => {
       const path = MAGIC_PATHS[entry.pathKey];
@@ -1303,7 +1297,7 @@ function renderKnownSpells() {
   filtered.forEach(sp => {
     const isInRiver = inRiver.some(r => r.pathKey === sp.pathKey && r.name === sp.name);
     const riverFull = inRiver.length >= (parseInt($('m-river-max')?.textContent, 10) || 0);
-    const canSlot = !sp.ritual && !isInRiver && !riverFull && sp.pathKey !== 'collective';
+    const canSlot = !sp.ritual && !isInRiver && !riverFull;
 
     html += `<div style="background:var(--input); border-left:3px solid var(--accent); border-radius:0 6px 6px 0; padding:8px 10px; margin-bottom:6px;">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:4px;">
@@ -1320,29 +1314,18 @@ function renderKnownSpells() {
         style="font-size:0.7rem; padding:4px 8px; background:var(--accent2); color:#000;">
         Cast Ritual
       </button>`;
-    } else if (sp.pathKey !== 'collective') {
-      if (isInRiver) {
-        html += `<button type="button" class="btn btn-sm btn-remove-river"
-          data-path="${sp.pathKey}" data-name="${sp.name}"
-          style="font-size:0.7rem; padding:4px 8px; background:var(--danger); color:#fff;">
-          Remove from River
-        </button>`;
-      } else {
-        html += `<button type="button" class="btn btn-sm btn-add-river"
-          data-path="${sp.pathKey}" data-name="${sp.name}"
-          ${canSlot ? '' : 'disabled'}
-          style="font-size:0.7rem; padding:4px 8px; background:var(--accent); color:#000;">
-          ${riverFull ? 'River Full' : 'Slot into River'}
-        </button>`;
-      }
-    }
-
-    // Collective spells get a Cast button too
-    if (sp.pathKey === 'collective' && !sp.ritual) {
-      html += `<button type="button" class="btn btn-sm btn-cast-collective"
-        data-name="${sp.name}"
-        style="font-size:0.7rem; padding:4px 8px; background:var(--accent2); color:#000;">
-        Cast (${sp.cc} CC)
+    } else if (isInRiver) {
+      html += `<button type="button" class="btn btn-sm btn-remove-river"
+        data-path="${sp.pathKey}" data-name="${sp.name}"
+        style="font-size:0.7rem; padding:4px 8px; background:var(--danger); color:#fff;">
+        Remove from River
+      </button>`;
+    } else {
+      html += `<button type="button" class="btn btn-sm btn-add-river"
+        data-path="${sp.pathKey}" data-name="${sp.name}"
+        ${canSlot ? '' : 'disabled'}
+        style="font-size:0.7rem; padding:4px 8px; background:var(--accent); color:#000;">
+        ${riverFull ? 'River Full' : 'Slot into River'}
       </button>`;
     }
 
@@ -1369,9 +1352,6 @@ function renderKnownSpells() {
   });
   box.querySelectorAll('.btn-cast-ritual').forEach(btn => {
     btn.onclick = () => castRitual(btn.dataset.path, btn.dataset.name);
-  });
-  box.querySelectorAll('.btn-cast-collective').forEach(btn => {
-    btn.onclick = () => castCollective(btn.dataset.name);
   });
 }
 
@@ -1403,25 +1383,6 @@ function castRitual(pathKey, name) {
   const sp = path?.spells.find(x => x.name === name);
   if (!sp) return;
   alert(`Casting ritual: ${sp.name}\n\nTime: ${sp.time}\nSacrifice may apply (see description).\n\nNo Vessel cost.`);
-}
-
-function castCollective(name) {
-  if (typeof COLLECTIVE_SPELLS === 'undefined') return;
-  const sp = COLLECTIVE_SPELLS.find(x => x.name === name);
-  if (!sp) return;
-  if (sp.ritual) {
-    alert(`Casting ritual: ${sp.name}`);
-    return;
-  }
-  const cur = getVesselCur();
-  const cost = sp.cc || 0;
-  if (cur < cost) {
-    alert(`Not enough Vessel to cast ${sp.name} (needs ${cost}, you have ${cur}).`);
-    return;
-  }
-  if (!confirm(`Cast ${sp.name} for ${cost} Vessel?`)) return;
-  setVesselCur(cur - cost);
-  renderMagic();
 }
 
 /* ---- RIVER SLOTS ---- */
