@@ -2,26 +2,13 @@
    PER-CHARACTER EXPORT / IMPORT
    ============================================================ */
 
-// Track export counts this session so duplicate names get _2, _3, ...
-const exportNameCounts = {};
-
 function sanitizeFileName(name) {
   return String(name || 'Operative')
     .trim()
-    .replace(/[<>:"/\\|?*\x00-\x1F]/g, '') // illegal filename chars
+    .replace(/[<>:"/\\|?*\x00-\x1F]/g, '')
     .replace(/\s+/g, '_')
     .replace(/_+/g, '_')
     .replace(/^\.+/, '') || 'Operative';
-}
-
-function getExportFileName(charName) {
-  const base = sanitizeFileName(charName);
-  if (!exportNameCounts[base]) {
-    exportNameCounts[base] = 1;
-    return base + '.json';
-  }
-  exportNameCounts[base] += 1;
-  return base + '_' + exportNameCounts[base] + '.json';
 }
 
 function exportActiveCharacter() {
@@ -31,18 +18,17 @@ function exportActiveCharacter() {
     return;
   }
 
-  // Export a clean copy of this one character only
   const payload = {
     version: 1,
     type: 'um5_character',
     exportedAt: new Date().toISOString(),
-    character: JSON.parse(JSON.stringify(c)) // deep clone
+    character: JSON.parse(JSON.stringify(c))
   };
 
   const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(payload, null, 2));
   const a = document.createElement('a');
   a.setAttribute('href', dataStr);
-  a.setAttribute('download', getExportFileName(c.name));
+  a.setAttribute('download', sanitizeFileName(c.name) + '.json');
   document.body.appendChild(a);
   a.click();
   a.remove();
@@ -50,8 +36,7 @@ function exportActiveCharacter() {
 
 function importCharacter(e) {
   const file = e.target.files && e.target.files[0];
-  // allow re-importing same file later
-  e.target.value = '';
+  e.target.value = ''; // allow re-importing same file
 
   if (!file) return;
 
@@ -60,14 +45,12 @@ function importCharacter(e) {
     try {
       const parsed = JSON.parse(evt.target.result);
 
-      // Support both: wrapped payload OR raw character object
       let incoming = null;
       if (parsed && parsed.type === 'um5_character' && parsed.character) {
         incoming = parsed.character;
       } else if (parsed && typeof parsed === 'object' && !Array.isArray(parsed) && parsed.name !== undefined) {
         incoming = parsed;
       } else if (Array.isArray(parsed) && parsed.length === 1) {
-        // accidently exported array of one
         incoming = parsed[0];
       } else {
         alert('Invalid character file. Export a single character backup and try again.');
@@ -76,10 +59,9 @@ function importCharacter(e) {
 
       const clone = JSON.parse(JSON.stringify(incoming));
 
-      // Always append as a NEW operative (never overwrite)
+      // Always append as a NEW operative
       clone.id = 'c_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
 
-      // Soft safety defaults
       if (!clone.weapons) clone.weapons = [emptyWeapon()];
       if (!clone.skills) clone.skills = {};
       if (!clone.saveProfs) clone.saveProfs = {};
@@ -91,8 +73,8 @@ function importCharacter(e) {
       const label = clone.name || 'Unnamed';
       if (!confirm(`Import "${label}" and add to your roster?`)) return;
 
-      chars.push(clone);          // append below existing
-      activeId = clone.id;        // select the new one
+      chars.push(clone);
+      activeId = clone.id;
       saveStorage();
       loadToForm(clone);
       renderRoster();
@@ -107,8 +89,7 @@ function importCharacter(e) {
 async function requestPersistentStorage() {
   if (navigator.storage && navigator.storage.persist) {
     try {
-      const granted = await navigator.storage.persist();
-      console.log('Persistent storage:', granted);
+      await navigator.storage.persist();
     } catch (e) {}
   }
 }
