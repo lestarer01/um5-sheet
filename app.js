@@ -197,7 +197,7 @@ function renderWeapons() {
           </div>
         </div>
         
-        <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:10px; margin-bottom:10px;">
+        <div style="display:grid; grid-template-columns: 2fr 0.5fr 1.5fr; gap:10px; margin-bottom:10px;">
           <div class="field-group" style="margin:0;"><label>Name</label><input type="text" class="wpn-input-name" data-idx="${i}" value="${w.name || ''}" /></div>
           <div class="field-group" style="margin:0;"><label>Attack</label><input type="text" class="wpn-input-atk" data-idx="${i}" value="${w.atk || ''}" style="text-align:center;" /></div>
           <div class="field-group" style="margin:0;"><label>Damage</label><input type="text" class="wpn-input-dmg" data-idx="${i}" value="${w.dmg || ''}" style="text-align:center;" /></div>
