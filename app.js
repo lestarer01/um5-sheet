@@ -1,3 +1,118 @@
+/* ============================================================
+   PER-CHARACTER EXPORT / IMPORT
+   ============================================================ */
+
+// Track export counts this session so duplicate names get _2, _3, ...
+const exportNameCounts = {};
+
+function sanitizeFileName(name) {
+  return String(name || 'Operative')
+    .trim()
+    .replace(/[<>:"/\\|?*\x00-\x1F]/g, '') // illegal filename chars
+    .replace(/\s+/g, '_')
+    .replace(/_+/g, '_')
+    .replace(/^\.+/, '') || 'Operative';
+}
+
+function getExportFileName(charName) {
+  const base = sanitizeFileName(charName);
+  if (!exportNameCounts[base]) {
+    exportNameCounts[base] = 1;
+    return base + '.json';
+  }
+  exportNameCounts[base] += 1;
+  return base + '_' + exportNameCounts[base] + '.json';
+}
+
+function exportActiveCharacter() {
+  const c = getActiveChar();
+  if (!c) {
+    alert('No active character to export.');
+    return;
+  }
+
+  // Export a clean copy of this one character only
+  const payload = {
+    version: 1,
+    type: 'um5_character',
+    exportedAt: new Date().toISOString(),
+    character: JSON.parse(JSON.stringify(c)) // deep clone
+  };
+
+  const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(payload, null, 2));
+  const a = document.createElement('a');
+  a.setAttribute('href', dataStr);
+  a.setAttribute('download', getExportFileName(c.name));
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
+function importCharacter(e) {
+  const file = e.target.files && e.target.files[0];
+  // allow re-importing same file later
+  e.target.value = '';
+
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function (evt) {
+    try {
+      const parsed = JSON.parse(evt.target.result);
+
+      // Support both: wrapped payload OR raw character object
+      let incoming = null;
+      if (parsed && parsed.type === 'um5_character' && parsed.character) {
+        incoming = parsed.character;
+      } else if (parsed && typeof parsed === 'object' && !Array.isArray(parsed) && parsed.name !== undefined) {
+        incoming = parsed;
+      } else if (Array.isArray(parsed) && parsed.length === 1) {
+        // accidently exported array of one
+        incoming = parsed[0];
+      } else {
+        alert('Invalid character file. Export a single character backup and try again.');
+        return;
+      }
+
+      const clone = JSON.parse(JSON.stringify(incoming));
+
+      // Always append as a NEW operative (never overwrite)
+      clone.id = 'c_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
+
+      // Soft safety defaults
+      if (!clone.weapons) clone.weapons = [emptyWeapon()];
+      if (!clone.skills) clone.skills = {};
+      if (!clone.saveProfs) clone.saveProfs = {};
+      if (!clone.unlockedPaths) clone.unlockedPaths = [];
+      if (!clone.knownSpells) clone.knownSpells = [];
+      if (!clone.riverSpells) clone.riverSpells = [];
+      if (!clone.classChoices) clone.classChoices = {};
+
+      const label = clone.name || 'Unnamed';
+      if (!confirm(`Import "${label}" and add to your roster?`)) return;
+
+      chars.push(clone);          // append below existing
+      activeId = clone.id;        // select the new one
+      saveStorage();
+      loadToForm(clone);
+      renderRoster();
+      alert(`Imported "${label}" successfully.`);
+    } catch (err) {
+      alert('Error reading character file: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+async function requestPersistentStorage() {
+  if (navigator.storage && navigator.storage.persist) {
+    try {
+      const granted = await navigator.storage.persist();
+      console.log('Persistent storage:', granted);
+    } catch (e) {}
+  }
+}
+
 const UM5_SKILLS = [
   { name: 'Acrobatics', stat: 'dex' },
   { name: 'Animal Handling', stat: 'wis' },
@@ -948,6 +1063,14 @@ document.addEventListener('DOMContentLoaded', () => {
   } else {
     createChar();
   }
+
+  if ($('btn-export')) $('btn-export').addEventListener('click', exportActiveCharacter);
+  if ($('btn-import')) $('btn-import').addEventListener('click', () => {
+  if ($('import-file-input')) $('import-file-input').click();
+  });
+  if ($('import-file-input')) $('import-file-input').addEventListener('change', importCharacter);
+
+  requestPersistentStorage();
   renderRoster();
   recalc();
 });
