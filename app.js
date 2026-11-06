@@ -203,9 +203,9 @@ function renderWeapons() {
           <div class="field-group" style="margin:0;"><label>Damage</label><input type="text" class="wpn-input-dmg" data-idx="${i}" value="${w.dmg || ''}" style="text-align:center;" /></div>
         </div>
         
-        <div class="grid-2">
-          <div class="field-group"><label>Range</label><input type="text" class="wpn-input-range" data-idx="${i}" value="${w.range || ''}" /></div>
-          <div class="field-group"><label>Properties</label><input type="text" class="wpn-input-props" data-idx="${i}" value="${w.props || ''}" /></div>
+        <div style="display:grid; grid-template-columns: 1fr 2.5fr; gap:10px; margin-bottom:10px;">
+          <div class="field-group" style="margin:0;"><label>Range</label><input type="text" class="wpn-input-range" data-idx="${i}" value="${w.range || ''}" /></div>
+          <div class="field-group" style="margin:0;"><label>Properties</label><input type="text" class="wpn-input-props" data-idx="${i}" value="${w.props || ''}" /></div>
         </div>
         
         <div class="ammo-row">
