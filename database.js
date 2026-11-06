@@ -1611,16 +1611,22 @@ const MAGIC_RULES = {
   concentrationRules: "Only one concentration spell at a time. Concentration doesn't consume dark beyond initial cast. You cannot recover vessel with any action on your turn while concentrating, but items can still restore vessel."
 };
 
-// Collective spells available to any spellcaster
-const COLLECTIVE_SPELLS = [
-  { name: "Dispel", ap: 2, cc: 3, time: "1 minute", range: "60 ft.", duration: "Inst.", comp: "", ritual: false,
-    desc: "End one spell on a creature/object/effect in range. Vigor check DC 10 + (tier × 2); roots = tier 0.<br><b>River note:</b> cost drops to a reaction if target ≤ 60 ft." },
-  { name: "Parlor Tricks", ap: 1, cc: null, time: "1 action", range: "30 ft.", duration: "Conc. up to 1 hour", comp: "V, S", ritual: true,
-    desc: "Minor effects: boom voice, flicker lights, tiny tremors, telekinesis ≤ 1 lb, slight appearance tweaks, dim/brighten lights. Can concentrate on multiple at once." }
-];
-
 // Full Paths list
 const MAGIC_PATHS = {
+  collective: {
+    name: "Collective Spells",
+    cost: 0,
+    synergy: "",
+    benefit: "Access the shared spell list available to all practitioners. Purchase each spell once with Assets; cast with Vessel (or as a ritual).",
+    traits: "Foundational techniques taught across traditions. No synergy path. Path unlock is free; each spell still costs AP once.",
+    spells: [
+      { tier: 0, name: "Dispel", ap: 2, cc: 3, time: "1 minute", range: "60 ft.", duration: "Inst.", comp: "", ritual: false,
+        desc: "End one spell on a creature/object/effect in range. Vigor check DC 10 + (tier × 2); roots = tier 0.<br><b>River note:</b> cost drops to a reaction if target ≤ 60 ft." },
+      { tier: 0, name: "Parlor Tricks", ap: 1, cc: null, time: "1 action", range: "30 ft.", duration: "Conc. up to 1 hour", comp: "V, S", ritual: true,
+        desc: "Minor effects: boom voice, flicker lights, tiny tremors, telekinesis ≤ 1 lb, slight appearance tweaks, dim/brighten lights. Can concentrate on multiple at once." }
+    ]
+  },
+
       air: {
     name: "Path of Air",
     cost: 2,
