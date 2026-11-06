@@ -1483,7 +1483,50 @@ const WEAPON_DATA = {
   "Psi-Scrambler Emitter":            { type: "Super-Heavy Weapon (TL5)", damage: "1d10+10 Psychic*", range: "150/600",  properties: "Mod(M/U), Mag (10 2xH-cell), Massive, SH, Special",              magSize: 10 },
   "Repeating Laser Blaster":          { type: "Super-Heavy Weapon (TL4)", damage: "1d8+8 Force*",     range: "250/1000", properties: "AP, Auto-Heavy (1d12+12), Laser, Mag (200 3xH-cell), Mod(M/U), SH", magSize: 200 },
   "Super-Kill Sniper":                { type: "Super-Heavy Weapon (TL4)", damage: "1d12+12 Piercing", range: "4000/16000",properties: "AP+, EM, Mag (5 flechettes), SH, Sniper (+3)",                  magSize: 5 }, 
-};
+
+  // ==========================================
+  // MARTIAL (SUBSONIC) RANGED WEAPONS
+  // ==========================================
+
+  // TL0 Ranged Weapons
+  "Arbalest (Steel Crossbow)":        { type: "Martial Ranged Weapon (TL0)", damage: "1d12 Piercing",   range: "50/200",  properties: "Cock (1 bolt), Heavy, Two-Handed, Special",              magSize: 1 },
+  "Crossbow Pistol":                  { type: "Martial Ranged Weapon (TL0)", damage: "1d4 Piercing",    range: "20/80",   properties: "Cock (1 bolt), Light",                                  magSize: 1 },
+  "Repeating Crossbow (Chu-ko-nu)":   { type: "Martial Ranged Weapon (TL0)", damage: "1d6 Piercing",    range: "80/320",  properties: "Mag (5 bolts), Two-Handed, Special",                    magSize: 5 },
+
+  // TL1 Ranged Weapons
+  "Compound Bow":                     { type: "Martial Ranged Weapon (TL1)", damage: "1d8 Piercing",    range: "150/600", properties: "Ammunition, Heavy, Two-Handed, Special",                magSize: 1 },
+  "Harpoon Gun (Pneumatic)":          { type: "Martial Ranged Weapon (TL1)", damage: "1d10 Piercing",   range: "50/200",  properties: "Cock (1 harpoon), Heavy, Special, Two-Handed",          magSize: 1 },
+
+  // TL2 Ranged Weapons
+  "AEA Alarmo":                       { type: "Martial Ranged Weapon (TL3)", damage: "1d12 Bludgeoning", range: "5 ft.",   properties: "Breech (2 charges), Double (2d10)",                     magSize: 2 },
+  "AEA Big Bore Double Shot Air Pistol": { type: "Martial Ranged Weapon (TL3)", damage: "Special",       range: "50/200",  properties: "Breech (2 cartridge), Double (Special), Special",      magSize: 2 },
+  "AEA SF Compact":                   { type: "Martial Ranged Weapon (TL2)", damage: "1d4-1d8 Piercing*", range: "80/320", properties: "Load(6-14 pellets), Mod(S), Special, Two-Handed",       magSize: 14 },
+  "AEA SF Sniper":                    { type: "Martial Ranged Weapon (TL2)", damage: "1d4-1d8 Piercing", range: "100/400", properties: "Load(6-14 pellets), Sniper (+1), Special, Two-Handed",  magSize: 14 },
+  "Bearx Desire XL Pistol Crossbow":  { type: "Martial Ranged Weapon (TL2)", damage: "1d6 Piercing",    range: "30/90",   properties: "Light, Load(1 bolt), Mod(S)",                           magSize: 1 },
+  "BinTac T-50 (Extreme)":            { type: "Martial Ranged Weapon (TL2)", damage: "1d12 Piercing",   range: "100/400", properties: "Mag (6 pellets), Mod(S), Special, Two-Handed",          magSize: 6 },
+  "Cobra Adder Tactical Crossbow":    { type: "Martial Ranged Weapon (TL2)", damage: "1d8 Piercing",    range: "80/320",  properties: "Load(5 bolts), Mod(S), Special, Two-Handed",            magSize: 5 },
+  "FX Redback \"Gatling\"":           { type: "Martial Ranged Weapon (TL2)", damage: "1d6-1d10 Piercing", range: "80/320", properties: "Load(8 pellets/bolts), Special, Two-Handed",           magSize: 8 },
+  "Lancehead F1 Hunting Crossbow":    { type: "Martial Ranged Weapon (TL2)", damage: "1d12 Piercing",   range: "200/800", properties: "AP, Cock (1 bolt), Mod(S), Special, Two-Handed",        magSize: 1 },
+  "MEY Interceptor Assault Crossbow": { type: "Martial Ranged Weapon (TL2)", damage: "1d6/1d8 Piercing", range: "100/400", properties: "Mag (18 bolts), Mod(S), Special, Two-Handed",          magSize: 18 },
+  "NXWerks Pistelle X-68":            { type: "Martial Ranged Weapon (TL3)", damage: "1d6 Bludgeoning*", range: "20/80",  properties: "Mag (6 pellets), Light, Mod(B,M,S,U)",                   magSize: 6 },
+  "Ravin R500":                       { type: "Martial Ranged Weapon (TL2)", damage: "1d10 Piercing",   range: "220/880", properties: "Cock (1 bolt), Mod(S), Special, Two-Handed",            magSize: 1 },
+  "TenPoint TRX 515":                 { type: "Martial Ranged Weapon (TL2)", damage: "2d8 Piercing",    range: "250/1000",properties: "Cock (1 bolt), AP, Mod(S), Two-Handed",                  magSize: 1 },
+  "WT Mini Striker":                  { type: "Martial Ranged Weapon (TL2)", damage: "1d8 Piercing",    range: "70/210",  properties: "Load(6 bolts), Mod(U)",                                  magSize: 6 },
+
+  // TL3 Ranged Weapons
+  "Acheron Mk. IV \"Stake Driver\"":  { type: "Martial Ranged Weapon (TL3)", damage: "1d8 Piercing",    range: "120/480", properties: "Double (1d12), Mag (20 bolts), Two-Handed",              magSize: 20 },
+  "Harkonnen HMG-90 \"Reaper\"":      { type: "Martial Ranged Weapon (TL3)", damage: "1d10 Piercing",   range: "150/600", properties: "Auto (1d12), Mag (60 bolts), Heavy, Two-Handed",         magSize: 60 },
+  "Krait HPA Micro-Burst":            { type: "Martial Ranged Weapon (TL3)", damage: "1d8 Piercing",    range: "50/200",  properties: "Auto (1d10), Bull, Mag (200 pellets), Special",          magSize: 200 },
+  "Stryder X1 \"Impaler\"":           { type: "Martial Ranged Weapon (TL3)", damage: "1d6 Piercing",    range: "200/800", properties: "Auto-Heavy (1d10), Heavy, Mag (80 bolts), Two-Handed",  magSize: 80 },
+  "Valravn C-10 \"Corvid\"":          { type: "Martial Ranged Weapon (TL3)", damage: "1d6 Piercing",    range: "100/400", properties: "Auto (1d8), Mag (40 bolts), Two-Handed, Special",        magSize: 40 },
+  "Vektor A-9 \"Whisper Creek\"":     { type: "Martial Ranged Weapon (TL3)", damage: "1d10 Piercing",   range: "200/800", properties: "Bull, Mag (20 pellets), Mod(S/U), Sniper (+2), Special, Two-Handed", magSize: 20 },
+
+  // ==========================================
+  // INJECTION WEAPONS
+  // ==========================================
+  "Dan-Inject JM Standard":           { type: "Injection Weapon (TL1)", damage: "0",                  range: "40/120",  properties: "Breech (1 dart), Special, Two-Handed",                   magSize: 1 },
+  "SixNeedler Needle Gun":            { type: "Injection Weapon (TL2)", damage: "0",                  range: "30/90",   properties: "Light, Breech(6 darts), Mod(S/U), Special",               magSize: 6 },
+  };
 
 const ARMOR_DATA = {
   // --- TL2 ARMOUR ---
