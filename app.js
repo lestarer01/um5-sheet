@@ -35,59 +35,46 @@ function exportActiveCharacter() {
 }
 
 function importCharacter(e) {
-  const file = e.target.files && e.target.files[0];
-  if (!file) return;
+  const files = e.target.files;
+  if (!files || files.length === 0) return;
 
+  const file = files[0];
   const reader = new FileReader();
-
-  reader.onerror = function() {
-    alert('Failed to read the file from your device.');
-  };
 
   reader.onload = function (evt) {
     try {
-      const content = evt.target.result;
-      if (!content) {
+      const rawText = evt.target.result;
+      if (!rawText || !rawText.trim()) {
         alert('File is empty.');
         return;
       }
 
-      const parsed = JSON.parse(content);
+      const parsed = JSON.parse(rawText);
       let incoming = null;
 
-      // 1. Wrapped format { type: 'um5_character', character: {...} }
       if (parsed && parsed.character && typeof parsed.character === 'object') {
         incoming = parsed.character;
-      } 
-      // 2. Direct character object { name: '...', str: 10, ... }
-      else if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      } else if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
         incoming = parsed;
-      } 
-      // 3. Array backup [ {...} ]
-      else if (Array.isArray(parsed) && parsed.length > 0) {
+      } else if (Array.isArray(parsed) && parsed.length > 0) {
         incoming = parsed[0];
       }
 
-      if (!incoming || typeof incoming !== 'object') {
-        alert('Could not find valid character data in this JSON file.');
+      if (!incoming) {
+        alert('Could not find character data in this file.');
         return;
       }
 
       const clone = JSON.parse(JSON.stringify(incoming));
-
-      // Generate fresh unique ID so it appends as a new operative
       clone.id = 'c_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
 
-      // Ensure required arrays/objects exist
-      if (!clone.weapons || !Array.isArray(clone.weapons)) clone.weapons = [emptyWeapon()];
+      if (!clone.weapons) clone.weapons = [emptyWeapon()];
       if (!clone.skills) clone.skills = {};
       if (!clone.saveProfs) clone.saveProfs = {};
       if (!clone.unlockedPaths) clone.unlockedPaths = [];
       if (!clone.knownSpells) clone.knownSpells = [];
       if (!clone.riverSpells) clone.riverSpells = [];
-      if (!clone.classChoices) clone.classChoices = {};
 
-      // Append to operative roster
       chars.push(clone);
       activeId = clone.id;
 
@@ -95,16 +82,13 @@ function importCharacter(e) {
       loadToForm(clone);
       renderRoster();
 
-      alert(`Imported "${clone.name || 'Unnamed Operative'}" successfully!`);
+      alert(`Successfully imported "${clone.name || 'Operative'}"!`);
     } catch (err) {
-      alert('Error parsing character file: ' + err.message);
+      alert('Error loading file: ' + err.message);
     }
   };
 
   reader.readAsText(file);
-
-  // Reset input AFTER starting the read operation
-  e.target.value = '';
 }
 
 async function requestPersistentStorage() {
@@ -1074,8 +1058,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnExport) btnExport.onclick = exportActiveCharacter;
 
   if (btnImport && inputImport) {
-    btnImport.onclick = () => inputImport.click();
-    inputImport.onchange = (e) => importCharacter(e);
+    btnImport.addEventListener('click', () => {
+      inputImport.value = ''; // Reset so clicking the same file triggers onchange
+      inputImport.click();
+    });
+    inputImport.addEventListener('change', importCharacter);
   }
 
   requestPersistentStorage();
