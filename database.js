@@ -388,7 +388,7 @@ const CLASS_DATA = {
       { level: 2, name: 'Pacification', desc: 'When you hit with an attack, spend a Hit Die (restores no HP) to convert the hit into a critical hit.' },
       { level: 3, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype (or forgo it for an extra Procedural Memory use).' },
       { level: 5, name: 'Ghost', desc: 'Advantage on initiative. If you act first in combat, gain 1 extra action on turn 1 and advantage on all attack rolls until end of turn.' },
-      { level: 6, name: 'Efficient Killer', desc: 'Hitting a target within 20 ft with a melee or ranged weapon lets you repeat the attack on the same target as part of the same action if previous hit.' },
+      { level: 6, name: 'Efficient Killer', desc: 'Hitting a target within 20 ft with a melee or ranged weapon lets you repeat the attack on the same target as part of the same action if previous hit. If hits do the third attack.' },
       { level: 7, name: 'Archetype Feature', desc: 'Gain a feature from your chosen Archetype.' },
       { level: 9, name: 'Most Dangerous Prey', desc: 'When attacking with a 1-handed small arm or melee weapon with advantage, from cover, or vs surprised target: step up weapon damage die by 1 rank (d4->d6->d8->d10->d12).' },
       { level: 10, name: 'Crippling Effect', desc: 'Score critical hits on a natural 19 or 20 with 1-handed small arms and 1-handed melee weapons.' },
