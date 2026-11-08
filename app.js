@@ -36,33 +36,50 @@ function exportActiveCharacter() {
 
 function importCharacter(e) {
   const file = e.target.files && e.target.files[0];
-  e.target.value = ''; // allow re-importing same file
-
   if (!file) return;
 
   const reader = new FileReader();
+
+  reader.onerror = function() {
+    alert('Failed to read the file from your device.');
+  };
+
   reader.onload = function (evt) {
     try {
-      const parsed = JSON.parse(evt.target.result);
+      const content = evt.target.result;
+      if (!content) {
+        alert('File is empty.');
+        return;
+      }
 
+      const parsed = JSON.parse(content);
       let incoming = null;
-      if (parsed && parsed.type === 'um5_character' && parsed.character) {
+
+      // 1. Wrapped format { type: 'um5_character', character: {...} }
+      if (parsed && parsed.character && typeof parsed.character === 'object') {
         incoming = parsed.character;
-      } else if (parsed && typeof parsed === 'object' && !Array.isArray(parsed) && parsed.name !== undefined) {
+      } 
+      // 2. Direct character object { name: '...', str: 10, ... }
+      else if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
         incoming = parsed;
-      } else if (Array.isArray(parsed) && parsed.length === 1) {
+      } 
+      // 3. Array backup [ {...} ]
+      else if (Array.isArray(parsed) && parsed.length > 0) {
         incoming = parsed[0];
-      } else {
-        alert('Invalid character file. Export a single character backup and try again.');
+      }
+
+      if (!incoming || typeof incoming !== 'object') {
+        alert('Could not find valid character data in this JSON file.');
         return;
       }
 
       const clone = JSON.parse(JSON.stringify(incoming));
 
-      // Always append as a NEW operative
+      // Generate fresh unique ID so it appends as a new operative
       clone.id = 'c_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
 
-      if (!clone.weapons) clone.weapons = [emptyWeapon()];
+      // Ensure required arrays/objects exist
+      if (!clone.weapons || !Array.isArray(clone.weapons)) clone.weapons = [emptyWeapon()];
       if (!clone.skills) clone.skills = {};
       if (!clone.saveProfs) clone.saveProfs = {};
       if (!clone.unlockedPaths) clone.unlockedPaths = [];
@@ -70,20 +87,24 @@ function importCharacter(e) {
       if (!clone.riverSpells) clone.riverSpells = [];
       if (!clone.classChoices) clone.classChoices = {};
 
-      const label = clone.name || 'Unnamed';
-      if (!confirm(`Import "${label}" and add to your roster?`)) return;
-
+      // Append to operative roster
       chars.push(clone);
       activeId = clone.id;
+
       saveStorage();
       loadToForm(clone);
       renderRoster();
-      alert(`Imported "${label}" successfully.`);
+
+      alert(`Imported "${clone.name || 'Unnamed Operative'}" successfully!`);
     } catch (err) {
-      alert('Error reading character file: ' + err.message);
+      alert('Error parsing character file: ' + err.message);
     }
   };
+
   reader.readAsText(file);
+
+  // Reset input AFTER starting the read operation
+  e.target.value = '';
 }
 
 async function requestPersistentStorage() {
@@ -1045,11 +1066,17 @@ document.addEventListener('DOMContentLoaded', () => {
     createChar();
   }
 
-  if ($('btn-export')) $('btn-export').addEventListener('click', exportActiveCharacter);
-  if ($('btn-import')) $('btn-import').addEventListener('click', () => {
-  if ($('import-file-input')) $('import-file-input').click();
-  });
-  if ($('import-file-input')) $('import-file-input').addEventListener('change', importCharacter);
+    // Import & Export Listeners
+  const btnExport = $('btn-export');
+  const btnImport = $('btn-import');
+  const inputImport = $('import-file-input');
+
+  if (btnExport) btnExport.onclick = exportActiveCharacter;
+
+  if (btnImport && inputImport) {
+    btnImport.onclick = () => inputImport.click();
+    inputImport.onchange = (e) => importCharacter(e);
+  }
 
   requestPersistentStorage();
   renderRoster();
