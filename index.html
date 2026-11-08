@@ -29,11 +29,18 @@
         <button id="btn-new" class="btn btn-primary">+ New Operative</button>
         <div id="roster"></div>
       </div>
-      <div style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;">
-        <button type="button" class="btn btn-secondary" id="btn-export" style="flex:1; font-size:0.75rem;">Export Character</button>
-        <button type="button" class="btn btn-secondary" id="btn-import" style="flex:1; font-size:0.75rem;">Import Character</button>
-        <input type="file" id="import-file-input" accept=".json" style="display:none;" />
-      </div>
+      <!-- Export / Import Buttons -->
+  <div style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;">
+    <button type="button" class="btn btn-secondary" id="btn-export" style="flex:1; font-size:0.75rem;">Export Character</button>
+    <button type="button" class="btn btn-secondary" id="btn-import" style="flex:1; font-size:0.75rem;">Import Character</button>
+    <input type="file" id="import-file-input" accept=".json" style="display:none;" />
+  </div>
+
+  <!-- PASTE THE STORAGE NOTE HERE -->
+  <div style="font-size:0.72rem; color:var(--muted); margin-top:10px; padding-top:8px; border-top:1px solid var(--border); line-height:1.35;">
+    🔒 <strong>Storage & Privacy:</strong> This page uses your browser/device storage to remember your operatives even after you refresh. Your characters are stored privately on your device only—not on a server. Export/backup your operatives often to avoid losing data if you clear your browser cache!
+  </div>
+</div>
     </section>
 
     <!-- TAB 2: CORE (REDESIGNED VITAL & STAT BLOCKS) -->
