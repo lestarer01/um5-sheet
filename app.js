@@ -571,31 +571,36 @@ function renderMagic() {
     }
   }
 
-  // ASSET RULE: Currency system with retroactive Level/Vigor deposits
+    // ASSET RULE: Leftover Assets + (Vigor Mod * Level difference)
   const c = getActiveChar();
   if (c) {
     const expectedLifetime = Math.max(0, vigorMod * lvl);
     let needSave = false;
-    
-    // If this is the first time the character accesses magic
-    if (c.lifetimeAssetsEarned === undefined) {
+
+    // Uninitialized character (first setup)
+    if (c.lifetimeAssetsEarned === undefined || c.lifetimeAssetsEarned === null) {
       c.lifetimeAssetsEarned = expectedLifetime;
       if (c.assets === undefined || c.assets === null || c.assets === '') {
         c.assets = expectedLifetime;
       }
       needSave = true;
-    } 
-    // If they leveled up or Vigor changed, calculate the difference and deposit it
-    else {
+    } else {
+      // Character already initialized: deposit the difference when Level or Vigor increases
       const diff = expectedLifetime - c.lifetimeAssetsEarned;
-      if (diff !== 0) {
-        c.assets = Math.max(0, (parseInt(c.assets, 10) || 0) + diff);
+      if (diff > 0) {
+        const currentLeftover = parseInt(c.assets, 10) || 0;
+        c.assets = currentLeftover + diff;
+        c.lifetimeAssetsEarned = expectedLifetime;
+        needSave = true;
+      } else if (diff < 0) {
         c.lifetimeAssetsEarned = expectedLifetime;
         needSave = true;
       }
     }
-    
-    if ($('m-assets')) $('m-assets').value = c.assets;
+
+    if ($('m-assets')) {
+      $('m-assets').value = (c.assets !== null && c.assets !== undefined) ? c.assets : 0;
+    }
     if (needSave) saveStorage();
   }
 
@@ -663,8 +668,8 @@ function blankChar() {
     weapons: [emptyWeapon()],
     credits: 500, inventory: '', skills: {}, ladderTaken: null, classChoices: {}, featNotes: '',
     mpMax: 0, mpCur: 0, spellDc: 10, spellAtk: 0, magicSource: '', spellList: '',
-    // New Dark Magic Fields
-    vesselCur: 0, vesselMax: 0, assets: 0, exhaustion: 0,
+        // Dark Magic Fields
+    vesselCur: 0, vesselMax: 0, assets: null, lifetimeAssetsEarned: null, exhaustion: 0,
     unlockedPaths: [],
     knownSpells: [],
     riverSpells: []
@@ -746,7 +751,7 @@ function loadToForm(c) {
   
   val('m-vessel-cur', c.vesselCur || 0);
   val('m-vessel-max', c.vesselMax || 0);
-  val('m-assets', c.assets || 0);
+  val('m-assets', (c.assets !== undefined && c.assets !== null) ? c.assets : 0);
   val('m-exhaustion', c.exhaustion || 0);
 
   if (!c.unlockedPaths) c.unlockedPaths = [];
