@@ -124,7 +124,7 @@ const UM5_SKILLS = [
   { name: 'Sciences', stat: 'int' },
   { name: 'Sleight of Hand', stat: 'dex' },
   { name: 'Stealth', stat: 'dex' },
-  { name: 'Survival', stat: 'dex' }
+  { name: 'Survival', stat: 'wis' }
 ];
 
 const STORAGE_KEY = 'um5_chars_v5';
