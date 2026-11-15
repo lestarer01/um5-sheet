@@ -571,44 +571,13 @@ function renderMagic() {
     }
   }
 
-    // ASSET RULE: Leftover Assets + (Vigor Mod * Level difference)
-  const c = getActiveChar();
-  if (c) {
-    const expectedLifetime = Math.max(0, vigorMod * lvl);
-    let needSave = false;
+  // Assets are now completely handled safely by saveCurrent()
 
-    // Uninitialized character (first setup)
-    if (c.lifetimeAssetsEarned === undefined || c.lifetimeAssetsEarned === null) {
-      c.lifetimeAssetsEarned = expectedLifetime;
-      if (c.assets === undefined || c.assets === null || c.assets === '') {
-        c.assets = expectedLifetime;
-      }
-      needSave = true;
-    } else {
-      // Character already initialized: deposit the difference when Level or Vigor increases
-      const diff = expectedLifetime - c.lifetimeAssetsEarned;
-      if (diff > 0) {
-        const currentLeftover = parseInt(c.assets, 10) || 0;
-        c.assets = currentLeftover + diff;
-        c.lifetimeAssetsEarned = expectedLifetime;
-        needSave = true;
-      } else if (diff < 0) {
-        c.lifetimeAssetsEarned = expectedLifetime;
-        needSave = true;
-      }
-    }
-
-    if ($('m-assets')) {
-      $('m-assets').value = (c.assets !== null && c.assets !== undefined) ? c.assets : 0;
-    }
-    if (needSave) saveStorage();
-  }
-
-  // Render the new magic UI pieces
   renderRiverSlots(riverMax);
   renderKnownSpells();
   renderDarkSequence();
 }
+
 
 function applyArmor() {
   const key = val('armor-preset');
@@ -690,8 +659,34 @@ function saveCurrent() {
   const c = chars.find(x => x.id === activeId);
   if (!c) return;
 
+  // --- 1. ASSET DELTA PAYCHECK LOGIC ---
+  const oldLvl = parseInt(c.lvl, 10) || 1;
+  const newLvl = parseInt(val('c-lvl'), 10) || 1;
+  const vigor = parseInt(val('s-vig'), 10) || 10;
+  const vigMod = Math.floor((vigor - 10) / 2);
+  
+  let currentAssets = parseInt(val('m-assets'), 10);
+  if (isNaN(currentAssets)) currentAssets = 0;
+
+  // A. Initialize fresh characters with their base starting assets
+  if (c.assets === null || c.assets === undefined || c.assets === '') {
+      if (vigMod > 0) {
+          val('m-assets', vigMod * newLvl);
+      } else {
+          val('m-assets', 0);
+      }
+  } 
+  // B. If level increased, add the difference (the paycheck) to the leftover balance
+  else if (newLvl > oldLvl) {
+    if (vigMod > 0) {
+      const levelDiff = newLvl - oldLvl;
+      val('m-assets', currentAssets + (levelDiff * vigMod));
+    }
+  }
+  // -------------------------------------
+
   c.name = val('c-name'); c.species = val('c-species'); c.arch = val('c-arch'); c.background = val('c-background');
-  c.ladder = val('c-ladder'); c.className = val('c-class'); c.lvl = val('c-lvl');
+  c.ladder = val('c-ladder'); c.className = val('c-class'); c.lvl = newLvl;
   
   c.str = val('s-str'); c.dex = val('s-dex'); c.con = val('s-con'); c.int = val('s-int'); c.wis = val('s-wis'); c.cha = val('s-cha'); c.vig = val('s-vig');
   c.saveProfs = { str: val('svS-str'), dex: val('svS-dex'), con: val('svS-con'), int: val('svS-int'), wis: val('svS-wis'), cha: val('svS-cha'), vig: val('svS-vig') };
@@ -710,11 +705,10 @@ function saveCurrent() {
 
   c.vesselCur = val('m-vessel-cur');
   c.vesselMax = val('m-vessel-max');
-  c.assets = val('m-assets');
+  c.assets = val('m-assets'); // Now correctly saves the updated math
   c.exhaustion = val('m-exhaustion');
 
-  
-if (!c.unlockedPaths) c.unlockedPaths = [];
+  if (!c.unlockedPaths) c.unlockedPaths = [];
   if (!c.knownSpells) c.knownSpells = [];
   if (!c.riverSpells) c.riverSpells = [];
   
