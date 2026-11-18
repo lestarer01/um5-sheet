@@ -638,7 +638,7 @@ function blankChar() {
     credits: 500, inventory: '', skills: {}, ladderTaken: null, classChoices: {}, featNotes: '',
     mpMax: 0, mpCur: 0, spellDc: 10, spellAtk: 0, magicSource: '', spellList: '',
         // Dark Magic Fields
-    vesselCur: 0, vesselMax: 0, assets: null, lifetimeAssetsEarned: null, exhaustion: 0,
+    vesselCur: 0, vesselMax: 0, assets: null, assetsPaidThroughLevel: null, exhaustion: 0,
     unlockedPaths: [],
     knownSpells: [],
     riverSpells: []
@@ -659,38 +659,48 @@ function saveCurrent() {
   const c = chars.find(x => x.id === activeId);
   if (!c) return;
 
-  // --- 1. ASSET DELTA PAYCHECK LOGIC ---
-  const oldLvl = parseInt(c.lvl, 10) || 1;
   const newLvl = parseInt(val('c-lvl'), 10) || 1;
-  const vigor = parseInt(val('s-vig'), 10) || 10;
-  const vigMod = Math.floor((vigor - 10) / 2);
-  
-  let currentAssets = parseInt(val('m-assets'), 10);
-  if (isNaN(currentAssets)) currentAssets = 0;
+  const vigScore = parseInt(val('s-vig'), 10) || 10;
+  const vigMod = Math.max(0, Math.floor((vigScore - 10) / 2));
 
-  // A. Initialize fresh characters with their base starting assets
-  if (c.assets === null || c.assets === undefined || c.assets === '') {
-      if (vigMod > 0) {
-          val('m-assets', vigMod * newLvl);
-      } else {
-          val('m-assets', 0);
-      }
-  } 
-  // B. If level increased, add the difference (the paycheck) to the leftover balance
-  else if (newLvl > oldLvl) {
-    if (vigMod > 0) {
-      const levelDiff = newLvl - oldLvl;
-      val('m-assets', currentAssets + (levelDiff * vigMod));
-    }
+  // ---- ASSETS: paycheck on level-up only ----
+  // assetsPaidThroughLevel = highest level we've already paid for.
+  // On first load of an existing char, lock it to the CURRENT level
+  // so we do NOT retroactively dump a full lifetime payout.
+  if (c.assetsPaidThroughLevel === undefined || c.assetsPaidThroughLevel === null) {
+    c.assetsPaidThroughLevel = parseInt(c.lvl, 10) || newLvl;
   }
-  // -------------------------------------
+
+  // Brand-new character (assets never initialized)
+  if (c.assets === null || c.assets === undefined || c.assets === '') {
+    const starting = vigMod * newLvl;
+    val('m-assets', starting);
+    c.assets = starting;
+    c.assetsPaidThroughLevel = newLvl;
+  }
+  // Real level-up: add vigorMod once per gained level to whatever is left
+  else if (newLvl > c.assetsPaidThroughLevel) {
+    const levelsGained = newLvl - c.assetsPaidThroughLevel;
+    const gain = levelsGained * vigMod;
+    const current = parseInt(val('m-assets'), 10) || 0;
+    const next = current + gain;
+    val('m-assets', next);
+    c.assets = next;
+    c.assetsPaidThroughLevel = newLvl;
+  }
+  // Manual edit or any other field change: trust the input box
+  else {
+    const manual = parseInt(val('m-assets'), 10);
+    c.assets = isNaN(manual) ? 0 : Math.max(0, manual);
+  }
+  // ---- end assets ----
 
   c.name = val('c-name'); c.species = val('c-species'); c.arch = val('c-arch'); c.background = val('c-background');
   c.ladder = val('c-ladder'); c.className = val('c-class'); c.lvl = newLvl;
-  
+
   c.str = val('s-str'); c.dex = val('s-dex'); c.con = val('s-con'); c.int = val('s-int'); c.wis = val('s-wis'); c.cha = val('s-cha'); c.vig = val('s-vig');
   c.saveProfs = { str: val('svS-str'), dex: val('svS-dex'), con: val('svS-con'), int: val('svS-int'), wis: val('svS-wis'), cha: val('svS-cha'), vig: val('svS-vig') };
-  
+
   c.hpMax = val('hp-max'); c.hpCur = val('hp-cur'); c.hpTemp = val('hp-temp');
   c.hd = val('hd-val'); c.ac = val('ac-val'); c.spd = val('spd-val'); c.init = val('init-val');
   c.dsS = [val('ds-s1'), val('ds-s2'), val('ds-s3')]; c.dsF = [val('ds-f1'), val('ds-f2'), val('ds-f3')];
@@ -699,24 +709,26 @@ function saveCurrent() {
   c.credits = val('credits'); c.inventory = val('inventory');
 
   UM5_SKILLS.forEach((_, i) => { c.skills['p'+i] = val('sk-p-'+i); c.skills['e'+i] = val('sk-e-'+i); });
-  
+
   c.featNotes = val('feat-notes'); c.mpMax = val('mp-max'); c.mpCur = val('mp-cur');
   c.spellDc = val('spell-dc'); c.spellAtk = val('spell-atk'); c.magicSource = val('magic-source'); c.spellList = val('spell-list');
 
   c.vesselCur = val('m-vessel-cur');
   c.vesselMax = val('m-vessel-max');
-  c.assets = val('m-assets'); // Now correctly saves the updated math
+  // c.assets already set above — do not overwrite from a formula
   c.exhaustion = val('m-exhaustion');
 
   if (!c.unlockedPaths) c.unlockedPaths = [];
   if (!c.knownSpells) c.knownSpells = [];
   if (!c.riverSpells) c.riverSpells = [];
-  
+
   saveStorage();
   recalc();
   renderRoster();
 }
 
+
+   
 function loadToForm(c) {
   if (!c) return;
   activeId = c.id;
